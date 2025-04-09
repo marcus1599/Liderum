@@ -23,8 +23,11 @@ public class MemberServiceImpl implements MemberService {
 
     @Override
 public MemberResponseDTO create(MemberRequestDTO dto) {
-    Team team = teamRepository.findById(dto.getTeamId())
-            .orElseThrow(() -> new TeamNotFoundException("Team with ID " + dto.getTeamId() + " not found."));
+    Team team = null;
+    if (dto.getTeamId() != null) {
+        team = teamRepository.findById(dto.getTeamId())
+            .orElseThrow(() -> new RuntimeException("Team not found"));
+    }
 
     Member member = Member.builder()
             .nickname(dto.getNickname())

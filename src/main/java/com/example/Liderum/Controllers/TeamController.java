@@ -44,4 +44,18 @@ public class TeamController {
         teamService.delete(id);
         return ResponseEntity.noContent().build();
     }
+    @PutMapping("/{teamId}/add-member/{memberId}")
+    @Operation(summary = "Adicionar um membro a uma equipe")
+public ResponseEntity<Void> addMemberToTeam(@PathVariable Long teamId, @PathVariable Long memberId) {
+    teamService.addMemberToTeam(teamId, memberId);
+    return ResponseEntity.ok().build();
+}
+
+@PutMapping("/{teamId}/remove-member/{memberId}")
+@Operation(summary = "Remover um membro de uma equipe")
+public ResponseEntity<Void> removeMemberFromTeam(@PathVariable Long teamId, @PathVariable Long memberId) {
+    teamService.removeMemberFromTeam(teamId, memberId);
+    return ResponseEntity.ok().build();
+}
+
 }

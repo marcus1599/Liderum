@@ -30,6 +30,6 @@ public class MemberRequestDTO {
     @NotNull(message = "Class is required")
     private Classe classe;
 
-    @NotNull(message = "Team ID is required")
+
     private Long teamId;
 }

@@ -10,4 +10,7 @@ public interface TeamService {
     List<TeamResponseDTO> findAll();
     TeamResponseDTO findById(Long id);
     void delete(Long id);
+    void addMemberToTeam(Long teamId, Long memberId);
+    void removeMemberFromTeam(Long teamId, Long memberId);
+
 }
