@@ -9,7 +9,7 @@ import com.example.Liderum.dto.MemberResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.example.Liderum.exceptions.MemberNotFoundException;
-import com.example.Liderum.exceptions.TeamNotFoundException;
+
 
 import java.util.List;
 import java.util.stream.Collectors;

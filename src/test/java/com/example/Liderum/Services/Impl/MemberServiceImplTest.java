@@ -8,7 +8,7 @@ import com.example.Liderum.Repository.MemberRepository;
 import com.example.Liderum.Repository.TeamRepository;
 import com.example.Liderum.dto.MemberRequestDTO;
 import com.example.Liderum.dto.MemberResponseDTO;
-import org.junit.jupiter.api.BeforeEach;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;

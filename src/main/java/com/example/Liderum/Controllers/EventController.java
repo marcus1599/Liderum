@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -21,6 +22,7 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Criar novo evento")
     public ResponseEntity<EventResponseDTO> create(@RequestBody @Valid EventRequestDTO dto) {
         EventResponseDTO created = eventService.create(dto);
@@ -40,6 +42,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Atualizar evento")
     public ResponseEntity<EventResponseDTO> update(@PathVariable Long id,
                                                    @RequestBody @Valid EventRequestDTO dto) {
@@ -47,6 +50,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
+      @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Deletar evento")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         eventService.delete(id);

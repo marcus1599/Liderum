@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class MemberController {
 
    
     @PostMapping
+    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
     public ResponseEntity<MemberResponseDTO> create(@RequestBody @Valid MemberRequestDTO dto) {
     return ResponseEntity.ok(memberService.create(dto));
     }
@@ -37,6 +39,7 @@ public class MemberController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         memberService.delete(id);
         return ResponseEntity.noContent().build();
