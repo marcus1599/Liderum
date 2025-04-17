@@ -8,6 +8,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from './auth.service';
 
 import { Router } from '@angular/router';
+import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -18,7 +19,10 @@ import { Router } from '@angular/router';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressSpinner
+    
+  
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
