@@ -1,0 +1,24 @@
+<mat-sidenav-container style="height: 100vh;">
+    <mat-sidenav mode="side" opened>
+      <h3 style="margin: 1rem;">Menu</h3>
+      <button mat-button routerLink="/dashboard">Dashboard</button>
+      <!-- Mais links aqui futuramente -->
+      <button mat-button (click)="logout()">Sair</button>
+    </mat-sidenav>
+  
+    <mat-sidenav-content>
+      <mat-toolbar color="primary">
+        <span>Liderum</span>
+        <span class="spacer"></span>
+        <button mat-icon-button (click)="logout()">
+          <mat-icon>logout</mat-icon>
+        </button>
+      </mat-toolbar>
+  
+      <div class="content">
+        <h1>Bem-vindo ao Dashboard!</h1>
+        <p>Visual bonito, organizado e funcional ✨</p>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+  
