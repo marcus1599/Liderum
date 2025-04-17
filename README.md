@@ -1,19 +1,3 @@
-## 📄 Como Criar e Adicionar o `README.md` no Windows
-
-1. **Abra o Explorador de Arquivos**  
-   Navegue até a pasta raiz do seu projeto `liderum`.
-
-2. **Crie o Arquivo `README.md`**  
-   - Clique com o botão direito → Novo → Documento de Texto.  
-   - Renomeie `Novo documento de texto.txt` para `README.md`.
-
-3. **Abra o `README.md` no seu Editor**  
-   - No Visual Studio Code (ou similar), abra a pasta `liderum` e dê um duplo‑clique em `README.md`.
-
-4. **Cole o Conteúdo Markdown**  
-   Copie todo o conteúdo abaixo e cole dentro do `README.md`:
-
-   ```md
    # 🎮 Liderum
 
    ## 🚀 Descrição
