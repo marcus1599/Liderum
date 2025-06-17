@@ -9,7 +9,7 @@ export const AuthInterceptor: HttpInterceptorFn = (
   next: HttpHandlerFn
 ): Observable<HttpEvent<any>> => {
   const authService = inject(AuthService);
-  const token = authService.getToken(); // ou como for seu método
+  const token = authService.getToken();
 
   const authReq = token
     ? req.clone({

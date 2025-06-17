@@ -1,7 +1,11 @@
 package com.example.Liderum.Security;
 
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -12,8 +16,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
-import java.io.IOException;
+import lombok.RequiredArgsConstructor;
 
 @Component
 @RequiredArgsConstructor
@@ -23,36 +26,43 @@ public class JwtFilter extends OncePerRequestFilter {
     private final UserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request,
-                                    HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
-        String jwt = null;
-        String username = null;
+        String header = request.getHeader("Authorization");
+        System.out.println("Authorization Header: " + header);
 
-        try {
-            if (authHeader != null && authHeader.startsWith("Bearer ")) {
-                jwt = authHeader.substring(7);
+        if (header != null && header.startsWith("Bearer ")) {
+            String token = header.substring(7);
+            System.out.println("Token recebido: " + token);
 
-                if (jwtUtil.validateToken(jwt)) {
-                    username = jwtUtil.extractUsername(jwt);
-                }
-            }
+            boolean valido = jwtUtil.validateToken(token);
+            System.out.println("Token válido? " + valido);
 
-            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (valido) {
+                String username = jwtUtil.extractUsername(token);
+                System.out.println("Username extraído: " + username);
+
+                // Extrai as roles do token
+                List<String> roles = jwtUtil.extractRoles(token);
+                System.out.println("Roles extraídas: " + roles);
+
+                // Mapeia as roles para SimpleGrantedAuthority com prefixo ROLE_
+                var authorities = roles.stream()
+                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                        .collect(Collectors.toList());
+
                 var userDetails = userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities()
-                );
+                var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+                authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
-                authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                // Configura o contexto de segurança do Spring
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+                System.out.println("Usuário autenticado no contexto de segurança");
             }
-
-        } catch (Exception e) {
-            logger.error("JWT authentication failed: {}", e);
+        } else {
+            System.out.println("Token não encontrado ou não começa com Bearer");
         }
 
         filterChain.doFilter(request, response);

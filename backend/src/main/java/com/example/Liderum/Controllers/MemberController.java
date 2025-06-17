@@ -22,21 +22,30 @@ public class MemberController {
     private final MemberService memberService;
 
    
+    
+    @GetMapping
+    public ResponseEntity<List<MemberResponseDTO>> findAll() {
+        return ResponseEntity.ok(memberService.findAll());
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
     public ResponseEntity<MemberResponseDTO> create(@RequestBody @Valid MemberRequestDTO dto) {
     return ResponseEntity.ok(memberService.create(dto));
     }
 
-    @GetMapping
-    public ResponseEntity<List<MemberResponseDTO>> findAll() {
-        return ResponseEntity.ok(memberService.findAll());
-    }
 
     @GetMapping("/{id}")
     public ResponseEntity<MemberResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(memberService.findById(id));
     }
+    @PutMapping("/{id}")
+@PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+public ResponseEntity<MemberResponseDTO> updateMember(@PathVariable Long id, @RequestBody @Valid MemberRequestDTO dto) {
+    MemberResponseDTO updated = memberService.update(id, dto);
+    return ResponseEntity.ok(updated);
+}
+
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")

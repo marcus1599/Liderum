@@ -41,6 +41,24 @@ public MemberResponseDTO create(MemberRequestDTO dto) {
     Member saved = memberRepository.save(member);
     return toDTO(saved);
 }
+public MemberResponseDTO update(Long id, MemberRequestDTO dto) {
+    Member existing = memberRepository.findById(id)
+        .orElseThrow(() -> new RuntimeException("Membro não encontrado com ID: " + id));
+
+  
+    existing.setNickname(dto.getNickname());
+    existing.setPhone(dto.getPhone());
+    existing.setClasse(dto.getClasse());
+    existing.setGuildRole(dto.getGuildRole());
+    existing.setRank(dto.getRank());
+
+   
+  // existing.setTeam(teamRepository.findById(dto.getTeamId()).orElseThrow(...));
+
+    Member updated = memberRepository.save(existing);
+    return toDTO(updated);
+}
+
 
 
     @Override
