@@ -1,17 +1,41 @@
 <mat-card>
   <mat-card-title>{{ isEditing ? 'Editar Membro' : 'Novo Membro' }}</mat-card-title>
   <mat-card-content>
-    <form (ngSubmit)="saveMember()">
-      <input [(ngModel)]="newMember.nickname" name="nickname" placeholder="Nickname" required />
-      <input [(ngModel)]="newMember.phone" name="phone" placeholder="Telefone" required />
-      <input [(ngModel)]="newMember.guildRole" name="guildRole" placeholder="Cargo" required />
-      <input [(ngModel)]="newMember.rank" name="rank" placeholder="Rank" required />
-      <input [(ngModel)]="newMember.classe" name="classe" placeholder="Classe" required />
-
-      <button mat-raised-button color="primary" type="submit">
-        {{ isEditing ? 'Atualizar' : 'Adicionar' }}
-      </button>
-      <button mat-button type="button" (click)="resetForm()">Cancelar</button>
+    <form (ngSubmit)="saveMember()" class="member-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Nickname</mat-label>
+        <input matInput [(ngModel)]="newMember.nickname" name="nickname" required />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Telefone</mat-label>
+        <input matInput [(ngModel)]="newMember.phone" name="phone" required />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Cargo</mat-label>
+        <mat-select [(ngModel)]="newMember.guildRole" name="guildRole" required>
+          <mat-option *ngFor="let role of guildRoles" [value]="role">{{
+            role
+          }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Rank</mat-label>
+        <mat-select [(ngModel)]="newMember.rank" name="rank" required>
+          <mat-option *ngFor="let r of ranks" [value]="r">{{ r }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Classe</mat-label>
+        <mat-select [(ngModel)]="newMember.classe" name="classe" required>
+          <mat-option *ngFor="let c of classes" [value]="c">{{ c }}</mat-option>
+        </mat-select>
+      </mat-form-field>
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit">
+          {{ isEditing ? 'Atualizar' : 'Adicionar' }}
+        </button>
+        <button mat-button type="button" (click)="resetForm()">Cancelar</button>
+      </div>
     </form>
   </mat-card-content>
 </mat-card>
@@ -20,17 +44,26 @@
   <mat-card-title>Lista de Membros</mat-card-title>
   <mat-card-content>
     <table mat-table [dataSource]="members" class="mat-elevation-z8">
-
       <ng-container matColumnDef="nickname">
         <th mat-header-cell *matHeaderCellDef> Nickname </th>
         <td mat-cell *matCellDef="let member"> {{ member.nickname }} </td>
       </ng-container>
-
+      <ng-container matColumnDef="phone">
+        <th mat-header-cell *matHeaderCellDef> Telefone </th>
+        <td mat-cell *matCellDef="let member"> {{ member.phone }} </td>
+      </ng-container>
       <ng-container matColumnDef="guildRole">
         <th mat-header-cell *matHeaderCellDef> Cargo </th>
         <td mat-cell *matCellDef="let member"> {{ member.guildRole }} </td>
       </ng-container>
-
+      <ng-container matColumnDef="rank">
+        <th mat-header-cell *matHeaderCellDef> Rank </th>
+        <td mat-cell *matCellDef="let member"> {{ member.rank }} </td>
+      </ng-container>
+      <ng-container matColumnDef="classe">
+        <th mat-header-cell *matHeaderCellDef> Classe </th>
+        <td mat-cell *matCellDef="let member"> {{ member.classe }} </td>
+      </ng-container>
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef> Ações </th>
         <td mat-cell *matCellDef="let member">
@@ -38,7 +71,6 @@
           <button mat-button color="warn" (click)="deleteMember(member.id)">Excluir</button>
         </td>
       </ng-container>
-
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>

@@ -6,8 +6,11 @@ import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { HttpClientModule } from '@angular/common/http';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatSelectModule } from '@angular/material/select';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 
 @Component({
   selector: 'app-members',
@@ -18,13 +21,17 @@ import { CommonModule } from '@angular/common';
     MatCardModule,
     HttpClientModule,
     FormsModule,
-    CommonModule
+    ReactiveFormsModule,
+    CommonModule,
+    MatSelectModule,
+    MatFormFieldModule,
+    MatInputModule
   ],
   styleUrls: ['./members.component.scss']
 })
 export class MembersComponent implements OnInit {
   members: Member[] = [];  
-  displayedColumns: string[] = ['nickname', 'guildRole', 'actions'];  
+  displayedColumns: string[] = ['nickname', 'phone', 'guildRole', 'rank', 'classe', 'actions'];  
 
   newMember: Member = {
     id: 0,
@@ -36,6 +43,13 @@ export class MembersComponent implements OnInit {
   };
 
   isEditing: boolean = false;
+
+  guildRoles: string[] = ['SOLDADO', 'CAPITÃO', 'MAIOR', 'GENERAL', 'MARECHAL'];
+  ranks: string[] = ['C', 'B', 'A', 'S'];
+  classes: string[] = [
+    'GUERREIRO', 'MAGO', 'ATIRADORA', 'SACERDOTE', 'ARQUEIRO', 'PALADINO',
+    'BARBARO', 'FEITICEIRA', 'MACACO', 'MERCENARIO', 'ESPIRITUALISTA', 'MISTICO', 'ARCANO'
+  ];
 
   constructor(private memberService: MemberService) { }
 
