@@ -1,0 +1,124 @@
+@media (max-width: 900px) {
+  .event-form {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  mat-form-field {
+    min-width: 100%;
+    width: 100%;
+  }
+  .form-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    align-items: stretch;
+  }
+  table {
+    font-size: 0.98rem;
+  }
+}
+
+@media (max-width: 600px) {
+  mat-card {
+    padding: 8px !important;
+    border-radius: 8px;
+  }
+  mat-card-title {
+    font-size: 1rem;
+  }
+  .event-form {
+    gap: 4px;
+  }
+  mat-form-field {
+    min-width: 100%;
+    width: 100%;
+    font-size: 0.95rem;
+  }
+  .form-actions button {
+    font-size: 0.95rem;
+    padding: 8px 0;
+  }
+  table {
+    font-size: 0.93rem;
+  }
+}
+
+.events-container {
+  padding: 16px;
+}
+
+.event-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+mat-form-field {
+  flex: 1 1 180px;
+  min-width: 160px;
+  margin-bottom: 8px;
+  background: white;
+  border-radius: 6px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 5px;
+}
+
+mat-card {
+  background: #363a41;
+  color: #fff;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0002;
+}
+
+mat-card-title {
+  color: #B89EB8;
+  font-weight: bold;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+th, td {
+  padding: 8px 12px;
+  text-align: left;
+}
+
+th {
+  color: #B89EB8;
+  font-weight: bold;
+}
+
+tr {
+  border-bottom: 1px solid #444;
+}
+
+button[mat-raised-button], button[mat-button] {
+  border-radius: 6px;
+}
+
+button[mat-raised-button] {
+  background: #B89EB8;
+  color: #363a41;
+  font-weight: bold;
+}
+
+button[mat-raised-button]:hover {
+  background: #a07ca0;
+}
+
+button[mat-button] {
+  color: #B89EB8;
+}
+
+button[mat-button]:hover {
+  background: #4a4e56;
+}

@@ -44,7 +44,7 @@ export class MembersComponent implements OnInit {
 
   isEditing: boolean = false;
 
-  guildRoles: string[] = ['SOLDADO', 'CAPITÃO', 'MAIOR', 'GENERAL', 'MARECHAL'];
+  guildRoles: string[] = ['SOLDADO', 'CAPITÃO', 'MAJOR', 'GENERAL', 'MARECHAL'];
   ranks: string[] = ['C', 'B', 'A', 'S'];
   classes: string[] = [
     'GUERREIRO', 'MAGO', 'ATIRADORA', 'SACERDOTE', 'ARQUEIRO', 'PALADINO',

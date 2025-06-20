@@ -11,41 +11,12 @@ mat-form-field {
   margin-bottom: 8px;
   background: white;
   border-radius: 6px;
-}
-
-mat-form-field input, mat-form-field.mat-form-field-type-mat-input input {
-  background: white !important;
-  color: #363a41 !important;
-}
-
-mat-form-field.mat-form-field-type-mat-select .mat-select-trigger {
-  background: white !important;
-  color: #363a41 !important;
-  border-radius: 6px;
-}
-
-mat-form-field .mat-form-field-label {
-  background: white !important;
-  color: #363a41 !important;
-  padding: 0 4px;
-  border-radius: 4px;
-
-}
-
-mat-select-panel {
-  background: white !important;
-  color: #363a41 !important;
-}
-
-mat-option {
-  color: #363a41 !important;
-}
-
-.form-actions {
-  display: flex;
-  gap: 8px;
+  box-sizing: border-box;
   width: 100%;
-  margin-top: 8px;
+  padding: 0;
+  min-height: unset;
+  height: 48px;
+  display: block;
 }
 
 mat-card {
@@ -63,6 +34,7 @@ mat-card-title {
   font-size: 1.2rem;
   letter-spacing: 1px;
 }
+
 
 mat-select, mat-input, input {
   color: #363a41 ;
@@ -97,4 +69,84 @@ button[mat-button] {
 
 button[mat-button]:hover {
   background: #4a4e56;
+}
+
+
+
+.mat-form-field-flex {
+  min-height: unset;
+  height: auto;
+  padding: 0;
+  align-items: flex-start;
+  background: white !important;
+  border-radius: 6px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+mat-form-field input, mat-form-field.mat-form-field-type-mat-input input {
+  background: transparent !important;
+  color: #363a41 !important;
+}
+
+mat-form-field.mat-form-field-type-mat-select .mat-select-trigger {
+  background: white !important;
+  color: #363a41 !important;
+  border-radius: 6px;
+}
+
+mat-form-field .mat-form-field-label {
+  line-height: 1.5 !important;
+  font-size: 1rem !important;
+  padding: 0 8px !important;
+  height: auto;
+  display: inline-block;
+  background: white !important;
+  left: 0 !important;
+  margin: 0;
+}
+
+mat-select-panel {
+  background: white !important;
+  color: #363a41 !important;
+}
+
+@media (max-width: 900px) {
+  .member-form {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  mat-form-field {
+    min-width: 100%;
+    width: 100%;
+  }
+  .form-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 600px) {
+  mat-card {
+    padding: 8px !important;
+    border-radius: 8px;
+  }
+  mat-card-title {
+    font-size: 1rem;
+  }
+  .member-form {
+    gap: 4px;
+  }
+  mat-form-field {
+    min-width: 100%;
+    width: 100%;
+    font-size: 0.95rem;
+  }
+  .form-actions button {
+    font-size: 0.95rem;
+    padding: 8px 0;
+  }
 }

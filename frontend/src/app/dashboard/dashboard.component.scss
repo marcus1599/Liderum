@@ -45,12 +45,17 @@ mat-sidenav-content {
   display: flex;
   align-items: center;
   background-color: #4a4e56;
+  color: #fff;
+  box-shadow: 0 2px 8px #0002;
+
   padding: 0 24px;
   flex-wrap: wrap;
+  min-height: 64px;
   .logo {
-    font-size: 1.7rem;
+    font-size: 2rem;
     font-weight: bold;
     letter-spacing: 2px;
+    color: #B89EB8;
     white-space: nowrap;
   }
   .spacer {
@@ -59,20 +64,34 @@ mat-sidenav-content {
   .search-bar {
     width: 200px;
     height: 36px;
-    min-width: 120px;
-    margin-right: 14px;
+    min-width: 180px;
+    margin-right: 16px;
    
-    background: white;
-    border-radius: 4px;
+    background: #fff;
+    border-radius: 6px;
   }
   .header-btn {
     margin-left: 8px;
     margin-top: 8px;
     white-space: nowrap;
+    font-weight: 600;
+    border-radius: 6px;
+    box-shadow: 0 1px 4px #0001;
   }
 }
 
 @media (max-width: 900px) {
+  mat-sidenav {
+    width: 100vw !important;
+    min-width: unset;
+    max-width: 100vw;
+  }
+  mat-sidenav-content {
+    padding: 8px !important;
+  }
+  .content {
+    padding: 0 !important;
+  }
   .dashboard-header {
     flex-direction: column;
     align-items: stretch;
@@ -96,6 +115,17 @@ mat-sidenav-content {
 }
 
 @media (max-width: 600px) {
+  mat-sidenav {
+    width: 100vw !important;
+    min-width: unset;
+    max-width: 100vw;
+  }
+  mat-sidenav-content {
+    padding: 2px !important;
+  }
+  .content {
+    padding: 0 !important;
+  }
   .dashboard-header {
     padding: 6px;
     .logo {

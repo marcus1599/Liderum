@@ -1,1 +1,25 @@
-<p>sidebar works!</p>
+<h3>Menu</h3>
+<button class="menu-btn" (click)="setShowMembers(false)">
+  <mat-icon>dashboard</mat-icon>
+  Dashboard
+</button>
+<button class="menu-btn" (click)="setShowMembers(true)">
+  <mat-icon>group</mat-icon>
+  Members
+</button>
+<button class="menu-btn">
+  <mat-icon>event</mat-icon>
+  Eventos
+</button>
+<button class="menu-btn">
+  <mat-icon>check_circle</mat-icon>
+  Presença
+</button>
+<button class="menu-btn">
+  <mat-icon>settings</mat-icon>
+  Configurações
+</button>
+<button class="menu-btn" (click)="logout()">
+  <mat-icon>logout</mat-icon>
+  Sair
+</button>

@@ -1,24 +1,7 @@
-<mat-toolbar color="primary" class="dashboard-header">
-      <span class="logo">Liderum</span>
-      <span class="spacer"></span>
-      <mat-form-field appearance="outline" class="search-bar">
-        <mat-label>Buscar</mat-label>
-        <input matInput placeholder="Buscar...">
-        <button mat-icon-button matSuffix>
-          <mat-icon>search</mat-icon>
-        </button>
-      </mat-form-field>
-      <button mat-raised-button color="accent" class="header-btn">Criar Evento</button>
-      <button mat-raised-button color="primary" class="header-btn">Novo Membro</button>
-    </mat-toolbar>
+<app-navbar></app-navbar>
 <mat-sidenav-container style="height: 100vh;">
   <mat-sidenav mode="side" opened>
-    <h3>Menu</h3>
-    <button class="menu-btn" (click)="showMembers = false">Dashboard</button>
-    <button class="menu-btn" (click)="showMembers = true">Members</button>
-    <button class="menu-btn">Eventos</button>
-    <!-- Mais links aqui futuramente -->
-    <button class="menu-btn" (click)="logout()">Sair</button>
+    <app-sidebar (showMembersChange)="showMembers = $event; showEvents = !$event" (logoutClick)="logout()"></app-sidebar>
   </mat-sidenav>
 
   <mat-sidenav-content>
@@ -27,7 +10,7 @@
         <app-members></app-members>
       </ng-container>
       <ng-template #eventos>
-        <h1>EVENTOS!</h1>
+        <app-events *ngIf="showEvents"></app-events>
       </ng-template>
     </div>
   </mat-sidenav-content>

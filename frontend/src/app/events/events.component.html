@@ -1,0 +1,53 @@
+<mat-card>
+  <mat-card-title>{{ isEditing ? 'Editar Evento' : 'Novo Evento' }}</mat-card-title>
+  <mat-card-content>
+    <form (ngSubmit)="saveEvent()" class="event-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome</mat-label>
+        <input matInput [(ngModel)]="newEvent.name" name="name" required />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Data</mat-label>
+        <input matInput [(ngModel)]="newEvent.date" name="date" type="date" required />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Descrição</mat-label>
+        <input matInput [(ngModel)]="newEvent.description" name="description" />
+      </mat-form-field>
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit">
+          {{ isEditing ? 'Atualizar' : 'Adicionar' }}
+        </button>
+        <button mat-button type="button" (click)="resetForm()">Cancelar</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-title>Lista de Eventos</mat-card-title>
+  <mat-card-content>
+    <table *ngIf="events.length > 0" class="mat-elevation-z8">
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Data</th>
+          <th>Descrição</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let event of events">
+          <td>{{ event.name }}</td>
+          <td>{{ event.date | date:'shortDate' }}</td>
+          <td>{{ event.description }}</td>
+          <td>
+            <button mat-button color="primary" (click)="editEvent(event)">Editar</button>
+            <button mat-button color="warn" (click)="deleteEvent(event.id)">Excluir</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p *ngIf="events.length === 0">Nenhum evento cadastrado.</p>
+  </mat-card-content>
+</mat-card>
