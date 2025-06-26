@@ -111,6 +111,36 @@ mat-select-panel {
   color: #363a41 !important;
 }
 
+/* Alinha ícone e texto no cabeçalho da tabela de membros */
+.header-icon {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.members-table th.mat-header-cell {
+  vertical-align: middle;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.members-table th.mat-header-cell span.header-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 500;
+  font-size: 1rem;
+}
+
+.members-table mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+  vertical-align: middle;
+}
+
 @media (max-width: 900px) {
   .member-form {
     flex-direction: column;

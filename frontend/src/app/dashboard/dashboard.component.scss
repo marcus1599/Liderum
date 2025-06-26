@@ -80,6 +80,37 @@ mat-sidenav-content {
   }
 }
 
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+.dashboard-card {
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: stretch;
+  align-items: stretch;
+  height: 100%;
+}
+
+.dashboard-card canvas {
+  max-width: 100% !important;
+  max-height: 320px;
+  margin: 0 auto;
+  display: block;
+}
+
+.dashboard-filter {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
 @media (max-width: 900px) {
   mat-sidenav {
     width: 100vw !important;
@@ -111,6 +142,10 @@ mat-sidenav-content {
     .spacer {
       display: none;
     }
+  }
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 

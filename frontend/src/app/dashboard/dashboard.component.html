@@ -14,9 +14,65 @@
   <mat-sidenav-content>
     <div class="content">
       <ng-container *ngIf="showDashboard">
-        <div class="dashboard-welcome">
-          <h2>Bem-vindo ao Dashboard</h2>
-          <p>Aqui você verá relatórios e estatísticas de participação futuramente.</p>
+        <div class="dashboard-grid">
+          <mat-card class="dashboard-card">
+            <mat-card-title><mat-icon>pie_chart</mat-icon> Taxa de Presença Geral</mat-card-title>
+            <mat-card-content>
+              <canvas baseChart
+                [data]="presencePieChartData"
+                [type]="'pie'"
+                [options]="{ responsive: true, plugins: { legend: { position: 'bottom' } } }">
+              </canvas>
+              <div class="dashboard-filter">
+                <mat-form-field appearance="fill" style="width: 180px;">
+                  <mat-label>Últimos eventos</mat-label>
+                  <input matInput type="number" min="1" max="50" [(ngModel)]="eventFilterCount" placeholder="10">
+                </mat-form-field>
+              </div>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="dashboard-card">
+            <mat-card-title><mat-icon>show_chart</mat-icon> Evolução de Presença</mat-card-title>
+            <mat-card-content>
+              <canvas baseChart
+                [data]="presenceLineChartData"
+                [type]="'line'"
+                [options]="{ responsive: true, plugins: { legend: { position: 'bottom' } } }">
+              </canvas>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="dashboard-card">
+            <mat-card-title><mat-icon>group</mat-icon> Distribuição por Classe</mat-card-title>
+            <mat-card-content>
+              <canvas baseChart
+                [data]="classPieChartData"
+                [type]="'pie'"
+                [options]="{ responsive: true, plugins: { legend: { position: 'bottom' } } }">
+              </canvas>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="dashboard-card dashboard-alerts">
+            <mat-card-title><mat-icon color="warn">warning</mat-icon> Alertas Rápidos</mat-card-title>
+            <mat-card-content>
+              <ul>
+                <li><mat-icon color="warn">warning</mat-icon> Membros com faltas consecutivas</li>
+                <li><mat-icon color="warn">person_off</mat-icon> Membros inativos</li>
+              </ul>
+            </mat-card-content>
+          </mat-card>
+
+          <mat-card class="dashboard-card dashboard-highlights">
+            <mat-card-title><mat-icon color="primary">emoji_events</mat-icon> Destaques Positivos</mat-card-title>
+            <mat-card-content>
+              <ul>
+                <li><mat-icon color="primary">star</mat-icon> Membros com 100% de presença</li>
+                <li><mat-icon color="primary">military_tech</mat-icon> Jogador do mês: <b>Arqueiro123</b> com 100% de presença!</li>
+              </ul>
+            </mat-card-content>
+          </mat-card>
         </div>
       </ng-container>
       <ng-container *ngIf="showMembers">
