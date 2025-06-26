@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 public class AdminController {
 
     @GetMapping("/restricted")
-    @PreAuthorize("hasRole('MARSHAL', 'GENERAL', 'MAJOR')")
+    @PreAuthorize("hasRole('MARECHAL', 'GENERAL', 'MAJOR')")
     public String acessoRestrito() {
         return "Acesso concedido ao Staff!";
     }

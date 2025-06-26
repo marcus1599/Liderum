@@ -38,7 +38,7 @@ public class MemberServiceImplTest {
         MemberRequestDTO request = new MemberRequestDTO();
         request.setNickname("Marcus");
         request.setPhone("+5511999999999");
-        request.setGuildRole(GuildRole.MARSHAL);
+        request.setGuildRole(GuildRole.MARECHAL);
         request.setRank("Líder");
         request.setClasse(Classe.GUERREIRO);
         request.setTeamId(1L);
@@ -72,7 +72,7 @@ public class MemberServiceImplTest {
                 .id(1L)
                 .nickname("Marcus")
                 .phone("123")
-                .guildRole(GuildRole.MARSHAL)
+                .guildRole(GuildRole.MARECHAL)
                 .rank("Líder")
                 .classe(Classe.GUERREIRO)
                 .team(team)
@@ -93,7 +93,7 @@ public class MemberServiceImplTest {
                 .id(1L)
                 .nickname("Marcus")
                 .phone("123")
-                .guildRole(GuildRole.MARSHAL)
+                .guildRole(GuildRole.MARECHAL)
                 .rank("Líder")
                 .classe(Classe.GUERREIRO)
                 .team(team)

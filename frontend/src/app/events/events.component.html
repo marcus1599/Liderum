@@ -7,8 +7,8 @@
         <input matInput [(ngModel)]="newEvent.name" name="name" required />
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>Data</mat-label>
-        <input matInput [(ngModel)]="newEvent.date" name="date" type="date" required />
+        <mat-label>Data e Hora</mat-label>
+        <input matInput [(ngModel)]="newEvent.date" name="date" type="datetime-local" required />
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Descrição</mat-label>
@@ -39,7 +39,7 @@
       <tbody>
         <tr *ngFor="let event of events">
           <td>{{ event.name }}</td>
-          <td>{{ event.date | date:'shortDate' }}</td>
+          <td>{{ event.date | date:'short' }}</td>
           <td>{{ event.description }}</td>
           <td>
             <button mat-button color="primary" (click)="editEvent(event)">Editar</button>

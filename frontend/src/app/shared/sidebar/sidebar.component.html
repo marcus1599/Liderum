@@ -1,5 +1,5 @@
 <h3>Menu</h3>
-<button class="menu-btn" (click)="setShowMembers(false)">
+<button class="menu-btn" (click)="setShowDashboard(true)">
   <mat-icon>dashboard</mat-icon>
   Dashboard
 </button>
@@ -7,15 +7,15 @@
   <mat-icon>group</mat-icon>
   Members
 </button>
-<button class="menu-btn">
+<button class="menu-btn" (click)="setShowEvents(true)">
   <mat-icon>event</mat-icon>
   Eventos
 </button>
-<button class="menu-btn">
+<button class="menu-btn" (click)="setShowAttendence(true)">
   <mat-icon>check_circle</mat-icon>
   Presença
 </button>
-<button class="menu-btn">
+<button class="menu-btn" (click)="setShowSettings(true)">
   <mat-icon>settings</mat-icon>
   Configurações
 </button>

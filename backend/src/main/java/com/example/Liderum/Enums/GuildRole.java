@@ -1,10 +1,10 @@
 package com.example.Liderum.Enums;
 
 public enum GuildRole {
-    MARSHAL,     // Marechal
+    MARECHAL,     // Marechal
     MAJOR,       // Major
     GENERAL,     // General
-    CAPTAIN,     // Capitão
-    SOLDIER,     // Soldado
+    CAPITÃO,     // Capitão
+    SOLDADO,     // Soldado
 
 }

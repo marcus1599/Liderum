@@ -1,0 +1,63 @@
+<p>attendence works!</p>
+<mat-card>
+  <mat-card-title>Controle de Presença</mat-card-title>
+  <mat-card-content>
+    <div class="attendance-layout">
+      <div class="attendance-table">
+        <mat-form-field appearance="outline">
+          <mat-label>Evento</mat-label>
+          <select matNativeControl [ngModel]="selectedEventId" (ngModelChange)="onEventChange($event)" name="event">
+            <option [value]="null">Selecione um evento</option>
+            <option *ngFor="let event of events" [value]="event.id">{{ event.name }} ({{ event.date | date:'short' }})</option>
+          </select>
+        </mat-form-field>
+        <table *ngIf="selectedEventId && attendancesLoaded">
+          <thead>
+            <tr>
+              <th>Membro</th>
+              <th>Presente</th>
+              <th>Faltou</th>
+              <th>Justificou</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let member of members" [class.absence-alert]="membersWithAlert.includes(member.id)">
+              <td>{{ member.nickname }}</td>
+              <td>
+                <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
+                  (change)="markAttendance(member.id, 'PRESENTE')"
+                  [checked]="isChecked(member.id, 'PRESENTE')"
+                  [value]="'PRESENTE'"
+                />
+              </td>
+              <td>
+                <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
+                  (change)="markAttendance(member.id, 'FALTOU')"
+                  [checked]="isChecked(member.id, 'FALTOU')"
+                  [value]="'FALTOU'"
+                />
+              </td>
+              <td>
+                <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
+                  (change)="markAttendance(member.id, 'JUSTIFICOU')"
+                  [checked]="isChecked(member.id, 'JUSTIFICOU')"
+                  [value]="'JUSTIFICOU'"
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="absence-alert-list">
+        <h4>Membros com Faltas Consecutivas</h4>
+        <ul>
+          <li *ngFor="let memberId of membersWithAlert">
+            <mat-icon color="warn" style="vertical-align: middle;">warning</mat-icon>
+            {{ getMemberNickname(memberId) }}
+          </li>
+          <li *ngIf="membersWithAlert.length === 0">Nenhum membro em risco.</li>
+        </ul>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

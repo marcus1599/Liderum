@@ -1,17 +1,36 @@
 <app-navbar></app-navbar>
 <mat-sidenav-container style="height: 100vh;">
   <mat-sidenav mode="side" opened>
-    <app-sidebar (showMembersChange)="showMembers = $event; showEvents = !$event" (logoutClick)="logout()"></app-sidebar>
+    <app-sidebar 
+      (showDashboardChange)="activateView('dashboard')"
+      (showMembersChange)="activateView('members')"
+      (showEventsChange)="activateView('events')"
+      (showAttendenceChange)="activateView('attendence')"
+      (showSettingsChange)="activateView('settings')"
+      (logoutClick)="logout()"
+    ></app-sidebar>
   </mat-sidenav>
 
   <mat-sidenav-content>
     <div class="content">
-      <ng-container *ngIf="showMembers; else eventos">
+      <ng-container *ngIf="showDashboard">
+        <div class="dashboard-welcome">
+          <h2>Bem-vindo ao Dashboard</h2>
+          <p>Aqui você verá relatórios e estatísticas de participação futuramente.</p>
+        </div>
+      </ng-container>
+      <ng-container *ngIf="showMembers">
         <app-members></app-members>
       </ng-container>
-      <ng-template #eventos>
-        <app-events *ngIf="showEvents"></app-events>
-      </ng-template>
+      <ng-container *ngIf="showEvents">
+        <app-events></app-events>
+      </ng-container>
+      <ng-container *ngIf="showAttendence">
+        <app-attendence></app-attendence>
+      </ng-container>
+      <ng-container *ngIf="showSettings">
+        <app-settings></app-settings>
+      </ng-container>
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

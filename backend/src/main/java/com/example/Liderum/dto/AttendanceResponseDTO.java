@@ -11,6 +11,8 @@ import lombok.Setter;
 @Builder
 public class AttendanceResponseDTO {
     private Long id;
+    private Long memberId;
+    private Long eventId;
     private String memberName;
     private String eventName;
     private AttendanceStatus status;

@@ -22,7 +22,7 @@ public class AttendanceController {
     private final AttendanceService attendanceService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Registra a presença de um membro em um evento")
     public ResponseEntity<AttendanceResponseDTO> create(@RequestBody @Valid AttendanceRequestDTO dto) {
         return ResponseEntity.ok(attendanceService.create(dto));
@@ -41,17 +41,23 @@ public class AttendanceController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Atualiza o status de uma presença")
     public ResponseEntity<AttendanceResponseDTO> update(@PathVariable Long id, @RequestBody @Valid AttendanceRequestDTO dto) {
         return ResponseEntity.ok(attendanceService.update(id, dto));
     }
 
     @DeleteMapping("/{id}")
-      @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+      @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Remove um registro de presença")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         attendanceService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/consecutive-absences")
+    @Operation(summary = "Retorna membros com N faltas consecutivas")
+    public ResponseEntity<List<Long>> getMembersWithConsecutiveAbsences(@RequestParam int threshold) {
+        return ResponseEntity.ok(attendanceService.findMembersWithConsecutiveAbsences(threshold));
     }
 }

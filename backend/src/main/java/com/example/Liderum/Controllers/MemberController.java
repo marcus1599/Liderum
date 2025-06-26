@@ -29,7 +29,7 @@ public class MemberController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     public ResponseEntity<MemberResponseDTO> create(@RequestBody @Valid MemberRequestDTO dto) {
     return ResponseEntity.ok(memberService.create(dto));
     }
@@ -40,7 +40,7 @@ public class MemberController {
         return ResponseEntity.ok(memberService.findById(id));
     }
     @PutMapping("/{id}")
-@PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+@PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
 public ResponseEntity<MemberResponseDTO> updateMember(@PathVariable Long id, @RequestBody @Valid MemberRequestDTO dto) {
     MemberResponseDTO updated = memberService.update(id, dto);
     return ResponseEntity.ok(updated);
@@ -48,7 +48,7 @@ public ResponseEntity<MemberResponseDTO> updateMember(@PathVariable Long id, @Re
 
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         memberService.delete(id);
         return ResponseEntity.noContent().build();

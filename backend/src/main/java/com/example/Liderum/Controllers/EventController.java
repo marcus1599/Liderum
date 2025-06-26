@@ -22,7 +22,7 @@ public class EventController {
     private final EventService eventService;
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Criar novo evento")
     public ResponseEntity<EventResponseDTO> create(@RequestBody @Valid EventRequestDTO dto) {
         EventResponseDTO created = eventService.create(dto);
@@ -42,7 +42,7 @@ public class EventController {
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Atualizar evento")
     public ResponseEntity<EventResponseDTO> update(@PathVariable Long id,
                                                    @RequestBody @Valid EventRequestDTO dto) {
@@ -50,7 +50,7 @@ public class EventController {
     }
 
     @DeleteMapping("/{id}")
-      @PreAuthorize("hasAnyRole('MARSHAL', 'GENERAL', 'MAJOR')")
+      @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Deletar evento")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         eventService.delete(id);

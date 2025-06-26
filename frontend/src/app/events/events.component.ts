@@ -30,6 +30,14 @@ export class EventsComponent implements OnInit {
   }
 
   saveEvent() {
+    // Converte o valor do input datetime-local para formato ISO LocalDateTime (yyyy-MM-ddTHH:mm:ss)
+    if (this.newEvent.date) {
+      const dateValue = this.newEvent.date;
+      // Se vier como string do input, pode estar no formato 'yyyy-MM-ddTHH:mm'
+      if (typeof dateValue === 'string' && dateValue.length === 16) {
+        this.newEvent.date = dateValue + ':00'; // adiciona os segundos
+      }
+    }
     if (this.isEditing && this.editingEventId !== null) {
       this.eventService.updateEvent({ ...this.newEvent, id: this.editingEventId } as Event).subscribe(() => {
         this.loadEvents();

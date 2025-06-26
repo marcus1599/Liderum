@@ -13,6 +13,8 @@ import { MembersComponent } from '../members/members.component';
 import { NavbarComponent } from '../shared/navbar/navbar.component';
 import { SidebarComponent } from '../shared/sidebar/sidebar.component';
 import { EventsComponent } from '../events/events.component';
+import { AttendenceComponent } from '../attendence/attendence.component';
+import { SettingsComponent } from '../settings/settings.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,7 +31,9 @@ import { EventsComponent } from '../events/events.component';
     MembersComponent,
     NavbarComponent,
     SidebarComponent,
-    EventsComponent
+    EventsComponent,
+    AttendenceComponent,
+    SettingsComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -37,6 +41,9 @@ import { EventsComponent } from '../events/events.component';
 export class DashboardComponent {
   showMembers = false;
   showEvents = false;
+  showAttendence = false;
+  showSettings = false;
+  showDashboard = true;
   constructor(private authService: AuthService) {}
 
   newEvent() {
@@ -50,5 +57,13 @@ export class DashboardComponent {
 
   logout() {
     this.authService.logout();
+  }
+
+  activateView(view: 'dashboard' | 'members' | 'events' | 'attendence' | 'settings') {
+    this.showDashboard = view === 'dashboard';
+    this.showMembers = view === 'members';
+    this.showEvents = view === 'events';
+    this.showAttendence = view === 'attendence';
+    this.showSettings = view === 'settings';
   }
 }

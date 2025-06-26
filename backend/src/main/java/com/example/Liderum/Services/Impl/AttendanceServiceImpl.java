@@ -3,6 +3,7 @@ package com.example.Liderum.Services.Impl;
 import com.example.Liderum.Entities.Attendance;
 import com.example.Liderum.Entities.Event;
 import com.example.Liderum.Entities.Member;
+import com.example.Liderum.Enums.AttendanceStatus;
 import com.example.Liderum.Repository.AttendanceRepository;
 import com.example.Liderum.Repository.EventRepository;
 import com.example.Liderum.Repository.MemberRepository;
@@ -68,10 +69,32 @@ public class AttendanceServiceImpl implements AttendanceService {
     public void delete(Long id) {
         attendanceRepository.deleteById(id);
     }
+    @Override
+    public List<Long> findMembersWithConsecutiveAbsences(int threshold) {
+        // Busca todos os eventos ordenados por data
+        List<Long> eventIds = attendanceRepository.findAll().stream()
+            .map(a -> a.getEvent().getId())
+            .distinct()
+            .sorted()
+            .collect(Collectors.toList());
+        if (eventIds.size() < threshold) return List.of();
+        List<Long> lastEventIds = eventIds.subList(eventIds.size() - threshold, eventIds.size());
+        // Busca todos os membros que faltaram nos últimos N eventos
+        List<Long> absents = attendanceRepository.findAllByStatusAndEventIds(AttendanceStatus.FALTOU, lastEventIds);
+        // Conta quantas vezes cada membro aparece
+        return absents.stream()
+            .collect(Collectors.groupingBy(id -> id, Collectors.counting()))
+            .entrySet().stream()
+            .filter(e -> e.getValue() == threshold)
+            .map(e -> e.getKey())
+            .collect(Collectors.toList());
+    }
 
     private AttendanceResponseDTO toDTO(Attendance attendance) {
         return AttendanceResponseDTO.builder()
                 .id(attendance.getId())
+                .memberId(attendance.getMember().getId())
+                .eventId(attendance.getEvent().getId())
                 .eventName(attendance.getEvent().getName())
                 .memberName(attendance.getMember().getNickname())
                 .status(attendance.getStatus())

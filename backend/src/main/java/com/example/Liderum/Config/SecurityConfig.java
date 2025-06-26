@@ -41,7 +41,7 @@ public class SecurityConfig {
                     "/webjars/**",
                     "http://localhost:4200/**" 
                 ).permitAll()
-                .requestMatchers("/api/members/**").hasAnyRole("MARSHAL", "GENERAL", "MAJOR")
+                .requestMatchers("/api/members/**").hasAnyRole("MARECHAL", "GENERAL", "MAJOR")
                 .anyRequest().authenticated()
             );
 
