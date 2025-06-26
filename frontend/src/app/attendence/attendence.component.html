@@ -1,55 +1,63 @@
-<p>attendence works!</p>
 <mat-card>
   <mat-card-title>Controle de Presença</mat-card-title>
   <mat-card-content>
     <div class="attendance-layout">
       <div class="attendance-table">
-        <mat-form-field appearance="outline">
+        <mat-form-field appearance="outline" class="event-select">
           <mat-label>Evento</mat-label>
           <select matNativeControl [ngModel]="selectedEventId" (ngModelChange)="onEventChange($event)" name="event">
             <option [value]="null">Selecione um evento</option>
             <option *ngFor="let event of events" [value]="event.id">{{ event.name }} ({{ event.date | date:'short' }})</option>
           </select>
         </mat-form-field>
-        <table *ngIf="selectedEventId && attendancesLoaded">
+        <table *ngIf="selectedEventId && attendancesLoaded" class="mat-elevation-z2 styled-table">
           <thead>
             <tr>
-              <th>Membro</th>
-              <th>Presente</th>
-              <th>Faltou</th>
-              <th>Justificou</th>
+              <th><mat-icon>person</mat-icon> Membro</th>
+              <th><mat-icon color="primary">check_circle</mat-icon> Presente</th>
+              <th><mat-icon color="warn">cancel</mat-icon> Faltou</th>
+              <th><mat-icon color="accent">info</mat-icon> Justificou</th>
             </tr>
           </thead>
           <tbody>
             <tr *ngFor="let member of members" [class.absence-alert]="membersWithAlert.includes(member.id)">
               <td>{{ member.nickname }}</td>
               <td>
-                <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
-                  (change)="markAttendance(member.id, 'PRESENTE')"
-                  [checked]="isChecked(member.id, 'PRESENTE')"
-                  [value]="'PRESENTE'"
-                />
+                <label class="status-radio present">
+                  <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
+                    (change)="markAttendance(member.id, 'PRESENTE')"
+                    [checked]="isChecked(member.id, 'PRESENTE')"
+                    [value]="'PRESENTE'"
+                  />
+                  <mat-icon color="primary">check_circle</mat-icon>
+                </label>
               </td>
               <td>
-                <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
-                  (change)="markAttendance(member.id, 'FALTOU')"
-                  [checked]="isChecked(member.id, 'FALTOU')"
-                  [value]="'FALTOU'"
-                />
+                <label class="status-radio absent">
+                  <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
+                    (change)="markAttendance(member.id, 'FALTOU')"
+                    [checked]="isChecked(member.id, 'FALTOU')"
+                    [value]="'FALTOU'"
+                  />
+                  <mat-icon color="warn">cancel</mat-icon>
+                </label>
               </td>
               <td>
-                <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
-                  (change)="markAttendance(member.id, 'JUSTIFICOU')"
-                  [checked]="isChecked(member.id, 'JUSTIFICOU')"
-                  [value]="'JUSTIFICOU'"
-                />
+                <label class="status-radio justified">
+                  <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
+                    (change)="markAttendance(member.id, 'JUSTIFICOU')"
+                    [checked]="isChecked(member.id, 'JUSTIFICOU')"
+                    [value]="'JUSTIFICOU'"
+                  />
+                  <mat-icon color="accent">info</mat-icon>
+                </label>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
       <div class="absence-alert-list">
-        <h4>Membros com Faltas Consecutivas</h4>
+        <h4><mat-icon color="warn">warning</mat-icon> Membros com Faltas Consecutivas</h4>
         <ul>
           <li *ngFor="let memberId of membersWithAlert">
             <mat-icon color="warn" style="vertical-align: middle;">warning</mat-icon>
