@@ -43,9 +43,16 @@
 <mat-card>
   <mat-card-title>Lista de Membros</mat-card-title>
   <mat-card-content>
-    <table mat-table [dataSource]="members" class="mat-elevation-z8 members-table">
+    <div class="search-bar">
+      <mat-form-field appearance="outline" style="width: 100%; max-width: 320px;">
+        <mat-label>Pesquisar membro</mat-label>
+        <input matInput (keyup)="applyFilter($event)" placeholder="Digite para pesquisar...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+    <table mat-table [dataSource]="dataSource" matSort class="mat-elevation-z8 members-table">
       <ng-container matColumnDef="nickname">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           <span class="header-content"><mat-icon aria-label="Nickname">person</mat-icon> Nickname</span>
         </th>
         <td mat-cell *matCellDef="let member"> {{ member.nickname }} </td>
@@ -57,19 +64,19 @@
         <td mat-cell *matCellDef="let member"> {{ member.phone }} </td>
       </ng-container>
       <ng-container matColumnDef="guildRole">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           <span class="header-content"><mat-icon aria-label="Cargo">work</mat-icon> Cargo</span>
         </th>
         <td mat-cell *matCellDef="let member"> {{ member.guildRole }} </td>
       </ng-container>
       <ng-container matColumnDef="rank">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           <span class="header-content"><mat-icon aria-label="Rank">military_tech</mat-icon> Rank</span>
         </th>
         <td mat-cell *matCellDef="let member"> {{ member.rank }} </td>
       </ng-container>
       <ng-container matColumnDef="classe">
-        <th mat-header-cell *matHeaderCellDef>
+        <th mat-header-cell *matHeaderCellDef mat-sort-header>
           <span class="header-content"><mat-icon aria-label="Classe">category</mat-icon> Classe</span>
         </th>
         <td mat-cell *matCellDef="let member">
@@ -92,5 +99,6 @@
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
     </table>
+    <mat-paginator [pageSize]="40" [pageSizeOptions]="[40]" showFirstLastButtons></mat-paginator>
   </mat-card-content>
 </mat-card>

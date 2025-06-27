@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
 import { MemberService } from '../services/member.service';
 import { Member } from './member.model';
 
@@ -13,6 +13,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatSortModule } from '@angular/material/sort';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-members',
@@ -29,13 +34,19 @@ import { MatChipsModule } from '@angular/material/chips';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule,
-    MatChipsModule
+    MatChipsModule,
+    MatPaginatorModule,
+    MatSortModule
   ],
   styleUrls: ['./members.component.scss']
 })
-export class MembersComponent implements OnInit {
-  members: Member[] = [];  
-  displayedColumns: string[] = ['nickname', 'phone', 'guildRole', 'rank', 'classe', 'actions'];  
+export class MembersComponent implements OnInit, AfterViewInit {
+  members: Member[] = [];
+  dataSource = new MatTableDataSource<Member>([]);
+  displayedColumns: string[] = ['nickname', 'phone', 'guildRole', 'rank', 'classe', 'actions'];
+
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
 
   newMember: Member = {
     id: 0,
@@ -58,13 +69,29 @@ export class MembersComponent implements OnInit {
   constructor(private memberService: MemberService) { }
 
   ngOnInit(): void {
-    this.loadMembers(); 
+    this.loadMembers();
   }
 
   loadMembers(): void {
     this.memberService.getMembers().subscribe((data) => {
       this.members = data;
+      this.dataSource.data = data;
+      // Atualiza paginator e sort após atualizar os dados
+      setTimeout(() => {
+        this.dataSource.paginator = this.paginator;
+        this.dataSource.sort = this.sort;
+      });
     });
+  }
+
+  applyFilter(event: Event) {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+  }
+
+  ngAfterViewInit() {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
   }
 
   saveMember(): void {

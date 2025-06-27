@@ -77,6 +77,7 @@ mat-form-field {
 mat-card {
   background: #363a41;
   color: #fff;
+  padding: 16px;
   margin-bottom: 24px;
   border-radius: 12px;
   box-shadow: 0 2px 8px #0002;
@@ -123,4 +124,39 @@ button[mat-button] {
 
 button[mat-button]:hover {
   background: #4a4e56;
+}
+
+/* Alinha ícones e textos centralizados na lista de eventos */
+.event-header-content, .event-cell-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+}
+
+.events-table th.mat-header-cell, .events-table td.mat-cell {
+  vertical-align: middle;
+}
+
+.events-table mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+  color: #B89EB8;
+}
+
+/* Visual extra para destacar linhas e hover */
+.events-table tr.mat-row:hover {
+  background: #444052;
+  transition: background 0.2s;
+}
+
+.events-table th.mat-header-cell {
+  color: #B89EB8;
+  font-weight: bold;
+  font-size: 1.05rem;
+}
+
+.events-table td.mat-cell {
+  font-size: 1rem;
 }
