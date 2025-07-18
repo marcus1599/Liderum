@@ -5,11 +5,12 @@ import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
+import { MatIcon } from '@angular/material/icon';
 
 @Component({
   selector: 'app-events',
   standalone: true,
-  imports: [CommonModule, FormsModule, MatCardModule, MatButtonModule, MatInputModule],
+  imports: [CommonModule, FormsModule, MatCardModule,MatIcon, MatButtonModule, MatInputModule],
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss']
 })

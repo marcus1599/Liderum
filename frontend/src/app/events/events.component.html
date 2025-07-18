@@ -27,27 +27,32 @@
 <mat-card>
   <mat-card-title>Lista de Eventos</mat-card-title>
   <mat-card-content>
-    <table *ngIf="events.length > 0" class="mat-elevation-z8">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Data</th>
-          <th>Descrição</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let event of events">
-          <td>{{ event.name }}</td>
-          <td>{{ event.date | date:'short' }}</td>
-          <td>{{ event.description }}</td>
-          <td>
-            <button mat-button color="primary" (click)="editEvent(event)">Editar</button>
-            <button mat-button color="warn" (click)="deleteEvent(event.id)">Excluir</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+    <div *ngIf="events.length > 0" class="event-list">
+      <mat-card class="event-item" *ngFor="let event of events">
+        <div class="event-header">
+          <span class="event-title">
+            <mat-icon>event</mat-icon>
+            <strong>{{ event.name }}</strong>
+          </span>
+          <span class="event-date">
+            <mat-icon>calendar_month</mat-icon>
+            {{ event.date | date:'short' }}
+          </span>
+        </div>
+        <div class="event-description">
+          <mat-icon>description</mat-icon>
+          <span>{{ event.description }}</span>
+        </div>
+        <div class="event-actions">
+          <button mat-icon-button color="primary" (click)="editEvent(event)" matTooltip="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteEvent(event.id)" matTooltip="Excluir">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </mat-card>
+    </div>
     <p *ngIf="events.length === 0">Nenhum evento cadastrado.</p>
   </mat-card-content>
 </mat-card>

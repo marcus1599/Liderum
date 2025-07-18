@@ -16,6 +16,7 @@ export class SidebarComponent {
   @Output() showAttendenceChange = new EventEmitter<boolean>();
   @Output() showSettingsChange = new EventEmitter<boolean>();
   @Output() showDashboardChange = new EventEmitter<boolean>();
+  @Output() showGroupsChange = new EventEmitter<boolean>();
 
   setShowMembers(value: boolean) {
     this.showMembersChange.emit(value);
@@ -37,5 +38,8 @@ export class SidebarComponent {
   }
   setShowDashboard(value: boolean) {
     this.showDashboardChange.emit(value);
+  }
+  setShowGroups(value: boolean) {
+    this.showGroupsChange.emit(value);
   }
 }

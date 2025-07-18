@@ -1,0 +1,127 @@
+.groups-layout {
+  display: flex;
+  gap: 32px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.members-list-panel, .groups-panel {
+  flex: 1 1 320px;
+  min-width: 260px;
+}
+
+.members-list-panel {
+  background: #23242a;
+  border-radius: 12px;
+  padding: 16px 12px 12px 12px;
+  box-shadow: 0 2px 8px #0002;
+}
+
+.members-list {
+  min-height: 120px;
+  background: #363a41;
+  border-radius: 8px;
+  padding: 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.member-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #444052;
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 4px;
+  cursor: grab;
+  transition: background 0.2s;
+}
+.member-item:active {
+  background: #B89EB8;
+  color: #363a41;
+}
+
+.groups-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.group-actions {
+  margin-bottom: 12px;
+  display: flex;
+  gap: 8px;
+}
+
+.groups-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.h3{
+    color: #B89EB8;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin: 0 0 12px 0;
+}
+.group-card {
+  background: #363a41;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0002;
+  padding: 14px 14px 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.1rem;
+  color: #B89EB8;
+  margin-bottom: 6px;
+}
+
+.group-members-list {
+  min-height: 40px;
+  background: #23242a;
+  border-radius: 8px;
+  padding: 8px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.group-form-panel {
+  margin-top: 24px;
+  max-width: 340px;
+}
+
+.drag-preview {
+  background: #1976d2;
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px #0004;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+  opacity: 0.95;
+}
+
+@media (max-width: 900px) {
+  .groups-layout {
+    flex-direction: column;
+    gap: 18px;
+  }
+  .members-list-panel, .groups-panel {
+    min-width: 0;
+    width: 100%;
+  }
+}

@@ -9,6 +9,7 @@ import com.example.Liderum.Repository.UserRepository;
 import com.example.Liderum.Services.TeamService;
 import com.example.Liderum.dto.TeamRequestDTO;
 import com.example.Liderum.dto.TeamResponseDTO;
+import com.example.Liderum.dto.MemberResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,12 +27,8 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public TeamResponseDTO create(TeamRequestDTO dto) {
-        User leader = userRepository.findById(dto.getLeaderId())
-                .orElseThrow(() -> new EntityNotFoundException("Líder não encontrado"));
-
         Team team = Team.builder()
                 .name(dto.getName())
-                .leader(leader)
                 .build();
 
         teamRepository.save(team);
@@ -39,7 +36,6 @@ public class TeamServiceImpl implements TeamService {
         return TeamResponseDTO.builder()
                 .id(team.getId())
                 .name(team.getName())
-                .leaderName(leader.getUsername())
                 .build();
     }
 
@@ -48,9 +44,14 @@ public class TeamServiceImpl implements TeamService {
         return teamRepository.findAll().stream().map(team ->
                 TeamResponseDTO.builder()
                         .id(team.getId())
-                        .name(team.getName())
-                        .leaderName(team.getLeader().getUsername())
-                        .build()
+                .name(team.getName())
+                .members(team.getMembers().stream()
+                        .map(member -> MemberResponseDTO.builder()
+                                .id(member.getId())
+                                .nickname(member.getNickname())
+                                .build())
+                        .collect(Collectors.toList()))
+                .build()
         ).collect(Collectors.toList());
     }
 
@@ -62,8 +63,16 @@ public class TeamServiceImpl implements TeamService {
         return TeamResponseDTO.builder()
                 .id(team.getId())
                 .name(team.getName())
-                .leaderName(team.getLeader().getUsername())
+                .members(team.getMembers().stream()
+                        .map(member -> MemberResponseDTO.builder()
+                                .id(member.getId())
+                                .nickname(member.getNickname())
+                                .build())
+                        .collect(Collectors.toList()))
                 .build();
+                        
+                
+               
     }
 
     @Override
@@ -93,6 +102,15 @@ public void removeMemberFromTeam(Long teamId, Long memberId) {
 
     member.setTeam(null);
     memberRepository.save(member);
+}
+@Override
+public void update(Long teamId) {
+    Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new EntityNotFoundException("Equipe não encontrada"));
+
+  
+
+    teamRepository.save(team);
 }
 
 }

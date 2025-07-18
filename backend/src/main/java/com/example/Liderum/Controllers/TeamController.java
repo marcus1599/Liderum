@@ -1,6 +1,7 @@
 package com.example.Liderum.Controllers;
 
 import com.example.Liderum.Services.TeamService;
+import com.example.Liderum.dto.MemberRequestDTO;
 import com.example.Liderum.dto.TeamRequestDTO;
 import com.example.Liderum.dto.TeamResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -47,14 +48,22 @@ public class TeamController {
         teamService.delete(id);
         return ResponseEntity.noContent().build();
     }
-    @PutMapping("/{teamId}/add-member/{memberId}")
+    @PostMapping("/{teamId}/add-member/{memberId}")
     @Operation(summary = "Adicionar um membro a uma equipe")
-public ResponseEntity<Void> addMemberToTeam(@PathVariable Long teamId, @PathVariable Long memberId) {
-    teamService.addMemberToTeam(teamId, memberId);
+    public ResponseEntity<Void> addMemberToTeam(@PathVariable Long teamId, @PathVariable Long memberId) {
+        teamService.addMemberToTeam(teamId, memberId);
+        System.out.println("Member added to team: " + teamId + ", Member ID: " + memberId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{teamId}")
+    @Operation(summary = "Atualizar a  equipe")
+public ResponseEntity<Void> update(@PathVariable Long teamId) {
+    teamService.update(teamId);
     return ResponseEntity.ok().build();
 }
 
-@PutMapping("/{teamId}/remove-member/{memberId}")
+@DeleteMapping("/{teamId}/remove-member/{memberId}")
 @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
 @Operation(summary = "Remover um membro de uma equipe")
 public ResponseEntity<Void> removeMemberFromTeam(@PathVariable Long teamId, @PathVariable Long memberId) {

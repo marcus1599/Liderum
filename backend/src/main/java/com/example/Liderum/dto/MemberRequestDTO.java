@@ -32,4 +32,5 @@ public class MemberRequestDTO {
 
 
     private Long teamId;
+    private Long id;
 }

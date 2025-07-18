@@ -1,0 +1,80 @@
+<mat-card>
+  <mat-card-title>Gerenciar Grupos</mat-card-title>
+  <mat-card-content>
+    <div class="groups-layout">
+      <!-- Lista de membros disponíveis -->
+      <div class="members-list-panel">
+        <h3>Membros Disponíveis</h3>
+        <div cdkDropList 
+             id="membersDropList"
+             [cdkDropListData]="availableMembers" 
+             [cdkDropListConnectedTo]="groupDropListIds"
+             class="members-list" 
+             (cdkDropListDropped)="dropToAvailable($event)">
+          <div *ngFor="let member of availableMembers" cdkDrag class="member-item">
+            <mat-icon>person</mat-icon> {{ member.nickname }}
+            <!-- Preview customizado ao arrastar -->
+            <ng-template cdkDragPreview>
+              <div class="drag-preview">
+                <mat-icon>person</mat-icon> {{ member.nickname }}
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- Painel de grupos -->
+      <div class="groups-panel">
+        <div class="group-actions">
+          <button mat-raised-button color="primary" (click)="openGroupForm()">
+            <mat-icon>add</mat-icon> Novo Grupo
+          </button>
+        </div>
+        <div class="groups-list">
+          <mat-card class="group-card" *ngFor="let group of groups">
+            <div class="group-header">
+              <span>{{ group.name }}</span>
+              <span class="group-actions">
+                <button mat-icon-button color="primary" (click)="editGroup(group)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button color="warn" (click)="deleteGroup(group)"><mat-icon>delete</mat-icon></button>
+              </span>
+            </div>
+            <div cdkDropList 
+                 [id]="'groupDropList-' + group.id"
+                 [cdkDropListData]="group.members" 
+                 [cdkDropListConnectedTo]="['membersDropList']"
+                 class="group-members-list" 
+                 (cdkDropListDropped)="dropToGroup($event, group)">
+              <div *ngFor="let member of group.members" cdkDrag class="member-item">
+                <mat-icon>person</mat-icon> {{ member.nickname }}
+                <ng-template cdkDragPreview>
+                  <div class="drag-preview">
+                    <mat-icon>person</mat-icon> {{ member.nickname }}
+                  </div>
+                </ng-template>
+                <button mat-icon-button color="warn" (click)="removeMemberFromGroup(member, group)" matTooltip="Remover do grupo">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-card>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="showGroupForm" class="group-form-panel">
+      <mat-card>
+        <form (ngSubmit)="saveGroup()">
+          <mat-form-field appearance="outline">
+            <mat-label>Nome do Grupo</mat-label>
+            <input matInput [(ngModel)]="groupForm.name" name="groupName" required />
+          </mat-form-field>
+          <div class="form-actions">
+            <button mat-raised-button color="primary" type="submit">{{ groupForm.id ? 'Atualizar' : 'Criar' }}</button>
+            <button mat-button type="button" (click)="cancelGroupForm()">Cancelar</button>
+          </div>
+        </form>
+      </mat-card>
+    </div>
+  </mat-card-content>
+</mat-card>

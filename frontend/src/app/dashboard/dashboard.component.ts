@@ -18,6 +18,7 @@ import { AttendenceComponent } from '../attendence/attendence.component';
 import { SettingsComponent } from '../settings/settings.component';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
+import { GroupsComponent } from '../groups/groups.component';
 
 
 @Component({
@@ -43,7 +44,8 @@ import { MatCardModule } from '@angular/material/card';
     MatFormFieldModule,
     MatInputModule,
     FormsModule,
-    NgChartsModule
+    NgChartsModule,
+    GroupsComponent
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
@@ -54,6 +56,7 @@ export class DashboardComponent {
   showAttendence = false;
   showSettings = false;
   showDashboard = true;
+  showGroups = false;
   eventFilterCount = 10;
 
   // Gráfico de pizza - Taxa de Presença Geral
@@ -110,11 +113,12 @@ export class DashboardComponent {
     this.authService.logout();
   }
 
-  activateView(view: 'dashboard' | 'members' | 'events' | 'attendence' | 'settings') {
+  activateView(view: 'dashboard' | 'members' | 'events' | 'attendence' | 'settings' | 'groups') {
     this.showDashboard = view === 'dashboard';
     this.showMembers = view === 'members';
     this.showEvents = view === 'events';
     this.showAttendence = view === 'attendence';
     this.showSettings = view === 'settings';
+    this.showGroups = view === 'groups';
   }
 }

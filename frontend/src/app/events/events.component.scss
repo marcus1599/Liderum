@@ -75,7 +75,7 @@ mat-form-field {
 }
 
 mat-card {
-  background: #363a41;
+  background: #43464b;
   color: #fff;
   padding: 16px;
   margin-bottom: 24px;
@@ -159,4 +159,68 @@ button[mat-button]:hover {
 
 .events-table td.mat-cell {
   font-size: 1rem;
+}
+
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.event-item {
+  background: #363a41;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0002;
+  padding: 18px 18px 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.event-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  color: #B89EB8;
+}
+
+.event-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  color: #b8b8b8;
+}
+
+.event-description {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #e0e0e0;
+}
+
+.event-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.event-actions button[mat-icon-button] {
+  background: #23242a;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.event-actions button[mat-icon-button]:hover {
+  background: #4a4e56;
 }
