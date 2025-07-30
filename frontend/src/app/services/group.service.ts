@@ -1,11 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
-export interface Member {
-  id: number;
-  nickname: string;
-}
+import { Member } from '../members/member.model';
 
 export interface Group {
   id: number;

@@ -12,11 +12,15 @@
              class="members-list" 
              (cdkDropListDropped)="dropToAvailable($event)">
           <div *ngFor="let member of availableMembers" cdkDrag class="member-item">
+          
             <mat-icon>person</mat-icon> {{ member.nickname }}
+              <img [src]="'assets/icons/classes/ClassIcon_' + member.classe + '.png'" alt="{{ member.classe }}" width="24" height="24" style="margin-right:6px;">
             <!-- Preview customizado ao arrastar -->
             <ng-template cdkDragPreview>
               <div class="drag-preview">
                 <mat-icon>person</mat-icon> {{ member.nickname }}
+                <img [src]="'assets/icons/classes/ClassIcon_' + member.classe + '.png'" alt="{{ member.classe }}" width="24" height="24" style="margin-right:6px;">
+                
               </div>
             </ng-template>
           </div>
@@ -46,9 +50,11 @@
                  class="group-members-list" 
                  (cdkDropListDropped)="dropToGroup($event, group)">
               <div *ngFor="let member of group.members" cdkDrag class="member-item">
+                <img [src]="'assets/icons/classes/ClassIcon_' + member.classe + '.svg'" alt="{{ member.classe }}" width="24" height="24" style="margin-right:6px;">
                 <mat-icon>person</mat-icon> {{ member.nickname }}
                 <ng-template cdkDragPreview>
                   <div class="drag-preview">
+                    <img [src]="'assets/icons/classes/ClassIcon_' + member.classe + '.svg'" alt="{{ member.classe }}" width="24" height="24" style="margin-right:6px;">
                     <mat-icon>person</mat-icon> {{ member.nickname }}
                   </div>
                 </ng-template>

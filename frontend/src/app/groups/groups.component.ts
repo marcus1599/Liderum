@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, CdkDropList, DragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { GroupService, Group, Member } from '../services/group.service';
+import { GroupService, Group } from '../services/group.service';
 import { MatTable } from '@angular/material/table';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardModule } from '@angular/material/card';
@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { Member } from '../members/member.model';
 
 @Component({
   selector: 'app-groups',

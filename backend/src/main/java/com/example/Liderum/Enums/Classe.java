@@ -9,9 +9,10 @@ public enum Classe {
     PALADINO,
     BARBARO,
     FEITICEIRA,
-    MACACO,
+    ANDARILHO,
     MERCENARIO,
     ESPIRITUALISTA,
     MISTICO,
+    BARDO,
     ARCANO
 }
