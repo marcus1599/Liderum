@@ -54,7 +54,7 @@ export class MembersComponent implements OnInit, AfterViewInit {
     phone: '',
     guildRole: 'SOLDIER',
     rank: '',
-    classe: 'Guerreiro'
+    classe: 'GUERREIRO'
   };
 
   isEditing: boolean = false;
@@ -128,7 +128,7 @@ export class MembersComponent implements OnInit, AfterViewInit {
       phone: '',
       guildRole: 'SOLDIER',
       rank: '',
-      classe: 'Guerreiro'
+      classe: 'GUERREIRO'
     };
     this.isEditing = false;
   }

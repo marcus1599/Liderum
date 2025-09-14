@@ -5,19 +5,19 @@ export interface Member {
     guildRole: 'MARECHAL' | 'GENERAL' | 'MAJOR' | 'CAPITÃO' | 'SOLDIER';
     rank: string;
     classe:
-      | 'Guerreiro'
-      | 'Mago'
-      | 'Atiradora'
-      | 'Sacerdote'
-      | 'Arqueiro'
-      | 'Paladino'
-      | 'Bárbaro'
-      | 'Feiticeira'
-      | 'Macaco'
-      | 'Mercenário'
-      | 'Espiritualista'
-      | 'Místico'
-      | 'Arcano';
+  | 'GUERREIRO'
+  | 'MAGO'
+  | 'ATIRADORA'
+  | 'SACERDOTE'
+  | 'ARQUEIRO'
+  | 'PALADINO'
+  | 'BARBARO'
+  | 'FEITICEIRA'
+  | 'ANDARILHO'
+  | 'MERCENARIO'
+  | 'ESPIRITUALISTA'
+  | 'MISTICO'
+  | 'ARCANO';
     team?: {
       id: number;
       name: string;

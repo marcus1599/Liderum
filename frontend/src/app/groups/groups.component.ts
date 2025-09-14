@@ -54,6 +54,7 @@ export class GroupsComponent implements OnInit {
   showGroupForm = false;
   groupForm: Partial<Group> = {};
   editingGroup: Group | null = null;
+  filterText: string = '';
 
   constructor(private groupService: GroupService) {}
 
@@ -85,14 +86,15 @@ ngAfterViewInit() {
       this.loadMembers();
     });
   }
-  applyFilter(event: Event) {
-  const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-  this.dataSource.filter = filterValue;
-  // Opcional: filtrar apenas nos disponíveis
+  filterMembers() {
   this.dataSource.data = this.availableMembers.filter(member =>
-    member.nickname.toLowerCase().includes(filterValue) &&
-    (!this.selectedClass || member.classe === this.selectedClass)
+    (!this.selectedClass || member.classe === this.selectedClass) &&
+    (!this.filterText || member.nickname.toLowerCase().includes(this.filterText))
   );
+}
+  applyFilter(event: Event) {
+  this.filterText = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  this.filterMembers();
   }
 
 
@@ -137,19 +139,24 @@ ngAfterViewInit() {
     });
   }
 
-  dropToGroup(event: CdkDragDrop<Member[]>, group: Group) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(group.members, event.previousIndex, event.currentIndex);
-    } else {
-      const member = event.previousContainer.data[event.previousIndex];
-      // Atualiza localmente para feedback imediato
-      group.members.push(member);
-      this.availableMembers = this.availableMembers.filter(m => m.id !== member.id);
+dropToGroup(event: CdkDragDrop<Member[]>, group: Group) {
+  if (event.previousContainer === event.container) {
+    moveItemInArray(group.members, event.previousIndex, event.currentIndex);
+  } else {
+    const member = event.previousContainer.data[event.previousIndex];
+    if (!group.members.some(m => m.id === member.id)) {
+      // Chame o serviço para adicionar o membro ao grupo no backend
       this.groupService.addMemberToGroup(group.id, member.id).subscribe(() => {
+        // Após salvar no backend, recarregue os grupos para garantir consistência
         this.loadGroups();
       });
+      // Opcional: atualize a UI imediatamente (otimista)
+      group.members.push(member);
+      this.availableMembers = this.availableMembers.filter(m => m.id !== member.id);
+      this.filterMembers();
     }
   }
+}
 
   dropToAvailable(event: CdkDragDrop<Member[]>) {
     if (event.previousContainer !== event.container) {
@@ -176,34 +183,29 @@ ngAfterViewInit() {
 
   selectedClass: string = '';
   classes: string[] = [
-    'Guerreiro',
-    'Mago',
-    'Atiradora',
-    'Sacerdote',
-    'Arqueiro',
-    'Paladino',
-    'Bárbaro',
-    'Feiticeira',
-    'Macaco',
-    'Mercenário',
-    'Espiritualista',
-    'Místico',
-    'Arcano'
-  ]; // Ajuste conforme seu sistema
+  'GUERREIRO',
+  'MAGO',
+  'ATIRADORA',
+  'SACERDOTE',
+  'ARQUEIRO',
+  'PALADINO',
+  'BARBARO',
+  'FEITICEIRA',
+  'ANDARILHO',
+  'MERCENARIO',
+  'ESPIRITUALISTA',
+  'MISTICO',
+  'ARCANO'
+  ];
 
   dataSource: MatTableDataSource<Member> = new MatTableDataSource<Member>();
 
   loadClasses() {
-    // Se quiser carregar de um serviço, substitua aqui
-    // Já inicializado acima
+ 
   }
 
   filterMembersByClass() {
-    if (this.selectedClass) {
-      this.dataSource.data = this.availableMembers.filter(m => m.classe === this.selectedClass);
-    } else {
-      this.dataSource.data = this.availableMembers;
-    }
+    this.filterMembers();
   }
 }
 
