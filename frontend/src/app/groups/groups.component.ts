@@ -11,9 +11,14 @@ import { MatFormField, MatFormFieldModule, MatLabel } from '@angular/material/fo
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
-import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSortModule } from '@angular/material/sort';
+import { MatDividerModule } from '@angular/material/divider';
 import { Member } from '../members/member.model';
+import { MatTableDataSource } from '@angular/material/table';
+import { ViewChild } from '@angular/core';
+
+
 
 @Component({
   selector: 'app-groups',
@@ -38,13 +43,14 @@ import { Member } from '../members/member.model';
      MatChipsModule, 
      MatPaginatorModule, 
      MatSortModule,
-     MatCardModule
+    MatCardModule,
+     MatDividerModule,
+
     ]
 })
 export class GroupsComponent implements OnInit {
   availableMembers: Member[] = [];
   groups: Group[] = [];
-
   showGroupForm = false;
   groupForm: Partial<Group> = {};
   editingGroup: Group | null = null;
@@ -53,15 +59,21 @@ export class GroupsComponent implements OnInit {
 
   ngOnInit() {
     this.loadGroups();
+    this.loadClasses(); // Adicione esta linha
   }
 
   loadMembers() {
     this.groupService.getMembers().subscribe(members => {
-      // Remove membros já alocados em grupos
       const groupMemberIds = this.groups.flatMap(g => g.members.map(m => m.id));
       this.availableMembers = members.filter(m => !groupMemberIds.includes(m.id));
+      this.dataSource.data = this.availableMembers; // <-- Atualize aqui
     });
   }
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+
+ngAfterViewInit() {
+  this.dataSource.paginator = this.paginator;
+}
 
   loadGroups() {
     this.groupService.getGroups().subscribe(groups => {
@@ -73,6 +85,16 @@ export class GroupsComponent implements OnInit {
       this.loadMembers();
     });
   }
+  applyFilter(event: Event) {
+  const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
+  this.dataSource.filter = filterValue;
+  // Opcional: filtrar apenas nos disponíveis
+  this.dataSource.data = this.availableMembers.filter(member =>
+    member.nickname.toLowerCase().includes(filterValue) &&
+    (!this.selectedClass || member.classe === this.selectedClass)
+  );
+  }
+
 
   openGroupForm(group?: Group) {
     this.showGroupForm = true;
@@ -151,5 +173,38 @@ export class GroupsComponent implements OnInit {
   get groupDropListIds(): string[] {
     return this.groups.map(g => 'groupDropList-' + g.id);
   }
+
+  selectedClass: string = '';
+  classes: string[] = [
+    'Guerreiro',
+    'Mago',
+    'Atiradora',
+    'Sacerdote',
+    'Arqueiro',
+    'Paladino',
+    'Bárbaro',
+    'Feiticeira',
+    'Macaco',
+    'Mercenário',
+    'Espiritualista',
+    'Místico',
+    'Arcano'
+  ]; // Ajuste conforme seu sistema
+
+  dataSource: MatTableDataSource<Member> = new MatTableDataSource<Member>();
+
+  loadClasses() {
+    // Se quiser carregar de um serviço, substitua aqui
+    // Já inicializado acima
+  }
+
+  filterMembersByClass() {
+    if (this.selectedClass) {
+      this.dataSource.data = this.availableMembers.filter(m => m.classe === this.selectedClass);
+    } else {
+      this.dataSource.data = this.availableMembers;
+    }
+  }
 }
+
 

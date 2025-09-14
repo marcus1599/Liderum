@@ -1,6 +1,7 @@
 @use '@angular/material' as mat;
 
 html {
+  background: #363a41;
   @include mat.theme((
     color: mat.$violet-palette,
     typography: Roboto,
@@ -11,7 +12,6 @@ html {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  background: #363a41;
 }
 
 body, #root, app-root {
