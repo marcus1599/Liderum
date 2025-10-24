@@ -8,7 +8,7 @@
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Filtrar por Classe</mat-label>
           <mat-select [(value)]="selectedClass" (selectionChange)="filterMembersByClass()">
-            <mat-option [value]="''">Todas as Classes</mat-option>
+            <mat-option class="mat-op" [value]="''">Todas as Classes</mat-option>
             <mat-option *ngFor="let classe of classes" [value]="classe">
               <img [src]="'assets/icons/classes/ClassIcon_' + classe + '.png'" [alt]="'Classe ' + classe" width="20"
                 height="20" class="classe-icon">

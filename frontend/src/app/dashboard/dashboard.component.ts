@@ -8,6 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { NgChartsModule } from 'ng2-charts';
 
+import { DashboardService, DashboardMetrics } from '../services/dashboard.service';
+
+
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
 import { MembersComponent } from '../members/members.component';
@@ -90,7 +93,7 @@ export class DashboardComponent {
     ]
   };
 
-  // Gráfico de pizza - Distribuição por Classe (Chart.js v4+)
+
   classPieChartData = {
     labels: ['Guerreiros', 'Magos', 'Sacerdotes', 'Arqueiros'],
     datasets: [
@@ -98,27 +101,80 @@ export class DashboardComponent {
     ]
   };
 
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService, private dashboardService: DashboardService) { }
 
-  newEvent() {
-    // Logic to create a new event
-    console.log('New event created');
+  ngOnInit() {
+    this.loadDashboardData();
   }
-  newMember() {
-    // Logic to add a new member
-    console.log('New member added');
+  loadDashboardData() {
+    this.dashboardService.getDashboardMetrics(this.eventFilterCount).subscribe((metrics: DashboardMetrics) => {
+      // Pie de presença
+      this.presencePieChartData = {
+        labels: metrics.presencePie.map(p => p.status),
+        datasets: [{
+          data: metrics.presencePie.map(p => p.count),
+          backgroundColor: ['#43a047', '#e53935', '#1e88e5']
+        }]
+      };
+      // Linha de presença
+      this.presenceLineChartData = {
+        labels: metrics.presenceLine.map(e => e.event),
+        datasets: [
+          {
+            label: 'Presentes',
+            data: metrics.presenceLine.map(e => e.presentes),
+            borderColor: '#43a047',
+            backgroundColor: 'rgba(67,160,71,0.2)'
+          },
+          {
+            label: 'Faltas',
+            data: metrics.presenceLine.map(e => e.faltas),
+            borderColor: '#e53935',
+            backgroundColor: 'rgba(229,57,53,0.2)'
+          },
+          {
+            label: 'Justificados',
+            data: metrics.presenceLine.map(e => e.justificados),
+            borderColor: '#fbc02d',
+            backgroundColor: 'rgba(251,192,45,0.2)'
+          }
+        ]
+      };
+      // Pie de classes
+      this.classPieChartData = {
+        labels: metrics.classPie.map(c => c.classe),
+        datasets: [{
+          data: metrics.classPie.map(c => c.count),
+          backgroundColor: ['#8e24aa', '#1976d2', '#fbc02d', '#43a047', '#e53935', '#f4511e', '#6d4c41', '#546e7a', '#d81b60', '#00897b', '#c0ca33', '#5e35b1', '#039be5', '#fb8c00', '#3949ab', '#00897b', '#d81b60', '#6d4c41']
+        }]
+      };
+      // Alertas e destaques
+      this.alerts = metrics.alerts;
+      this.highlights = metrics.highlights;
+    });
+  }
+
+  // Atualiza ao mudar o filtro de eventos
+  onEventFilterChange() {
+    this.loadDashboardData();
+  }
+
+  // Métodos para navegação entre views
+  activateView(view: string) {
+    this.showDashboard = view === 'dashboard';
+    this.showMembers = view === 'members';
+    this.showGroups = view === 'groups';
+    this.showEvents = view === 'events';
+    this.showAttendence = view === 'attendence';
+    this.showSettings = view === 'settings';
   }
 
   logout() {
     this.authService.logout();
   }
 
-  activateView(view: 'dashboard' | 'members' | 'events' | 'attendence' | 'settings' | 'groups') {
-    this.showDashboard = view === 'dashboard';
-    this.showMembers = view === 'members';
-    this.showEvents = view === 'events';
-    this.showAttendence = view === 'attendence';
-    this.showSettings = view === 'settings';
-    this.showGroups = view === 'groups';
-  }
+  highlights: { member: any, presencas: number }[] = [];
+  alerts: { member: any, faltasConsecutivas: number }[] = [];
+
+
 }

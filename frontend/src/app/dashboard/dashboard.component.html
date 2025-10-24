@@ -76,6 +76,37 @@
           </mat-card>
         </div>
       </ng-container>
+      <mat-card class="dashboard-card dashboard-alerts" *ngIf="showDashboard">
+        <mat-card-title><mat-icon color="warn">warning</mat-icon> Alertas Rápidos</mat-card-title>
+        <mat-card-content>
+          <ul>
+            <li *ngFor="let alert of alerts">
+              <mat-icon color="warn">warning</mat-icon>
+              {{ alert.member.nickname }} - {{ alert.faltasConsecutivas }} faltas consecutivas
+            </li>
+            <li *ngIf="alerts.length === 0">
+              <mat-icon color="primary">check_circle</mat-icon>
+              Nenhum alerta de faltas consecutivas!
+            </li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
+      
+      <mat-card class="dashboard-card dashboard-highlights" *ngIf="showDashboard">
+        <mat-card-title><mat-icon color="primary">emoji_events</mat-icon> Destaques Positivos</mat-card-title>
+        <mat-card-content>
+          <ul>
+            <li *ngFor="let h of highlights">
+              <mat-icon color="primary">star</mat-icon>
+              {{ h.member.nickname }} - {{ h.presencas }} presenças
+            </li>
+            <li *ngIf="highlights.length === 0">
+              <mat-icon color="primary">check_circle</mat-icon>
+              Nenhum destaque no momento.
+            </li>
+          </ul>
+        </mat-card-content>
+      </mat-card>
       <ng-container *ngIf="showMembers">
         <app-members></app-members>
       </ng-container>
