@@ -1,0 +1,58 @@
+<mat-card>
+  <mat-card-title>{{ isEditing ? 'Editar Evento' : 'Novo Evento' }}</mat-card-title>
+  <mat-card-content>
+    <form (ngSubmit)="saveEvent()" class="event-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Nome</mat-label>
+        <input matInput [(ngModel)]="newEvent.name" name="name" required />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Data e Hora</mat-label>
+        <input matInput [(ngModel)]="newEvent.date" name="date" type="datetime-local" required />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Descrição</mat-label>
+        <input matInput [(ngModel)]="newEvent.description" name="description" />
+      </mat-form-field>
+      <div class="form-actions">
+        <button mat-raised-button color="primary" type="submit">
+          {{ isEditing ? 'Atualizar' : 'Adicionar' }}
+        </button>
+        <button mat-button type="button" (click)="resetForm()">Cancelar</button>
+      </div>
+    </form>
+  </mat-card-content>
+</mat-card>
+
+<mat-card>
+  <mat-card-title>Lista de Eventos</mat-card-title>
+  <mat-card-content>
+    <div *ngIf="events.length > 0" class="event-list">
+      <mat-card class="event-item" *ngFor="let event of events">
+        <div class="event-header">
+          <span class="event-title">
+            <mat-icon>event</mat-icon>
+            <strong>{{ event.name }}</strong>
+          </span>
+          <span class="event-date">
+            <mat-icon>calendar_month</mat-icon>
+            {{ event.date | date:'short' }}
+          </span>
+        </div>
+        <div class="event-description">
+          <mat-icon>description</mat-icon>
+          <span>{{ event.description }}</span>
+        </div>
+        <div class="event-actions">
+          <button mat-icon-button color="primary" (click)="editEvent(event)" matTooltip="Editar">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteEvent(event.id)" matTooltip="Excluir">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </mat-card>
+    </div>
+    <p *ngIf="events.length === 0">Nenhum evento cadastrado.</p>
+  </mat-card-content>
+</mat-card>

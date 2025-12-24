@@ -1,0 +1,226 @@
+@media (max-width: 900px) {
+  .event-form {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+  mat-form-field {
+    min-width: 100%;
+    width: 100%;
+   
+  }
+  .form-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    align-items: stretch;
+  }
+  table {
+    font-size: 0.98rem;
+  }
+}
+
+@media (max-width: 600px) {
+  mat-card {
+    padding: 8px !important;
+    border-radius: 8px;
+  }
+  mat-card-title {
+    font-size: 1rem;
+  }
+  .event-form {
+    gap: 4px;
+  }
+  mat-form-field {
+    min-width: 100%;
+    width: 100%;
+    font-size: 0.95rem;
+  }
+  .form-actions button {
+    font-size: 0.95rem;
+    padding: 8px 0;
+  }
+  table {
+    font-size: 0.93rem;
+  }
+}
+
+.events-container {
+  padding: 16px;
+}
+
+.event-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+mat-form-field {
+  flex: 1 1 180px;
+  min-width: 160px;
+  margin-bottom: 8px;
+  background: white;
+  border-radius: 6px;
+  box-sizing: border-box;
+  width: 100%;
+  height: 47px;
+}
+
+.form-actions {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 5px;
+}
+
+mat-card {
+  background: #43464b;
+  color: #fff;
+  padding: 16px;
+  margin-bottom: 24px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0002;
+}
+
+mat-card-title {
+  color: #B89EB8;
+  font-weight: bold;
+  font-size: 1.2rem;
+  letter-spacing: 1px;
+}
+
+th, td {
+  padding: 8px 12px;
+  text-align: left;
+}
+
+th {
+  color: #B89EB8;
+  font-weight: bold;
+}
+
+tr {
+  border-bottom: 1px solid #444;
+}
+
+button[mat-raised-button], button[mat-button] {
+  border-radius: 6px;
+}
+
+button[mat-raised-button] {
+  background: #B89EB8;
+  color: #363a41;
+  font-weight: bold;
+}
+
+button[mat-raised-button]:hover {
+  background: #a07ca0;
+}
+
+button[mat-button] {
+  color: #B89EB8;
+}
+
+button[mat-button]:hover {
+  background: #4a4e56;
+}
+
+/* Alinha ícones e textos centralizados na lista de eventos */
+.event-header-content, .event-cell-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  vertical-align: middle;
+}
+
+.events-table th.mat-header-cell, .events-table td.mat-cell {
+  vertical-align: middle;
+}
+
+.events-table mat-icon {
+  font-size: 20px;
+  height: 20px;
+  width: 20px;
+  color: #B89EB8;
+}
+
+/* Visual extra para destacar linhas e hover */
+.events-table tr.mat-row:hover {
+  background: #444052;
+  transition: background 0.2s;
+}
+
+.events-table th.mat-header-cell {
+  color: #B89EB8;
+  font-weight: bold;
+  font-size: 1.05rem;
+}
+
+.events-table td.mat-cell {
+  font-size: 1rem;
+}
+
+.event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.event-item {
+  background: #363a41;
+  color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px #0002;
+  padding: 18px 18px 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.event-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.event-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  color: #B89EB8;
+}
+
+.event-date {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1rem;
+  color: #b8b8b8;
+}
+
+.event-description {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1rem;
+  color: #e0e0e0;
+}
+
+.event-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.event-actions button[mat-icon-button] {
+  background: #23242a;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.event-actions button[mat-icon-button]:hover {
+  background: #4a4e56;
+}
