@@ -1,3 +1,10 @@
+<<<<<<< HEAD
+=======
+.content{
+  background-color: #393641;
+  padding: 10px;
+}
+>>>>>>> dev
 mat-sidenav {
   width: 250px;
   background-color: #363a41;
@@ -6,10 +13,17 @@ mat-sidenav {
   color: white;
   padding-top: 0;
   align-items: stretch;
+<<<<<<< HEAD
   .menu-btn {
     color: #fff;
     background: transparent;
     border-radius: 0;
+=======
+  border-radius: 0;
+  .menu-btn {
+    color: #fff;
+    background: transparent;
+>>>>>>> dev
     justify-content: flex-start;
     width: 100%;
     text-align: left;
@@ -33,9 +47,19 @@ mat-sidenav {
 }
 
 mat-sidenav-content {
+<<<<<<< HEAD
   
   padding: 20px;
 }
+=======
+  background-color: #4a4e56;
+  padding: 20px;
+}
+.dashboard-card-alerts{
+  gap: 1px;
+  background-color: #B89EB8;
+}
+>>>>>>> dev
 
 .spacer {
   flex: 1 1 auto;
@@ -83,7 +107,11 @@ mat-sidenav-content {
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+<<<<<<< HEAD
   gap: 1.5rem;
+=======
+  gap: 1rem;
+>>>>>>> dev
   align-items: stretch;
 }
 
@@ -92,6 +120,10 @@ mat-sidenav-content {
   max-width: 100%;
   width: 100%;
   display: flex;
+<<<<<<< HEAD
+=======
+  gap: 1rem;
+>>>>>>> dev
   flex-direction: column;
   justify-content: stretch;
   align-items: stretch;
@@ -101,10 +133,18 @@ mat-sidenav-content {
 .dashboard-card canvas {
   max-width: 100% !important;
   max-height: 320px;
+<<<<<<< HEAD
+=======
+  gap: 1rem;
+>>>>>>> dev
   margin: 0 auto;
   display: block;
 }
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> dev
 .dashboard-filter {
   margin-top: 1rem;
   display: flex;

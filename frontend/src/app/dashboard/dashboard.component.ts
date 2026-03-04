@@ -22,6 +22,10 @@ import { SettingsComponent } from '../settings/settings.component';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { GroupsComponent } from '../groups/groups.component';
+<<<<<<< HEAD
+=======
+import { DashboardCardComponent } from "./components/dashboard-card/dashboard-card.component";
+>>>>>>> dev
 
 
 @Component({
@@ -48,8 +52,14 @@ import { GroupsComponent } from '../groups/groups.component';
     MatInputModule,
     FormsModule,
     NgChartsModule,
+<<<<<<< HEAD
     GroupsComponent
   ],
+=======
+    GroupsComponent,
+    DashboardCardComponent
+],
+>>>>>>> dev
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
