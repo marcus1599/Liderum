@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Member } from '../members/member.model';
+import { environment } from '../../environments/environment';
 
 export interface Group {
   id: number;
@@ -11,8 +12,8 @@ export interface Group {
 
 @Injectable({ providedIn: 'root' })
 export class GroupService {
-  private apiUrl = 'http://localhost:8080/teams';
-  private membersUrl = 'http://localhost:8080/api/members';
+  private apiUrl = environment.apiUrl + '/teams';
+  private membersUrl = environment.apiUrl + '/members';
 
   constructor(private http: HttpClient) {}
 

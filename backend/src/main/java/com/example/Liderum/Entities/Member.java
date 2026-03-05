@@ -2,6 +2,7 @@ package com.example.Liderum.Entities;
 
 import com.example.Liderum.Enums.Classe;
 import com.example.Liderum.Enums.GuildRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -36,6 +37,7 @@ public class Member {
 
 
     @ManyToOne
+    @JsonIgnore
     private Team team;
 
     

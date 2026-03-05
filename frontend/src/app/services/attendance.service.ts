@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 export type AttendanceStatus = 'PRESENTE' | 'FALTOU' | 'JUSTIFICOU';
 
@@ -13,7 +14,8 @@ export interface Attendance {
 
 @Injectable({ providedIn: 'root' })
 export class AttendanceService {
-  private apiUrl = 'http://localhost:8080/attendances';
+
+  private apiUrl = `${environment.apiUrl}/attendances`;
 
   constructor(private http: HttpClient) {}
 
