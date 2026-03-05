@@ -33,6 +33,6 @@ public class Team {
     @JoinColumn(name = "leader_id")
     private User leader;
     
-    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members;
 }

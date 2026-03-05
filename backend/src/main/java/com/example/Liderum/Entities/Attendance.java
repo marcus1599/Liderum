@@ -2,6 +2,7 @@ package com.example.Liderum.Entities;
 
 import com.example.Liderum.Enums.AttendanceStatus;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -25,7 +26,7 @@ public class Attendance {
     @Id @GeneratedValue
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.ALL)
     private Member member;
 
     @ManyToOne
