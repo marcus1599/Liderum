@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/members")
 @RequiredArgsConstructor
 @Tag(name = "Members", description = "Member management endpoints")
 public class MemberController {
