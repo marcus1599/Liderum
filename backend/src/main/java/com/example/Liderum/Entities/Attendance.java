@@ -26,7 +26,8 @@ public class Attendance {
     @Id @GeneratedValue
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(name = "member_id")
     private Member member;
 
     @ManyToOne
