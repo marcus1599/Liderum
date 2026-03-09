@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -18,5 +18,6 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {
-
+  @Input() isHandset = false;
+  @Output() menuToggle = new EventEmitter<void>();
 }

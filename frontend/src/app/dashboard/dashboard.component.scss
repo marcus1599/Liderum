@@ -126,7 +126,12 @@ mat-sidenav-content {
     width: 100vw !important;
     min-width: unset;
     max-width: 100vw;
+    height: 100vh;
   }
+  mat-sidenav-container {
+    height: 100vh;
+  }
+
   mat-sidenav-content {
     padding: 8px !important;
   }

@@ -1,7 +1,8 @@
-<app-navbar></app-navbar>
+<app-navbar [isHandset]="(isHandset$ | async) ?? false" (menuToggle)="sidenav.toggle()"></app-navbar>
 <mat-sidenav-container style="height: 100vh;">
-  <mat-sidenav mode="side" opened>
+  <mat-sidenav #sidenav [mode]="(isHandset$ | async) ?? false ? 'over' : 'side'" [opened]="!((isHandset$ | async) ?? false)">
     <app-sidebar 
+      [isHandset]="(isHandset$ | async) ?? false"
       (showDashboardChange)="activateView('dashboard')"
       (showMembersChange)="activateView('members')"
       (showEventsChange)="activateView('events')"
@@ -9,6 +10,7 @@
       (showSettingsChange)="activateView('settings')"
       (showGroupsChange)="activateView('groups')"
       (logoutClick)="logout()"
+      (closeSidenav)="sidenav.close()"
     ></app-sidebar>
   </mat-sidenav>
 

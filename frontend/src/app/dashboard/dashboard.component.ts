@@ -1,4 +1,7 @@
 import { Component } from '@angular/core';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Observable } from 'rxjs';
+import { map, shareReplay } from 'rxjs/operators';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -56,6 +59,8 @@ import { DashboardCardComponent } from "./components/dashboard-card/dashboard-ca
   styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
+  isHandset$: Observable<boolean>;
+
   showMembers = false;
   showEvents = false;
   showAttendence = false;
@@ -103,7 +108,18 @@ export class DashboardComponent {
     ]
   };
 
-  constructor(private authService: AuthService, private dashboardService: DashboardService) { }
+  constructor(
+    private authService: AuthService,
+    private dashboardService: DashboardService,
+    private breakpointObserver: BreakpointObserver
+  ) {
+    this.isHandset$ = this.breakpointObserver
+      .observe([Breakpoints.Handset, Breakpoints.Tablet])
+      .pipe(
+        map((result) => result.matches),
+        shareReplay({ bufferSize: 1, refCount: true })
+      );
+  }
 
   ngOnInit() {
     this.loadDashboardData();
