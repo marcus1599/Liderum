@@ -1,19 +1,136 @@
-.login-container {
-    max-width: 400px;
-    margin: 100px auto;
-    padding: 2rem;
-    border-radius: 10px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    background-color: #fff;
-  
-    h2 {
-      text-align: center;
-      margin-bottom: 1.5rem;
-    }
-  
-    .full-width {
-      width: 100%;
-      margin-bottom: 1rem;
-    }
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.login-background {
+  position: absolute;
+  inset: 0;
+  background: url('/assets/images/background.png') center / cover no-repeat;
+  background-attachment: fixed;
+  transform: translateZ(0);
+  will-change: transform;
+  filter: brightness(0.75);
+}
+
+.login-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.particles {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.particles span {
+  position: absolute;
+  display: block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 0 12px rgba(255, 255, 255, 0.5);
+  animation: float 8s infinite ease-in-out;
+  opacity: 0;
+}
+
+.particles span:nth-child(1) { left: 12%; top: 20%; animation-delay: 0s; animation-duration: 9s; }
+.particles span:nth-child(2) { left: 70%; top: 15%; animation-delay: 1.2s; animation-duration: 10s; }
+.particles span:nth-child(3) { left: 40%; top: 70%; animation-delay: 2.4s; animation-duration: 11s; }
+.particles span:nth-child(4) { left: 15%; top: 80%; animation-delay: 0.8s; animation-duration: 8.5s; }
+.particles span:nth-child(5) { left: 85%; top: 55%; animation-delay: 3.2s; animation-duration: 9.2s; }
+.particles span:nth-child(6) { left: 55%; top: 35%; animation-delay: 4.5s; animation-duration: 10.5s; }
+.particles span:nth-child(7) { left: 25%; top: 50%; animation-delay: 5.8s; animation-duration: 9.7s; }
+.particles span:nth-child(8) { left: 60%; top: 80%; animation-delay: 6.9s; animation-duration: 10.8s; }
+
+@keyframes float {
+  0% {
+    transform: translateY(0) scale(0.75);
+    opacity: 0;
   }
+  20% {
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateY(-28px) scale(1);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translateY(12px) scale(0.7);
+    opacity: 0;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.login-container {
+  max-width: 420px;
+  width: 100%;
+  margin: 0 1rem;
+  padding: 2.5rem;
+  border-radius: 14px;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, 0.45);
+  background: rgba(8, 12, 26, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(16px);
+  position: relative;
+  z-index: 1;
+  animation: slideIn 0.7s ease-out both;
+  color: rgba(255, 255, 255, 0.95);
+
+  h2 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+  }
+  input{
+    color: rgba(255, 255, 255, 0.92);
+  }
+  mat-label{
+    color:rgb(255, 255, 255)
+  }
+
+  ::ng-deep .mat-form-field-infix {
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+  }
+
+  ::ng-deep .mat-form-field-outline {
+    border-color: rgba(255, 255, 255, 0.699);
+  }
+
+  ::ng-deep .mat-form-field-label {
+    color: rgba(255, 255, 255, 0.75) !important;
+  }
+
+  ::ng-deep .mat-input-element {
+    color: rgba(255, 255, 255, 0.92);
+  }
+
+  ::ng-deep .mat-icon {
+    color: rgba(255, 255, 255, 0.65);
+  }
+
+  .full-width {
+    width: 100%;
+    margin-bottom: 1rem;
+  }
+}
   

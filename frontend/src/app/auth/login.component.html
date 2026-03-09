@@ -1,17 +1,27 @@
-<div class="login-container">
+<div class="login-page">
+  <div class="login-background" aria-hidden="true"></div>
+  <div class="login-overlay"></div>
+  <div class="particles" aria-hidden="true">
+    <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+  </div>
 
-  <mat-spinner *ngIf="isLoading" diameter="50"></mat-spinner>
+  <div class="login-container">
+    <mat-spinner *ngIf="isLoading" diameter="50"></mat-spinner>
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <h2>Login</h2>
   
       <mat-form-field appearance="outline" class="full-width">
+        <mat-icon matPrefix>person</mat-icon>
         <mat-label>Usuário</mat-label>
         <input matInput formControlName="username" />
+        
       </mat-form-field>
   
       <mat-form-field appearance="outline" class="full-width">
+        <mat-icon matPrefix>vpn_key</mat-icon>
         <mat-label>Senha</mat-label>
         <input matInput type="password" formControlName="password" />
+        
       </mat-form-field>
   
       <button mat-raised-button color="primary" class="full-width" type="submit" [disabled]="form.invalid">
@@ -19,4 +29,5 @@
       </button>
     </form>
   </div>
+</div>
   
