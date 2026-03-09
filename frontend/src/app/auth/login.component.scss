@@ -128,9 +128,107 @@
     color: rgba(255, 255, 255, 0.65);
   }
 
+  ::ng-deep .mat-form-field.mat-focused .mat-form-field-outline {
+    animation: glow 1.2s ease-in-out;
+    border-color: rgba(123, 206, 255, 0.9);
+    box-shadow: 0 0 16px rgba(123, 206, 255, 0.35);
+  }
+
+  ::ng-deep .mat-form-field.mat-focused .mat-form-field-infix {
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  ::ng-deep .mat-raised-button:not(.mat-button-disabled) {
+    animation: pulse 2.2s ease-in-out infinite;
+    box-shadow: 0 0 0 0 rgba(123, 206, 255, 0.5);
+    position: relative;
+    overflow: hidden;
+  }
+
+  ::ng-deep .mat-raised-button:not(.mat-button-disabled)::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 6px;
+    background: radial-gradient(circle at center, rgba(123, 206, 255, 0.45), transparent 60%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  ::ng-deep .mat-raised-button:not(.mat-button-disabled):active::after {
+    animation: clickBurst 0.8s ease-out forwards;
+  }
+
   .full-width {
     width: 100%;
     margin-bottom: 1rem;
   }
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 16px;
+    padding: 2px;
+    background: linear-gradient(135deg, rgba(123, 206, 255, 0.55), rgba(219, 94, 251, 0.55), rgba(255, 207, 74, 0.55));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: destination-out;
+            mask-composite: exclude;
+    pointer-events: none;
+    animation: borderRunes 6s ease-in-out infinite;
+  }
 }
-  
+
+@keyframes glow {
+  0% {
+    box-shadow: 0 0 0px rgba(123, 206, 255, 0);
+  }
+  50% {
+    box-shadow: 0 0 22px rgba(123, 206, 255, 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0px rgba(123, 206, 255, 0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 rgba(123, 206, 255, 0.5);
+  }
+  50% {
+    transform: translateY(-1.5px) scale(1.02);
+    box-shadow: 0 0 18px 6px rgba(123, 206, 255, 0.25);
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 0 rgba(123, 206, 255, 0);
+  }
+}
+
+@keyframes clickBurst {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  40% {
+    transform: scale(1.1);
+    opacity: 0.35;
+  }
+  100% {
+    transform: scale(1.25);
+    opacity: 0;
+  }
+}
+
+@keyframes borderRunes {
+  0% {
+    filter: drop-shadow(0 0 0 rgba(123, 206, 255, 0.8));
+  }
+  50% {
+    filter: drop-shadow(0 0 18px rgba(219, 94, 251, 0.45));
+  }
+  100% {
+    filter: drop-shadow(0 0 0 rgba(255, 207, 74, 0.8));
+  }
+}
