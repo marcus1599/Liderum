@@ -14,7 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatButtonModule,
     MatIconModule
   ],
-  templateUrl: './navbar.component.html',
+  templateUrl:'./navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent {

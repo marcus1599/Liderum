@@ -5,7 +5,7 @@ import { MembersComponent } from './members/members.component';
 import { authGuard } from './auth/auth.guard';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },

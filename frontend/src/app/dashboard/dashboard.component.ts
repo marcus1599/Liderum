@@ -52,8 +52,7 @@ import { DashboardCardComponent } from "./components/dashboard-card/dashboard-ca
     MatInputModule,
     FormsModule,
     NgChartsModule,
-    GroupsComponent,
-    DashboardCardComponent
+    GroupsComponent
 ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
