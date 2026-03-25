@@ -1,4 +1,10 @@
-<h3>Menu</h3>
+<div class="sidebar-header">
+  <h3>Menu</h3>
+  <button class="close-btn" *ngIf="isHandset" (click)="closeSidenav.emit()" aria-label="Fechar menu">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+
 <button class="menu-btn" (click)="setShowDashboard(true)">
   <mat-icon>dashboard</mat-icon>
   Dashboard
@@ -23,7 +29,10 @@
   <mat-icon>settings</mat-icon>
   Configurações
 </button>
-<button class="menu-btn" (click)="logout()">
+
+<div class="sidebar-spacer"></div>
+
+<button class="menu-btn logout-btn" (click)="logout()">
   <mat-icon>logout</mat-icon>
   Sair
 </button>

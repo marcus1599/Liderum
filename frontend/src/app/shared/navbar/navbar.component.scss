@@ -1,7 +1,6 @@
 mat-toolbar.dashboard-header {
   display: flex;
   align-items: center;
-  flex-wrap: wrap;
   background-color: #363a41;
   color: #fff;
   box-shadow: 0 2px 8px #0002;
@@ -15,72 +14,41 @@ mat-toolbar.dashboard-header {
     color: #B89EB8;
     white-space: nowrap;
   }
+
   .spacer {
     flex: 1 1 auto;
   }
-  
-  .menu-button {
-    margin-right: 12px;
-    color: inherit;
-  }
 
-  .search-bar {
-    background: #fff;
-    border-radius: 6px;
-    min-width: 180px;
-    margin-right: 16px;
-    margin-left: 16px;
-    flex: 0 1 250px;
-    height: 47px;
-    display: flex;
-    align-items: center;
-  }
-  .header-btn {
-    margin-left: 8px;
-    font-weight: 600;
-    border-radius: 6px;
-    box-shadow: 0 1px 4px #0001;
-    white-space: nowrap;
-    height: 40px;
-    display: flex;
-    align-items: center;
+  /* Em desktop: sidenav já está aberta, botão oculto */
+  .menu-button {
+    display: none;
+    margin-right: 8px;
+    color: inherit;
   }
 }
 
-@media (max-width: 900px) {
+/* Em mobile/tablet: mostra o botão hamburguer */
+@media (max-width: 960px) {
   mat-toolbar.dashboard-header {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 12px;
+    padding: 0 12px;
+
+    .menu-button {
+      display: inline-flex;
+    }
 
     .logo {
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    .search-bar {
-      width: 100%;
-      margin: 0 0 10px 0;
-    }
-    .header-btn {
-      width: 100%;
-      margin: 0 0 8px 0;
-    }
-    .spacer {
-      display: none;
+      font-size: 1.4rem;
     }
   }
 }
 
 @media (max-width: 600px) {
   mat-toolbar.dashboard-header {
-    padding: 6px;
+    padding: 0 8px;
+    min-height: 56px;
 
     .logo {
       font-size: 1.2rem;
-    }
-    .header-btn {
-      font-size: 0.95rem;
-      padding: 6px 0;
     }
   }
 }

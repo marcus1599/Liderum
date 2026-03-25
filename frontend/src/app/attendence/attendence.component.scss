@@ -7,11 +7,12 @@
 
 .attendance-table {
   flex: 2 1 420px;
-  min-width: 340px;
+  min-width: 0; /* Permite encolher abaixo do valor flex-basis */
 }
 
 .event-select {
-  min-width: 260px;
+  width: 100%;
+  max-width: 420px;
   margin-bottom: 18px;
   background: rgb(228, 230, 236);
   border-radius: 8px;
@@ -22,10 +23,19 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px #0002;
   padding: 0 0 8px 0;
+  overflow: hidden; /* Garante que o border-radius seja respeitado */
+}
+
+/* Wrapper de scroll horizontal */
+.table-scroll-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .styled-table {
   width: 100%;
+  min-width: 420px; /* Mínimo para manter legibilidade */
   border-collapse: separate;
   border-spacing: 0;
   background: transparent;
@@ -35,20 +45,25 @@
     padding: 10px 12px;
     text-align: center;
     font-size: 1rem;
+    white-space: nowrap;
   }
 
   th {
     color: #b89eb8;
     font-weight: bold;
     background: #23242a;
-    border-top-left-radius: 8px;
-    border-top-right-radius: 8px;
+  }
+
+  td:first-child,
+  th:first-child {
+    text-align: left;
   }
 
   tr {
     border-bottom: 1px solid #444;
     transition: background 0.2s;
-    color:white;
+    color: white;
+
     &:hover {
       background: #444052;
     }
@@ -67,18 +82,24 @@
   align-items: center;
   gap: 4px;
   justify-content: center;
+  cursor: pointer;
 
   input[type='radio'] {
     accent-color: #b89eb8;
     margin-right: 2px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
   }
 
   &.present mat-icon {
     color: #4caf50 !important;
   }
+
   &.absent mat-icon {
     color: #f44336 !important;
   }
+
   &.justified mat-icon {
     color: #ffb300 !important;
   }
@@ -91,7 +112,7 @@
 
 .absence-alert-list {
   flex: 1 1 220px;
-  min-width: 220px;
+  min-width: 200px;
   background: #23242a;
   border-radius: 12px;
   color: #fff;
@@ -121,25 +142,6 @@
   }
 }
 
-// Responsividade extra para tabela
-@media (max-width: 600px) {
-  .styled-table th,
-  .styled-table td {
-    padding: 0.4rem 0.2rem;
-    font-size: 0.95rem;
-  }
-
-  .attendance-table,
-  .absence-alert-list {
-    min-width: 0;
-    width: 100%;
-  }
-
-  .attendance-layout {
-    gap: 0.5rem;
-  }
-}
-
 @media (max-width: 900px) {
   .attendance-layout {
     flex-direction: column;
@@ -150,5 +152,17 @@
   .absence-alert-list {
     min-width: 0;
     width: 100%;
+  }
+
+  .event-select {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 600px) {
+  .styled-table th,
+  .styled-table td {
+    padding: 8px 8px;
+    font-size: 0.93rem;
   }
 }

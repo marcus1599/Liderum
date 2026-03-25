@@ -1,7 +1,8 @@
 <mat-toolbar color="primary" class="dashboard-header">
-  <button mat-icon-button class="menu-button" *ngIf="isHandset" (click)="menuToggle.emit()" aria-label="Abrir menu">
+  <!-- Botão hamburguer: sempre no DOM, visível/oculto via CSS -->
+  <button mat-icon-button class="menu-button" (click)="menuToggle.emit()" aria-label="Abrir menu">
     <mat-icon>menu</mat-icon>
   </button>
   <span class="logo">Liderum</span>
   <span class="spacer"></span>
- </mat-toolbar>
+</mat-toolbar>

@@ -22,12 +22,11 @@ mat-form-field {
 mat-card {
   background: #363a41;
   color: #fff;
-  padding:16px;
+  padding: 16px;
   margin-bottom: 24px;
   border-radius: 12px;
   box-shadow: 0 2px 8px #0002;
 }
-
 
 mat-card-title {
   color: #B89EB8;
@@ -36,17 +35,12 @@ mat-card-title {
   letter-spacing: 1px;
 }
 
-
 mat-select, mat-input, input {
-  color: #363a41 ;
+  color: #363a41;
   width: 100%;
- 
-}
-mat-option {
-  color: #363a41 ;
 }
 
-.mat-form-field-appearance-outline .mat-form-field-outline {
+mat-option {
   color: #363a41;
 }
 
@@ -72,59 +66,25 @@ button[mat-button]:hover {
   background: #4a4e56;
 }
 
-
-
-.mat-form-field-flex {
-  min-height: unset;
-  height: auto;
-  padding: 0;
-  align-items: flex-start;
-  background: white !important;
-  border-radius: 6px;
-  box-sizing: border-box;
+/* Wrapper com scroll horizontal para a tabela em mobile */
+.table-wrapper {
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 8px;
 }
 
-mat-form-field input, mat-form-field.mat-form-field-type-mat-input input {
-  background: transparent !important;
-  color: #363a41 !important;
-}
-
-mat-form-field.mat-form-field-type-mat-select .mat-select-trigger {
-  background: white !important;
-  color: #363a41 !important;
-  border-radius: 6px;
-}
-
-mat-form-field .mat-form-field-label {
-  line-height: 1.5 !important;
-  font-size: 1rem !important;
-  padding: 0 8px !important;
-  height: auto;
-  display: inline-block;
-  background: white !important;
-  left: 0 !important;
-  margin: 0;
-}
-
-mat-select-panel {
-  background: white !important;
-  color: #363a41 !important;
-}
-
-/* Alinha ícone e texto no cabeçalho da tabela de membros */
-.header-icon {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-weight: 500;
-  font-size: 1rem;
+.members-table {
+  /* Tabela não pode encolher abaixo de um mínimo legível */
+  min-width: 560px;
+  width: 100%;
 }
 
 .members-table th.mat-header-cell {
   vertical-align: middle;
   padding-top: 8px;
   padding-bottom: 8px;
+  white-space: nowrap;
 }
 
 .members-table th.mat-header-cell span.header-content {
@@ -142,16 +102,26 @@ mat-select-panel {
   vertical-align: middle;
 }
 
+.members-table td.mat-cell {
+  white-space: nowrap;
+}
+
+.search-bar {
+  margin-bottom: 12px;
+}
+
 @media (max-width: 900px) {
   .member-form {
     flex-direction: column;
     gap: 8px;
     align-items: stretch;
   }
+
   mat-form-field {
     min-width: 100%;
     width: 100%;
   }
+
   .form-actions {
     flex-direction: column;
     gap: 8px;
@@ -165,17 +135,21 @@ mat-select-panel {
     padding: 8px !important;
     border-radius: 8px;
   }
+
   mat-card-title {
     font-size: 1rem;
   }
+
   .member-form {
     gap: 4px;
   }
+
   mat-form-field {
     min-width: 100%;
     width: 100%;
     font-size: 0.95rem;
   }
+
   .form-actions button {
     font-size: 0.95rem;
     padding: 8px 0;

@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Observable } from 'rxjs';
-import { map, shareReplay } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { map, shareReplay, takeUntil } from 'rxjs/operators';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,7 +12,6 @@ import { MatInputModule } from '@angular/material/input';
 import { NgChartsModule } from 'ng2-charts';
 
 import { DashboardService, DashboardMetrics } from '../services/dashboard.service';
-
 
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../auth/auth.service';
@@ -25,8 +24,6 @@ import { SettingsComponent } from '../settings/settings.component';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { GroupsComponent } from '../groups/groups.component';
-import { DashboardCardComponent } from "./components/dashboard-card/dashboard-card.component";
-
 
 @Component({
   selector: 'app-dashboard',
@@ -47,18 +44,18 @@ import { DashboardCardComponent } from "./components/dashboard-card/dashboard-ca
     AttendenceComponent,
     SettingsComponent,
     MatCardModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
     FormsModule,
     NgChartsModule,
     GroupsComponent
-],
+  ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent {
-  isHandset$: Observable<boolean>;
+export class DashboardComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  // Valor síncrono — sem async pipe no template
+  isHandset = false;
 
   showMembers = false;
   showEvents = false;
@@ -68,64 +65,67 @@ export class DashboardComponent {
   showGroups = false;
   eventFilterCount = 10;
 
-  // Gráfico de pizza - Taxa de Presença Geral
-  presencePieLabels: string[] = ['Presenças', 'Faltas', 'Justificadas'];
-  presencePieData: number[] = [60, 30, 10]; // Exemplo mock
-  presencePieColors = [{ backgroundColor: ['#43a047', '#e53935', '#1e88e5'] }];
-
-  // Gráfico de linha - Evolução de Presença
-  presenceLineLabels: string[] = ['Evento 1', 'Evento 2', 'Evento 3', 'Evento 4', 'Evento 5'];
-  presenceLineData = [{ data: [18, 22, 20, 25, 19], label: 'Presentes' }];
-  presenceLineColors = [{ borderColor: '#43a047', backgroundColor: 'rgba(67,160,71,0.1)' }];
-
-  // Gráfico de pizza - Distribuição por Classe
-  classPieLabels: string[] = ['Guerreiros', 'Magos', 'Sacerdotes', 'Arqueiros'];
-  classPieData: number[] = [12, 8, 5, 5];
-  classPieColors = [{ backgroundColor: ['#8e24aa', '#1976d2', '#fbc02d', '#43a047'] }];
-
-  // Gráfico de pizza - Taxa de Presença Geral (Chart.js v4+)
   presencePieChartData = {
     labels: ['Presenças', 'Faltas', 'Justificadas'],
     datasets: [
-      { data: [60, 30, 10], backgroundColor: ['#43a047', '#e53935', '#1e88e5'] }
+      { data: [0, 0, 0], backgroundColor: ['#43a047', '#e53935', '#1e88e5'] }
     ]
   };
 
-  // Gráfico de linha - Evolução de Presença (Chart.js v4+)
   presenceLineChartData = {
-    labels: ['Evento 1', 'Evento 2', 'Evento 3', 'Evento 4', 'Evento 5'],
+    labels: [] as string[],
     datasets: [
-      { data: [18, 22, 20, 25, 19], label: 'Presentes', borderColor: '#43a047', backgroundColor: 'rgba(67,160,71,0.1)' }
+      { data: [] as number[], label: 'Presentes', borderColor: '#43a047', backgroundColor: 'rgba(67,160,71,0.2)' },
+      { data: [] as number[], label: 'Faltas', borderColor: '#e53935', backgroundColor: 'rgba(229,57,53,0.2)' },
+      { data: [] as number[], label: 'Justificados', borderColor: '#fbc02d', backgroundColor: 'rgba(251,192,45,0.2)' }
     ]
   };
-
 
   classPieChartData = {
-    labels: ['Guerreiros', 'Magos', 'Sacerdotes', 'Arqueiros'],
+    labels: [] as string[],
     datasets: [
-      { data: [12, 8, 5, 5], backgroundColor: ['#8e24aa', '#1976d2', '#fbc02d', '#43a047'] }
+      {
+        data: [] as number[],
+        backgroundColor: [
+          '#8e24aa', '#1976d2', '#fbc02d', '#43a047', '#e53935',
+          '#f4511e', '#6d4c41', '#546e7a', '#d81b60', '#00897b',
+          '#c0ca33', '#5e35b1', '#039be5'
+        ]
+      }
     ]
   };
+
+  highlights: { member: any, presencas: number }[] = [];
+  alerts: { member: any, faltasConsecutivas: number }[] = [];
 
   constructor(
     private authService: AuthService,
     private dashboardService: DashboardService,
     private breakpointObserver: BreakpointObserver
-  ) {
-    this.isHandset$ = this.breakpointObserver
-      .observe([Breakpoints.Handset, Breakpoints.Tablet])
-      .pipe(
-        map((result) => result.matches),
-        shareReplay({ bufferSize: 1, refCount: true })
-      );
-  }
+  ) {}
 
   ngOnInit() {
+    // Subscreve o breakpoint e atualiza a propriedade síncrona
+    this.breakpointObserver
+      .observe([Breakpoints.Handset, Breakpoints.Tablet])
+      .pipe(
+        map(result => result.matches),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(isHandset => {
+        this.isHandset = isHandset;
+      });
+
     this.loadDashboardData();
   }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadDashboardData() {
     this.dashboardService.getDashboardMetrics(this.eventFilterCount).subscribe((metrics: DashboardMetrics) => {
-      // Pie de presença
       this.presencePieChartData = {
         labels: metrics.presencePie.map(p => p.status),
         datasets: [{
@@ -133,7 +133,7 @@ export class DashboardComponent {
           backgroundColor: ['#43a047', '#e53935', '#1e88e5']
         }]
       };
-      // Linha de presença
+
       this.presenceLineChartData = {
         labels: metrics.presenceLine.map(e => e.event),
         datasets: [
@@ -157,26 +157,28 @@ export class DashboardComponent {
           }
         ]
       };
-      // Pie de classes
+
       this.classPieChartData = {
         labels: metrics.classPie.map(c => c.classe),
         datasets: [{
           data: metrics.classPie.map(c => c.count),
-          backgroundColor: ['#8e24aa', '#1976d2', '#fbc02d', '#43a047', '#e53935', '#f4511e', '#6d4c41', '#546e7a', '#d81b60', '#00897b', '#c0ca33', '#5e35b1', '#039be5', '#fb8c00', '#3949ab', '#00897b', '#d81b60', '#6d4c41']
+          backgroundColor: [
+            '#8e24aa', '#1976d2', '#fbc02d', '#43a047', '#e53935',
+            '#f4511e', '#6d4c41', '#546e7a', '#d81b60', '#00897b',
+            '#c0ca33', '#5e35b1', '#039be5'
+          ]
         }]
       };
-      // Alertas e destaques
+
       this.alerts = metrics.alerts;
       this.highlights = metrics.highlights;
     });
   }
 
-  // Atualiza ao mudar o filtro de eventos
   onEventFilterChange() {
     this.loadDashboardData();
   }
 
-  // Métodos para navegação entre views
   activateView(view: string) {
     this.showDashboard = view === 'dashboard';
     this.showMembers = view === 'members';
@@ -189,9 +191,4 @@ export class DashboardComponent {
   logout() {
     this.authService.logout();
   }
-
-  highlights: { member: any, presencas: number }[] = [];
-  alerts: { member: any, faltasConsecutivas: number }[] = [];
-
-
 }

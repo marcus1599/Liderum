@@ -1,8 +1,14 @@
-<app-navbar [isHandset]="(isHandset$ | async) ?? false" (menuToggle)="sidenav.toggle()"></app-navbar>
-<mat-sidenav-container style="height: 100vh;">
-  <mat-sidenav #sidenav [mode]="(isHandset$ | async) ?? false ? 'over' : 'side'" [opened]="!((isHandset$ | async) ?? false)">
-    <app-sidebar 
-      [isHandset]="(isHandset$ | async) ?? false"
+<app-navbar [isHandset]="isHandset" (menuToggle)="sidenav.toggle()"></app-navbar>
+
+<mat-sidenav-container style="height: calc(100vh - 64px);">
+  <mat-sidenav
+    #sidenav
+    [mode]="isHandset ? 'over' : 'side'"
+    [opened]="!isHandset"
+    [fixedInViewport]="isHandset"
+    fixedTopGap="64">
+    <app-sidebar
+      [isHandset]="isHandset"
       (showDashboardChange)="activateView('dashboard')"
       (showMembersChange)="activateView('members')"
       (showEventsChange)="activateView('events')"
@@ -27,9 +33,10 @@
                 [options]="{ responsive: true, plugins: { legend: { position: 'bottom' } } }">
               </canvas>
               <div class="dashboard-filter">
-                <mat-form-field appearance="fill" style="width: 180px;">
+                <mat-form-field appearance="fill" style="width: 160px;">
                   <mat-label>Últimos eventos</mat-label>
-                  <input matInput type="number" min="1" max="50" [(ngModel)]="eventFilterCount" placeholder="10">
+                  <input matInput type="number" min="1" max="50" [(ngModel)]="eventFilterCount"
+                    (ngModelChange)="onEventFilterChange()" placeholder="10">
                 </mat-form-field>
               </div>
             </mat-card-content>
@@ -57,42 +64,40 @@
             </mat-card-content>
           </mat-card>
 
-          <mat-card class="dashboard-card dashboard-alerts" *ngIf="showDashboard">
-        <mat-card-title><mat-icon color="warn">warning</mat-icon> Alertas Rápidos</mat-card-title>
-        <mat-card-content>
-          <ul>
-            <li *ngFor="let alert of alerts">
-              <mat-icon color="warn">warning</mat-icon>
-              {{ alert.member.nickname }} - {{ alert.faltasConsecutivas }} faltas consecutivas
-            </li>
-            <li *ngIf="alerts.length === 0">
-              <mat-icon color="primary">check_circle</mat-icon>
-              Nenhum alerta de faltas consecutivas!
-            </li>
-          </ul>
-        </mat-card-content>
-      </mat-card>
-      
-      <mat-card class="dashboard-card dashboard-highlights" *ngIf="showDashboard">
-        <mat-card-title><mat-icon color="primary">emoji_events</mat-icon> Destaques Positivos</mat-card-title>
-        <mat-card-content>
-          <ul>
-            <li *ngFor="let h of highlights">
-              <mat-icon color="primary">star</mat-icon>
-              {{ h.member.nickname }} - {{ h.presencas }} presenças
-            </li>
-            <li *ngIf="highlights.length === 0">
-              <mat-icon color="primary">check_circle</mat-icon>
-              Nenhum destaque no momento.
-            </li>
-          </ul>
-        </mat-card-content>
-      </mat-card>
-        </div>
-        
+          <mat-card class="dashboard-card">
+            <mat-card-title><mat-icon color="warn">warning</mat-icon> Alertas Rápidos</mat-card-title>
+            <mat-card-content>
+              <ul>
+                <li *ngFor="let alert of alerts">
+                  <mat-icon color="warn">warning</mat-icon>
+                  {{ alert.member.nickname }} — {{ alert.faltasConsecutivas }} faltas consecutivas
+                </li>
+                <li *ngIf="alerts.length === 0">
+                  <mat-icon color="primary">check_circle</mat-icon>
+                  Nenhum alerta de faltas consecutivas!
+                </li>
+              </ul>
+            </mat-card-content>
+          </mat-card>
 
+          <mat-card class="dashboard-card">
+            <mat-card-title><mat-icon color="primary">emoji_events</mat-icon> Destaques Positivos</mat-card-title>
+            <mat-card-content>
+              <ul>
+                <li *ngFor="let h of highlights">
+                  <mat-icon color="primary">star</mat-icon>
+                  {{ h.member.nickname }} — {{ h.presencas }} presenças
+                </li>
+                <li *ngIf="highlights.length === 0">
+                  <mat-icon color="primary">check_circle</mat-icon>
+                  Nenhum destaque no momento.
+                </li>
+              </ul>
+            </mat-card-content>
+          </mat-card>
+        </div>
       </ng-container>
-      
+
       <ng-container *ngIf="showMembers">
         <app-members></app-members>
       </ng-container>
