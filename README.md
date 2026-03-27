@@ -1,53 +1,92 @@
-   # 🎮 Liderum
+# 🚀 Liderum
 
-   ## 🚀 Descrição
-   Liderum é um sistema de gestão para guildas de RPG, projetado para facilitar a organização de membros, equipes, eventos e o controle de presença. A aplicação permite que líderes de guildas monitorem a participação de membros, mantenham informações organizadas e integrem‑se com ferramentas como autenticação JWT.
+Liderum é uma aplicação web voltada para a organização de guildas de RPG, com o objetivo de centralizar e facilitar a gestão de membros, equipes e eventos.
 
-   ## ⚙️ Tecnologias Utilizadas
-   - **Back-End**:
-     - Spring Boot
-     - Spring Security (JWT)
-     - JPA/Hibernate
-     - Banco de Dados H2 (em memória)
-   - **Front-End**:
-     - Angular (com standalone components)
-     - Angular Material
+## 🧠 Sobre o projeto
 
+A ideia do Liderum surgiu da necessidade de organizar informações de guildas que, na maioria das vezes, são gerenciadas de forma manual ou utilizando múltiplas ferramentas desconectadas.
 
-   
-    ## 🔧 Como Rodar o Projeto Localmente
+A proposta é oferecer uma solução única, intuitiva e escalável para líderes e membros de guildas.
 
-    ### Back-End
-    ```bash
-    cd backend
-    mvn spring-boot:run
+---
 
-    A API estará em http://localhost:8080
+## ✨ Funcionalidades
 
-    📝 Funcionalidades Implementadas
-        Autenticação com JWT
+- 👥 Gerenciamento de membros
+- 🛡️ Controle de cargos e permissões
+- 🧩 Organização de equipes/grupos
+- 📅 Criação de eventos
+- ✅ Controle de presença (attendance)
+- 🔐 Autenticação com JWT
+- 📊 Dashboard com visualização de dados
 
-        Gestão de membros (add, editar, listar)
+---
 
-        Controle de presença em eventos
+## 🖼️ Interface
 
-        Dashboard para visualizar dados da guilda
+### Dashboard
+Visão geral com informações e indicadores da guilda.
 
-    🚧 Status do Projeto
-        ✅ Back-End completo
+### Membros
+Gerenciamento completo de membros, incluindo dados e cargos.
 
-        🚧 Front-End em desenvolvimento
+### Grupos
+Organização de equipes dentro da guilda.
 
-    📜 Documentação da API
-        Acesse no navegador: http://localhost:8080/swagger-ui.html
+---
 
-    🤝 Contribuição
-        Faça um fork deste repositório
+## 🛠️ Tecnologias utilizadas
 
-        Crie uma branch: git checkout -b feature/minha-feature
+### Back-end
+- Java
+- Spring Boot
+- Spring Security
+- JPA / Hibernate
 
-        Commit suas mudanças: git commit -m "feat: minha feature"
+### Front-end
+- Angular
+- Angular Material
+- TypeScript
 
-        Envie para o repositório original: git push origin feature/minha-feature
+### Outros
+- JWT (autenticação)
+- Docker (planejado)
+- Swagger (planejado)
 
-        Abra um Pull Request
+---
+
+## 🌐 Acesso ao projeto
+
+🔗 https://theliderum.vercel.app/
+
+> ⚠️ Observação: o backend pode levar alguns segundos para iniciar devido ao uso de hospedagem gratuita.
+
+---
+
+## 🎯 Objetivo
+
+O objetivo do projeto é evoluir continuamente até se tornar um SaaS completo, oferecendo uma solução robusta para gestão de guildas.
+
+---
+
+## 📈 Roadmap (próximos passos)
+
+- [ ] Melhorias de UX/UI
+- [ ] Sistema de notificações
+- [ ] Dashboard mais completo
+- [ ] Deploy com maior disponibilidade
+- [ ] Planos e monetização (SaaS)
+
+---
+
+## 🤝 Contribuição
+
+Feedbacks são muito bem-vindos!
+
+Se você tiver sugestões, ideias ou encontrar algum problema, fique à vontade para abrir uma issue ou entrar em contato.
+
+---
+
+## 📌 Autor
+
+Desenvolvido por Marcus Ferreira  
