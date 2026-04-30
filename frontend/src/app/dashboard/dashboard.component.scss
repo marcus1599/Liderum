@@ -1,143 +1,507 @@
-.content {
-  background-color: #393641;
-  padding: 10px;
-}
+// ── Tokens ──────────────────────────────────────────────────────────────────
+$bg-page:    #2e3139;
+$bg-sidenav: #262930;
+$bg-card:    #31353e;
+$bg-surface: #3a3e48;
 
+$green:  #1D9E75;
+$red:    #E24B4A;
+$amber:  #EF9F27;
+$purple: #7F77DD;
+$blue:   #378ADD;
+
+$text-primary:   #e8e6f0;
+$text-secondary: #9ca3af;
+$text-muted:     #6b7280;
+
+$border: rgba(255, 255, 255, 0.07);
+$radius-lg: 14px;
+$radius-md: 10px;
+$radius-sm: 6px;
+
+// ── Layout base ─────────────────────────────────────────────────────────────
 mat-sidenav {
   width: 260px;
-  background-color: #363a41;
-  display: flex;
-  flex-direction: column;
+  background-color: $bg-sidenav;
   color: white;
-  padding-top: 0;
-  align-items: stretch;
+  border-right: 1px solid $border;
   border-radius: 0;
 }
 
 mat-sidenav-content {
-  background-color: #4a4e56;
+  background-color: $bg-page;
+}
+
+.content {
   padding: 20px;
+  background-color: $bg-page;
+  min-height: 100%;
 }
 
-.spacer {
-  flex: 1 1 auto;
+// ── KPI strip ────────────────────────────────────────────────────────────────
+.kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
 }
 
-/* Grid de cards do dashboard */
+.kpi-card {
+  background: $bg-card;
+  border: 0.5px solid $border;
+  border-radius: $radius-md;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  &.kpi-danger { border-left: 3px solid $red; }
+  &.kpi-warn   { border-left: 3px solid $amber; }
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: $text-secondary;
+}
+
+.kpi-value {
+  font-size: 26px;
+  font-weight: 500;
+  color: $text-primary;
+  line-height: 1.1;
+}
+
+.kpi-sub {
+  font-size: 11px;
+  color: $text-muted;
+}
+
+// ── Dashboard grid ───────────────────────────────────────────────────────────
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-rows: auto auto;
+  gap: 12px;
   align-items: start;
 }
 
+// ── Cards base ────────────────────────────────────────────────────────────────
 .dashboard-card {
-  background: #363a41;
-  color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0002;
-  padding: 16px;
+  background: $bg-card !important;
+  color: $text-primary !important;
+  border-radius: $radius-lg !important;
+  border: 0.5px solid $border;
+  box-shadow: none !important;
+  padding: 0 !important;
   min-width: 0;
+
+  mat-card-header {
+    padding: 14px 16px 0;
+  }
+
+  mat-card-content {
+    padding: 12px 16px 16px;
+    margin: 0 !important;
+  }
+}
+
+// ── Card title row ────────────────────────────────────────────────────────────
+.card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.card-title-text {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: $text-secondary;
+}
+
+.card-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+
+  &.icon-green  { color: $green; }
+  &.icon-purple { color: $purple; }
+  &.icon-blue   { color: $blue; }
+  &.icon-amber  { color: $amber; }
+  &.icon-red    { color: $red; }
+}
+
+// ── Donut card ────────────────────────────────────────────────────────────────
+.card-donut {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.donut-wrap {
+  display: flex;
+  justify-content: center;
+  canvas {
+    max-width: 160px !important;
+    max-height: 160px !important;
+  }
+}
+
+.donut-legend {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-
-  mat-card-title {
-    color: #B89EB8;
-    font-size: 1rem;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-
-  ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-
-    li {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 0;
-      font-size: 0.95rem;
-    }
-  }
+  gap: 6px;
+  margin-top: 12px;
 }
 
-/* Canvas dos charts: nunca ultrapassar a largura do card */
-.dashboard-card canvas {
-  max-width: 100% !important;
-  max-height: 280px;
-  margin: 0 auto;
-  display: block;
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: $text-secondary;
 }
 
-/* Filtro de eventos: alinhado à direita, responsivo */
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  &.dot-green { background: $green; }
+  &.dot-red   { background: $red; }
+  &.dot-amber { background: $amber; }
+}
+
+.legend-label { flex: 1; }
+
+.legend-count {
+  font-weight: 500;
+  color: $text-primary;
+}
+
+// ── Filter field ──────────────────────────────────────────────────────────────
 .dashboard-filter {
-  margin-top: 0.75rem;
+  margin-top: 14px;
   display: flex;
   justify-content: flex-end;
+}
 
-  mat-form-field {
-    width: 160px;
+.filter-field {
+  width: 160px;
+
+  // Override Angular Material para o tema escuro
+  .mat-mdc-text-field-wrapper {
+    background: $bg-surface !important;
+  }
+
+  .mdc-text-field--outlined .mdc-notched-outline__leading,
+  .mdc-text-field--outlined .mdc-notched-outline__notch,
+  .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  input, .mat-mdc-form-field-input-control {
+    color: $text-primary !important;
+    font-size: 13px;
+  }
+
+  .mat-mdc-floating-label, label {
+    color: $text-secondary !important;
+    font-size: 13px;
+  }
+
+  mat-icon {
+    color: $text-muted;
+    font-size: 16px;
   }
 }
 
-/* ── Responsividade ── */
+// ── Line chart card ───────────────────────────────────────────────────────────
+.card-line {
+  grid-column: 2;
+  grid-row: 1;
+}
 
-@media (max-width: 900px) {
-  mat-sidenav {
-    width: 80vw !important;
-    max-width: 320px;
+.chart-wrap {
+  position: relative;
+  height: 160px;
+  canvas {
+    max-width: 100% !important;
+  }
+}
+
+.line-legend {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+// ── Bar classes card ──────────────────────────────────────────────────────────
+.card-classes {
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.class-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bar-label {
+  font-size: 12px;
+  color: $text-secondary;
+  width: 82px;
+  flex-shrink: 0;
+  text-align: right;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.bar-track {
+  flex: 1;
+  height: 8px;
+  background: $bg-surface;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width .4s ease;
+}
+
+.bar-count {
+  font-size: 11px;
+  color: $text-muted;
+  min-width: 16px;
+  text-align: right;
+}
+
+// ── Alerts card ───────────────────────────────────────────────────────────────
+.card-alerts {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+.alert-ok {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba($green, 0.1);
+  border-radius: $radius-sm;
+  font-size: 13px;
+  color: lighten($green, 20%);
+  margin-bottom: 10px;
+
+  .alert-check {
+    color: $green;
+    font-size: 18px;
+  }
+}
+
+.alert-warn-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 9px 12px;
+  background: rgba($amber, 0.08);
+  border-radius: $radius-sm;
+  margin-bottom: 6px;
+
+  .alert-warn-icon {
+    color: $amber;
+    font-size: 18px;
+    flex-shrink: 0;
+    margin-top: 1px;
   }
 
-  mat-sidenav-content {
-    padding: 8px !important;
+  .alert-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
-  .content {
-    padding: 0 !important;
+  .alert-name {
+    font-size: 13px;
+    font-weight: 500;
+    color: $text-primary;
+  }
+
+  .alert-detail {
+    font-size: 11px;
+    color: $text-muted;
+  }
+}
+
+.event-summary {
+  margin-top: 14px;
+
+  .summary-label {
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: $text-muted;
+    margin-bottom: 8px;
+  }
+
+  .summary-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .summary-card {
+    background: $bg-surface;
+    border-radius: $radius-sm;
+    padding: 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+
+    &.summary-green .summary-num { color: $green; }
+    &.summary-red   .summary-num { color: $red; }
+  }
+
+  .summary-num {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  .summary-tag {
+    font-size: 11px;
+    color: $text-muted;
+  }
+}
+
+// ── Highlights card ───────────────────────────────────────────────────────────
+.card-highlights {
+  grid-column: 2 / span 2;
+  grid-row: 2;
+}
+
+.highlight-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 0;
+  border-bottom: 0.5px solid $border;
+
+  &:last-child { border-bottom: none; }
+}
+
+.highlight-rank {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: $bg-surface;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: $text-muted;
+  }
+
+  &.rank-gold   mat-icon { color: #F59E0B; }
+  &.rank-silver mat-icon { color: #9CA3AF; }
+  &.rank-bronze mat-icon { color: #B45309; }
+}
+
+.highlight-name {
+  flex: 1;
+  font-size: 13px;
+  color: $text-primary;
+}
+
+.highlight-count {
+  font-size: 12px;
+  color: $text-muted;
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: $text-muted;
+  padding: 8px 0;
+
+  mat-icon { font-size: 18px; color: $text-muted; }
+}
+
+// ── Responsividade ────────────────────────────────────────────────────────────
+@media (max-width: 1024px) {
+  .kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .dashboard-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto;
+  }
+
+  .card-donut    { grid-column: 1; grid-row: 1; }
+  .card-line     { grid-column: 2; grid-row: 1; }
+  .card-classes  { grid-column: 1; grid-row: 2; }
+  .card-alerts   { grid-column: 2; grid-row: 2; }
+  .card-highlights { grid-column: 1 / span 2; grid-row: 3; }
+}
+
+@media (max-width: 768px) {
+  mat-sidenav { width: 80vw !important; max-width: 300px; }
+
+  .content { padding: 10px; }
+
+  .kpi-strip {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
   }
 
   .dashboard-grid {
     grid-template-columns: 1fr;
-    gap: 0.75rem;
+    gap: 10px;
   }
 
-  .dashboard-card canvas {
-    max-height: 240px;
+  .card-donut,
+  .card-line,
+  .card-classes,
+  .card-alerts,
+  .card-highlights {
+    grid-column: 1;
+    grid-row: auto;
   }
+
+  .chart-wrap { height: 140px; }
 }
 
-@media (max-width: 600px) {
-  mat-sidenav-content {
-    padding: 4px !important;
-  }
+@media (max-width: 480px) {
+  .kpi-strip { grid-template-columns: 1fr 1fr; }
+  .kpi-value { font-size: 22px; }
 
-  .content {
-    padding: 0 !important;
-  }
-
-  .dashboard-grid {
-    gap: 0.5rem;
-  }
+  .content { padding: 6px; }
 
   .dashboard-card {
-    padding: 12px;
-    border-radius: 8px;
-
-    mat-card-title {
-      font-size: 0.95rem;
-    }
-  }
-
-  .dashboard-card canvas {
-    max-height: 200px;
-  }
-
-  .dashboard-filter mat-form-field {
-    width: 140px;
+    border-radius: 10px !important;
   }
 }

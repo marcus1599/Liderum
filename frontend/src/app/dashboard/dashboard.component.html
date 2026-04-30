@@ -22,79 +22,235 @@
 
   <mat-sidenav-content>
     <div class="content">
+
       <ng-container *ngIf="showDashboard">
+
+        <!-- ── KPI strip ── -->
+        <div class="kpi-strip">
+          <div class="kpi-card">
+            <span class="kpi-label">Taxa de presença</span>
+            <span class="kpi-value">
+              {{ presencePieChartData.datasets[0].data[0] &&
+                 (presencePieChartData.datasets[0].data[0] /
+                  (presencePieChartData.datasets[0].data[0] +
+                   presencePieChartData.datasets[0].data[1] +
+                   presencePieChartData.datasets[0].data[2]) * 100 | number:'1.0-0')
+              }}%
+            </span>
+            <span class="kpi-sub">dos membros presentes</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-label">Total no evento</span>
+            <span class="kpi-value">
+              {{ (presencePieChartData.datasets[0].data[0] || 0) +
+                 (presencePieChartData.datasets[0].data[1] || 0) +
+                 (presencePieChartData.datasets[0].data[2] || 0) }}
+            </span>
+            <span class="kpi-sub">registros totais</span>
+          </div>
+          <div class="kpi-card kpi-danger">
+            <span class="kpi-label">Faltas</span>
+            <span class="kpi-value">{{ presencePieChartData.datasets[0].data[1] || 0 }}</span>
+            <span class="kpi-sub">sem justificativa</span>
+          </div>
+          <div class="kpi-card kpi-warn">
+            <span class="kpi-label">Justificadas</span>
+            <span class="kpi-value">{{ presencePieChartData.datasets[0].data[2] || 0 }}</span>
+            <span class="kpi-sub">falta com justificativa</span>
+          </div>
+        </div>
+
+        <!-- ── Main grid ── -->
         <div class="dashboard-grid">
-          <mat-card class="dashboard-card">
-            <mat-card-title><mat-icon>pie_chart</mat-icon> Taxa de Presença Geral</mat-card-title>
+
+          <!-- Donut de presença -->
+          <mat-card class="dashboard-card card-donut">
+            <mat-card-header>
+              <div class="card-title-row">
+                <mat-icon class="card-icon icon-green">donut_large</mat-icon>
+                <span class="card-title-text">Taxa de presença geral</span>
+              </div>
+            </mat-card-header>
             <mat-card-content>
-              <canvas baseChart
-                [data]="presencePieChartData"
-                [type]="'pie'"
-                [options]="{ responsive: true, plugins: { legend: { position: 'bottom' } } }">
-              </canvas>
+              <div class="donut-wrap">
+                <canvas baseChart
+                  [data]="presencePieChartData"
+                  [type]="'doughnut'"
+                  [options]="{
+                    responsive: true,
+                    cutout: '68%',
+                    plugins: {
+                      legend: { display: false },
+                      tooltip: { enabled: true }
+                    }
+                  }">
+                </canvas>
+              </div>
+              <div class="donut-legend">
+                <div class="legend-item">
+                  <span class="legend-dot dot-green"></span>
+                  <span class="legend-label">Presente</span>
+                  <span class="legend-count">{{ presencePieChartData.datasets[0].data[0] || 0 }}</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot dot-red"></span>
+                  <span class="legend-label">Faltou</span>
+                  <span class="legend-count">{{ presencePieChartData.datasets[0].data[1] || 0 }}</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot dot-amber"></span>
+                  <span class="legend-label">Justificou</span>
+                  <span class="legend-count">{{ presencePieChartData.datasets[0].data[2] || 0 }}</span>
+                </div>
+              </div>
               <div class="dashboard-filter">
-                <mat-form-field appearance="fill" style="width: 160px;">
+                <mat-form-field appearance="outline" class="filter-field">
                   <mat-label>Últimos eventos</mat-label>
-                  <input matInput type="number" min="1" max="50" [(ngModel)]="eventFilterCount"
-                    (ngModelChange)="onEventFilterChange()" placeholder="10">
+                  <input matInput type="number" min="1" max="50"
+                    [(ngModel)]="eventFilterCount"
+                    (ngModelChange)="onEventFilterChange()">
+                  <mat-icon matSuffix>filter_list</mat-icon>
                 </mat-form-field>
               </div>
             </mat-card-content>
           </mat-card>
 
-          <mat-card class="dashboard-card">
-            <mat-card-title><mat-icon>show_chart</mat-icon> Evolução de Presença</mat-card-title>
+          <!-- Evolução de presença -->
+          <mat-card class="dashboard-card card-line">
+            <mat-card-header>
+              <div class="card-title-row">
+                <mat-icon class="card-icon icon-purple">show_chart</mat-icon>
+                <span class="card-title-text">Evolução de presença</span>
+              </div>
+            </mat-card-header>
             <mat-card-content>
-              <canvas baseChart
-                [data]="presenceLineChartData"
-                [type]="'line'"
-                [options]="{ responsive: true, plugins: { legend: { position: 'bottom' } } }">
-              </canvas>
+              <div class="chart-wrap">
+                <canvas baseChart
+                  [data]="presenceLineChartData"
+                  [type]="'line'"
+                  [options]="{
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                      x: {
+                        ticks: { color: '#9ca3af', font: { size: 11 } },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        border: { display: false }
+                      },
+                      y: {
+                        ticks: { color: '#9ca3af', font: { size: 11 } },
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        border: { display: false }
+                      }
+                    }
+                  }">
+                </canvas>
+              </div>
+              <div class="line-legend">
+                <div class="legend-item">
+                  <span class="legend-dot dot-green"></span>
+                  <span class="legend-label">Presentes</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot dot-red"></span>
+                  <span class="legend-label">Faltas</span>
+                </div>
+                <div class="legend-item">
+                  <span class="legend-dot dot-amber"></span>
+                  <span class="legend-label">Justificados</span>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
 
-          <mat-card class="dashboard-card">
-            <mat-card-title><mat-icon>group</mat-icon> Distribuição por Classe</mat-card-title>
+          <!-- Distribuição por classe -->
+          <mat-card class="dashboard-card card-classes">
+            <mat-card-header>
+              <div class="card-title-row">
+                <mat-icon class="card-icon icon-blue">groups</mat-icon>
+                <span class="card-title-text">Distribuição por classe</span>
+              </div>
+            </mat-card-header>
             <mat-card-content>
-              <canvas baseChart
-                [data]="classPieChartData"
-                [type]="'pie'"
-                [options]="{ responsive: true, plugins: { legend: { position: 'bottom' } } }">
-              </canvas>
+              <div class="class-bars">
+                <ng-container *ngFor="let label of classPieChartData.labels; let i = index">
+                  <div class="bar-row">
+                    <span class="bar-label">{{ label }}</span>
+                    <div class="bar-track">
+                      <div class="bar-fill"
+                        [style.width.%]="classPieChartData.datasets[0].data[i] /
+                          (classPieChartData.datasets[0].data | sum) * 100"
+                        [style.background]="classPieChartData.datasets[0].backgroundColor[i]">
+                      </div>
+                    </div>
+                    <span class="bar-count">{{ classPieChartData.datasets[0].data[i] }}</span>
+                  </div>
+                </ng-container>
+              </div>
             </mat-card-content>
           </mat-card>
 
-          <mat-card class="dashboard-card">
-            <mat-card-title><mat-icon color="warn">warning</mat-icon> Alertas Rápidos</mat-card-title>
+          <!-- Alertas -->
+          <mat-card class="dashboard-card card-alerts">
+            <mat-card-header>
+              <div class="card-title-row">
+                <mat-icon class="card-icon icon-amber">notifications_active</mat-icon>
+                <span class="card-title-text">Alertas rápidos</span>
+              </div>
+            </mat-card-header>
             <mat-card-content>
-              <ul>
-                <li *ngFor="let alert of alerts">
-                  <mat-icon color="warn">warning</mat-icon>
-                  {{ alert.member.nickname }} — {{ alert.faltasConsecutivas }} faltas consecutivas
-                </li>
-                <li *ngIf="alerts.length === 0">
-                  <mat-icon color="primary">check_circle</mat-icon>
-                  Nenhum alerta de faltas consecutivas!
-                </li>
-              </ul>
+              <div class="alert-ok" *ngIf="alerts.length === 0">
+                <mat-icon class="alert-check">check_circle</mat-icon>
+                <span>Nenhuma falta consecutiva detectada</span>
+              </div>
+              <div class="alert-warn-item" *ngFor="let alert of alerts">
+                <mat-icon class="alert-warn-icon">warning_amber</mat-icon>
+                <div class="alert-info">
+                  <span class="alert-name">{{ alert.member.nickname }}</span>
+                  <span class="alert-detail">{{ alert.faltasConsecutivas }} faltas consecutivas</span>
+                </div>
+              </div>
+
+              <div class="event-summary">
+                <div class="summary-label">Resumo do evento atual</div>
+                <div class="summary-row">
+                  <div class="summary-card summary-green">
+                    <span class="summary-num">{{ presencePieChartData.datasets[0].data[0] || 0 }}</span>
+                    <span class="summary-tag">Presentes</span>
+                  </div>
+                  <div class="summary-card summary-red">
+                    <span class="summary-num">{{ presencePieChartData.datasets[0].data[1] || 0 }}</span>
+                    <span class="summary-tag">Ausentes</span>
+                  </div>
+                </div>
+              </div>
             </mat-card-content>
           </mat-card>
 
-          <mat-card class="dashboard-card">
-            <mat-card-title><mat-icon color="primary">emoji_events</mat-icon> Destaques Positivos</mat-card-title>
+          <!-- Destaques -->
+          <mat-card class="dashboard-card card-highlights">
+            <mat-card-header>
+              <div class="card-title-row">
+                <mat-icon class="card-icon icon-amber">emoji_events</mat-icon>
+                <span class="card-title-text">Destaques positivos</span>
+              </div>
+            </mat-card-header>
             <mat-card-content>
-              <ul>
-                <li *ngFor="let h of highlights">
-                  <mat-icon color="primary">star</mat-icon>
-                  {{ h.member.nickname }} — {{ h.presencas }} presenças
-                </li>
-                <li *ngIf="highlights.length === 0">
-                  <mat-icon color="primary">check_circle</mat-icon>
-                  Nenhum destaque no momento.
-                </li>
-              </ul>
+              <div class="empty-state" *ngIf="highlights.length === 0">
+                <mat-icon>hourglass_empty</mat-icon>
+                <span>Nenhum destaque no momento.</span>
+              </div>
+              <div class="highlight-row" *ngFor="let h of highlights; let i = index">
+                <div class="highlight-rank" [class.rank-gold]="i === 0" [class.rank-silver]="i === 1" [class.rank-bronze]="i === 2">
+                  <mat-icon>{{ i < 3 ? 'star' : 'star_border' }}</mat-icon>
+                </div>
+                <span class="highlight-name">{{ h.member.nickname }}</span>
+                <span class="highlight-count">{{ h.presencas }} presenças</span>
+              </div>
             </mat-card-content>
           </mat-card>
+
         </div>
       </ng-container>
 
@@ -113,6 +269,7 @@
       <ng-container *ngIf="showSettings">
         <app-settings></app-settings>
       </ng-container>
+
     </div>
   </mat-sidenav-content>
 </mat-sidenav-container>

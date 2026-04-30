@@ -24,6 +24,7 @@ import { SettingsComponent } from '../settings/settings.component';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { GroupsComponent } from '../groups/groups.component';
+import { SumPipe } from './sum.pipe';
 
 @Component({
   selector: 'app-dashboard',
@@ -46,7 +47,8 @@ import { GroupsComponent } from '../groups/groups.component';
     MatCardModule,
     FormsModule,
     NgChartsModule,
-    GroupsComponent
+    GroupsComponent,
+    SumPipe
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
