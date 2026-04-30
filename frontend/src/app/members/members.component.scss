@@ -1,157 +1,442 @@
+// ── Tokens (em sincronia com o dashboard) ────────────────────────────────────
+$bg-card:    #31353e;
+$bg-surface: #3a3e48;
+$bg-row:     #2e3139;
+$bg-hover:   #393d48;
+
+$green:  #1D9E75;
+$red:    #E24B4A;
+$amber:  #EF9F27;
+$purple: #7F77DD;
+$blue:   #378ADD;
+
+$text-primary:   #e8e6f0;
+$text-secondary: #9ca3af;
+$text-muted:     #6b7280;
+
+$border:    rgba(255, 255, 255, 0.07);
+$radius-lg: 14px;
+$radius-md: 10px;
+$radius-sm: 6px;
+
+// ── Cards base ────────────────────────────────────────────────────────────────
+mat-card {
+  background: $bg-card !important;
+  color: $text-primary !important;
+  border-radius: $radius-lg !important;
+  border: 0.5px solid $border;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 16px;
+
+  mat-card-header { padding: 16px 20px 0; }
+  mat-card-content { padding: 14px 20px 20px; margin: 0 !important; }
+}
+
+// ── Card title row ─────────────────────────────────────────────────────────────
+.card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.card-title-text {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  color: $text-secondary;
+}
+
+.card-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+  color: $purple;
+}
+
+// ── Formulário ────────────────────────────────────────────────────────────────
 .member-form {
   display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.form-row {
+  display: flex;
   flex-wrap: wrap;
-  gap: 16px;
-  align-items: flex-end;
+  gap: 10px;
+  align-items: flex-start;
+  margin-bottom: 6px;
 }
 
+// Tamanhos relativos dos campos
+.field-lg  { flex: 2 1 200px; min-width: 160px; }
+.field-md  { flex: 1.5 1 160px; min-width: 140px; }
+.field-sm  { flex: 1 1 130px; min-width: 120px; }
+.field-xs  { flex: 0 1 90px; min-width: 80px; }
+
+// Override Angular Material — tema escuro
 mat-form-field {
-  flex: 1 1 180px;
-  min-width: 160px;
-  margin-bottom: 8px;
-  background: white;
-  border-radius: 6px;
-  box-sizing: border-box;
+  // Remove o fundo branco dos campos
+  .mat-mdc-text-field-wrapper {
+    background: $bg-surface !important;
+  }
+
+  // Borda outline escura
+  .mdc-text-field--outlined .mdc-notched-outline__leading,
+  .mdc-text-field--outlined .mdc-notched-outline__notch,
+  .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  &:hover {
+    .mdc-text-field--outlined .mdc-notched-outline__leading,
+    .mdc-text-field--outlined .mdc-notched-outline__notch,
+    .mdc-text-field--outlined .mdc-notched-outline__trailing {
+      border-color: rgba(255, 255, 255, 0.25) !important;
+    }
+  }
+
+  // Cor do texto de input e label
+  input,
+  .mat-mdc-form-field-input-control,
+  .mat-mdc-select-value-text,
+  .mat-mdc-select-placeholder {
+    color: $text-primary !important;
+    font-size: 13px;
+  }
+
+  .mat-mdc-floating-label,
+  label {
+    color: $text-secondary !important;
+    font-size: 13px;
+  }
+
+  // Ícone prefix/suffix
+  mat-icon {
+    color: $text-muted;
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+}
+
+// Painel dropdown de mat-select
+::ng-deep .mat-mdc-select-panel {
+  background: $bg-surface !important;
+  border: 0.5px solid rgba(255, 255, 255, 0.12);
+  border-radius: $radius-sm !important;
+
+  .mat-mdc-option {
+    color: $text-primary !important;
+    font-size: 13px;
+
+    &:hover,
+    &.mat-mdc-option-active {
+      background: $bg-hover !important;
+    }
+  }
+}
+
+// ── Botões do formulário ──────────────────────────────────────────────────────
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-primary {
+  background: $purple !important;
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 500;
+  border-radius: $radius-sm !important;
+  height: 38px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+
+  &:hover { background: darken($purple, 8%) !important; }
+}
+
+.btn-cancel {
+  color: $text-secondary !important;
+  font-size: 13px;
+  border-radius: $radius-sm !important;
+  height: 38px;
+
+  &:hover {
+    background: $bg-surface !important;
+    color: $text-primary !important;
+  }
+}
+
+// ── Header da lista (título + busca) ─────────────────────────────────────────
+.list-header {
   width: 100%;
-  padding: 0;
-  min-height: unset;
-  height: 48px;
-  display: block;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-mat-card {
-  background: #363a41;
-  color: #fff;
-  padding: 16px;
-  margin-bottom: 24px;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px #0002;
+.search-bar { flex-shrink: 0; }
+
+.search-field {
+  width: 280px;
+
+  .mat-mdc-text-field-wrapper { background: $bg-surface !important; }
+
+  .mdc-text-field--outlined .mdc-notched-outline__leading,
+  .mdc-text-field--outlined .mdc-notched-outline__notch,
+  .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+  }
+
+  input { color: $text-primary !important; font-size: 13px; }
+  label { color: $text-secondary !important; font-size: 13px; }
+  mat-icon { color: $text-muted; font-size: 18px; }
 }
 
-mat-card-title {
-  color: #B89EB8;
-  font-weight: bold;
-  font-size: 1.2rem;
-  letter-spacing: 1px;
-}
-
-mat-select, mat-input, input {
-  color: #363a41;
-  width: 100%;
-}
-
-mat-option {
-  color: #363a41;
-}
-
-button[mat-raised-button], button[mat-button] {
-  border-radius: 6px;
-}
-
-button[mat-raised-button] {
-  background: #B89EB8;
-  color: #363a41;
-  font-weight: bold;
-}
-
-button[mat-raised-button]:hover {
-  background: #a07ca0;
-}
-
-button[mat-button] {
-  color: #B89EB8;
-}
-
-button[mat-button]:hover {
-  background: #4a4e56;
-}
-
-/* Wrapper com scroll horizontal para a tabela em mobile */
+// ── Tabela ────────────────────────────────────────────────────────────────────
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  border-radius: 8px;
+  border-radius: $radius-md;
+  border: 0.5px solid $border;
+  margin-bottom: 4px;
 }
 
 .members-table {
-  /* Tabela não pode encolher abaixo de um mínimo legível */
-  min-width: 560px;
   width: 100%;
+  min-width: 600px;
+  background: transparent !important;
+
+  // Header
+  th.mat-header-cell {
+    background: $bg-row !important;
+    color: $text-muted !important;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: .07em;
+    border-bottom: 0.5px solid $border !important;
+    padding: 12px 14px;
+    white-space: nowrap;
+  }
+
+  // Células
+  td.mat-cell {
+    background: $bg-card !important;
+    color: $text-primary !important;
+    font-size: 13px;
+    border-bottom: 0.5px solid $border !important;
+    padding: 10px 14px;
+    white-space: nowrap;
+  }
+
+  // Linha hover
+  .member-row {
+    transition: background .15s;
+    cursor: default;
+
+    &:hover td.mat-cell {
+      background: $bg-hover !important;
+    }
+
+    &:last-child td.mat-cell { border-bottom: none !important; }
+  }
 }
 
-.members-table th.mat-header-cell {
-  vertical-align: middle;
-  padding-top: 8px;
-  padding-bottom: 8px;
-  white-space: nowrap;
-}
-
-.members-table th.mat-header-cell span.header-content {
-  display: inline-flex;
+// ── Coluna Nickname com avatar ────────────────────────────────────────────────
+.member-cell {
+  display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 10px;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba($purple, 0.2);
+  color: lighten($purple, 20%);
+  font-size: 13px;
   font-weight: 500;
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
-.members-table mat-icon {
-  font-size: 20px;
-  height: 20px;
-  width: 20px;
-  vertical-align: middle;
+.member-name {
+  font-weight: 500;
+  color: $text-primary;
 }
 
-.members-table td.mat-cell {
-  white-space: nowrap;
+.cell-muted {
+  color: $text-secondary !important;
+  font-size: 12px !important;
 }
 
-.search-bar {
-  margin-bottom: 12px;
+// ── Badges ────────────────────────────────────────────────────────────────────
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: .04em;
 }
 
+.badge-role {
+  background: rgba($blue, 0.12);
+  color: lighten($blue, 20%);
+}
+
+.badge-class {
+  background: rgba($purple, 0.12);
+  color: lighten($purple, 20%);
+}
+
+.badge-rank {
+  background: rgba(255,255,255,0.07);
+  color: $text-secondary;
+  font-weight: 600;
+  min-width: 28px;
+  text-align: center;
+
+  &.rank-s {
+    background: rgba($amber, 0.15);
+    color: $amber;
+  }
+  &.rank-a {
+    background: rgba($green, 0.12);
+    color: lighten($green, 10%);
+  }
+  &.rank-b {
+    background: rgba($blue, 0.12);
+    color: lighten($blue, 10%);
+  }
+  &.rank-c {
+    background: rgba(255,255,255,0.06);
+    color: $text-secondary;
+  }
+}
+
+// ── Botões de ação ────────────────────────────────────────────────────────────
+.col-actions {
+  width: 90px;
+  text-align: right !important;
+}
+
+.action-btns {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 2px;
+}
+
+.action-edit, .action-delete {
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
+  border-radius: 8px !important;
+  transition: background .15s;
+
+  mat-icon {
+    font-size: 17px;
+    width: 17px;
+    height: 17px;
+  }
+}
+
+.action-edit {
+  color: $blue !important;
+  &:hover { background: rgba($blue, 0.12) !important; }
+}
+
+.action-delete {
+  color: $red !important;
+  &:hover { background: rgba($red, 0.1) !important; }
+}
+
+// ── Paginator ─────────────────────────────────────────────────────────────────
+::ng-deep mat-paginator {
+  background: transparent !important;
+  color: $text-secondary !important;
+
+  .mat-mdc-paginator-container {
+    justify-content: flex-end;
+    padding: 8px 0 0;
+  }
+
+  .mat-mdc-paginator-range-label,
+  .mat-mdc-select-value-text {
+    color: $text-secondary !important;
+    font-size: 12px;
+  }
+
+  button[mat-icon-button] {
+    color: $text-secondary !important;
+    &:disabled { opacity: 0.3; }
+    &:not(:disabled):hover { background: $bg-surface !important; }
+  }
+}
+
+// ── Responsividade ────────────────────────────────────────────────────────────
 @media (max-width: 900px) {
-  .member-form {
+  .list-header {
     flex-direction: column;
-    gap: 8px;
-    align-items: stretch;
+    gap: 10px;
   }
 
-  mat-form-field {
-    min-width: 100%;
-    width: 100%;
+  .search-field { width: 100%; }
+
+  .form-row {
+    flex-direction: column;
+    gap: 6px;
   }
 
-  .form-actions {
-    flex-direction: column;
-    gap: 8px;
+  .field-lg, .field-md, .field-sm, .field-xs {
+    flex: 1 1 100%;
+    min-width: unset;
     width: 100%;
-    align-items: stretch;
   }
 }
 
 @media (max-width: 600px) {
   mat-card {
-    padding: 8px !important;
-    border-radius: 8px;
+    border-radius: 10px !important;
+
+    mat-card-header { padding: 14px 14px 0; }
+    mat-card-content { padding: 12px 14px 16px; }
   }
 
-  mat-card-title {
-    font-size: 1rem;
+  .form-actions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+
+    .btn-primary, .btn-cancel {
+      width: 100%;
+      justify-content: center;
+    }
   }
 
-  .member-form {
-    gap: 4px;
-  }
-
-  mat-form-field {
-    min-width: 100%;
-    width: 100%;
-    font-size: 0.95rem;
-  }
-
-  .form-actions button {
-    font-size: 0.95rem;
-    padding: 8px 0;
+  .members-table {
+    th.mat-header-cell { padding: 10px 10px; }
+    td.mat-cell { padding: 8px 10px; }
   }
 }
