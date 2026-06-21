@@ -24,10 +24,7 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       JWT_SECRET: minha-chave-super-secreta123tgd24t57u
       JWT_EXPIRATION: 604800000
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USERNAME: guest
-      RABBITMQ_PASSWORD: guest
+      RABBITMQ_ADDRESSES: amqp://guest:guest@rabbitmq:5672
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -39,10 +36,7 @@ services:
     ports:
       - "8081:8081"
     environment:
-      RABBITMQ_HOST: rabbitmq
-      RABBITMQ_PORT: 5672
-      RABBITMQ_USERNAME: guest
-      RABBITMQ_PASSWORD: guest
+      RABBITMQ_ADDRESSES: amqp://guest:guest@rabbitmq:5672
     depends_on:
       rabbitmq:
         condition: service_healthy
