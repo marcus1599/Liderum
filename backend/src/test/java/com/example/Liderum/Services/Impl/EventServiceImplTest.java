@@ -1,6 +1,8 @@
 package com.example.Liderum.Services.Impl;
 
 import com.example.Liderum.Entities.Event;
+import com.example.Liderum.Messaging.GuildEventCreatedMessage;
+import com.example.Liderum.Messaging.GuildEventCreatedPublisher;
 import com.example.Liderum.Repository.EventRepository;
 import com.example.Liderum.dto.EventRequestDTO;
 import com.example.Liderum.dto.EventResponseDTO;
@@ -23,6 +25,9 @@ public class EventServiceImplTest {
 
     @Mock
     private EventRepository eventRepository;
+
+    @Mock
+    private GuildEventCreatedPublisher guildEventCreatedPublisher;
 
     @InjectMocks
     private EventServiceImpl eventService;
@@ -55,6 +60,7 @@ public class EventServiceImplTest {
         assertNotNull(response);
         assertEquals("Missão Principal", response.getName());
         verify(eventRepository, times(1)).save(any(Event.class));
+        verify(guildEventCreatedPublisher, times(1)).publish(any(GuildEventCreatedMessage.class));
     }
 
     @Test

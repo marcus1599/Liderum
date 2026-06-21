@@ -1,21 +1,24 @@
 package com.example.Liderum.Services.Impl;
 
 import com.example.Liderum.Entities.Event;
+import com.example.Liderum.Messaging.GuildEventCreatedMessage;
+import com.example.Liderum.Messaging.GuildEventCreatedPublisher;
 import com.example.Liderum.Repository.EventRepository;
 import com.example.Liderum.Services.EventService;
 import com.example.Liderum.dto.EventRequestDTO;
 import com.example.Liderum.dto.EventResponseDTO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
-    @Autowired
-    private EventRepository eventRepository;
+    private final EventRepository eventRepository;
+    private final GuildEventCreatedPublisher guildEventCreatedPublisher;
 
     @Override
     public EventResponseDTO create(EventRequestDTO dto) {
@@ -26,6 +29,12 @@ public class EventServiceImpl implements EventService {
                 .build();
 
         Event saved = eventRepository.save(event);
+        guildEventCreatedPublisher.publish(new GuildEventCreatedMessage(
+                saved.getId(),
+                saved.getName(),
+                saved.getDate()
+        ));
+
         return toResponseDTO(saved);
     }
 

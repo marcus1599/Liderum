@@ -1,0 +1,48 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: liderum-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "check_port_connectivity"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  liderum-producer:
+    build:
+      context: ./backend
+    container_name: liderum-producer
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      JWT_SECRET: minha-chave-super-secreta123tgd24t57u
+      JWT_EXPIRATION: 604800000
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  notification-consumer:
+    build:
+      context: ./notification-service
+    container_name: liderum-notification-consumer
+    ports:
+      - "8081:8081"
+    environment:
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
+      RABBITMQ_USERNAME: guest
+      RABBITMQ_PASSWORD: guest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy

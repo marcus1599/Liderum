@@ -27,33 +27,24 @@ public class TeamServiceImpl implements TeamService {
 
         @Override
         public TeamResponseDTO create(TeamRequestDTO dto) {
+                User leader = userRepository.findById(dto.getLeaderId())
+                                .orElseThrow(() -> new EntityNotFoundException("Lider nao encontrado"));
+
                 Team team = Team.builder()
                                 .name(dto.getName())
+                                .leader(leader)
                                 .build();
 
-                teamRepository.save(team);
+                Team saved = teamRepository.save(team);
 
-                return TeamResponseDTO.builder()
-                                .id(team.getId())
-                                .name(team.getName())
-                                .build();
+                return toResponseDTO(saved);
         }
 
         @Override
         public List<TeamResponseDTO> findAll() {
-                return teamRepository.findAll().stream().map(team -> TeamResponseDTO.builder()
-                                .id(team.getId())
-                                .name(team.getName())
-                                .members(team.getMembers().stream()
-                                                .map(member -> MemberResponseDTO.builder()
-                                                                .id(member.getId())
-                                                                .nickname(member.getNickname())
-                                                                .classe(member.getClasse())
-                                                                .rank(member.getRank())
-
-                                                                .build())
-                                                .collect(Collectors.toList()))
-                                .build()).collect(Collectors.toList());
+                return teamRepository.findAll().stream()
+                                .map(this::toResponseDTO)
+                                .collect(Collectors.toList());
         }
 
         @Override
@@ -61,16 +52,7 @@ public class TeamServiceImpl implements TeamService {
                 Team team = teamRepository.findById(id)
                                 .orElseThrow(() -> new EntityNotFoundException("Equipe não encontrada"));
 
-                return TeamResponseDTO.builder()
-                                .id(team.getId())
-                                .name(team.getName())
-                                .members(team.getMembers().stream()
-                                                .map(member -> MemberResponseDTO.builder()
-                                                                .id(member.getId())
-                                                                .nickname(member.getNickname())
-                                                                .build())
-                                                .collect(Collectors.toList()))
-                                .build();
+                return toResponseDTO(team);
 
         }
 
@@ -110,6 +92,26 @@ public class TeamServiceImpl implements TeamService {
                                 .orElseThrow(() -> new EntityNotFoundException("Equipe não encontrada"));
 
                 teamRepository.save(team);
+        }
+
+        private TeamResponseDTO toResponseDTO(Team team) {
+                List<MemberResponseDTO> members = team.getMembers() == null
+                                ? List.of()
+                                : team.getMembers().stream()
+                                                .map(member -> MemberResponseDTO.builder()
+                                                                .id(member.getId())
+                                                                .nickname(member.getNickname())
+                                                                .classe(member.getClasse())
+                                                                .rank(member.getRank())
+                                                                .build())
+                                                .collect(Collectors.toList());
+
+                return TeamResponseDTO.builder()
+                                .id(team.getId())
+                                .name(team.getName())
+                                .leaderName(team.getLeader() != null ? team.getLeader().getUsername() : null)
+                                .members(members)
+                                .build();
         }
 
 }
