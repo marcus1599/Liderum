@@ -8,6 +8,7 @@ import com.example.Liderum.Repository.AttendanceRepository;
 import com.example.Liderum.Repository.EventRepository;
 import com.example.Liderum.Repository.MemberRepository;
 import com.example.Liderum.Services.AttendanceService;
+import com.example.Liderum.Tenancy.TenantService;
 import com.example.Liderum.dto.AttendanceRequestDTO;
 import com.example.Liderum.dto.AttendanceResponseDTO;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,13 +25,15 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final AttendanceRepository attendanceRepository;
     private final MemberRepository memberRepository;
     private final EventRepository eventRepository;
+    private final TenantService tenantService;
 
     @Override
     public AttendanceResponseDTO create(AttendanceRequestDTO dto) {
-        Member member = memberRepository.findById(dto.getMemberId())
-                .orElseThrow(() -> new EntityNotFoundException("Membro não encontrado"));
-        Event event = eventRepository.findById(dto.getEventId())
-                .orElseThrow(() -> new EntityNotFoundException("Evento não encontrado"));
+        Long guildId = tenantService.getCurrentGuildId();
+        Member member = memberRepository.findByIdAndGuildId(dto.getMemberId(), guildId)
+                .orElseThrow(() -> new EntityNotFoundException("Membro nao encontrado"));
+        Event event = eventRepository.findByIdAndGuildId(dto.getEventId(), guildId)
+                .orElseThrow(() -> new EntityNotFoundException("Evento nao encontrado"));
 
         Attendance attendance = Attendance.builder()
                 .member(member)
@@ -38,56 +41,66 @@ public class AttendanceServiceImpl implements AttendanceService {
                 .status(dto.getStatus())
                 .build();
 
-        Attendance saved = attendanceRepository.save(attendance);
-        return toDTO(saved);
+        return toDTO(attendanceRepository.save(attendance));
     }
 
     @Override
     public List<AttendanceResponseDTO> findAll() {
-        return attendanceRepository.findAll()
-                .stream().map(this::toDTO)
+        return attendanceRepository.findAllByEventGuildId(tenantService.getCurrentGuildId())
+                .stream()
+                .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
     public AttendanceResponseDTO findById(Long id) {
-        Attendance attendance = attendanceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Presença não encontrada"));
-        return toDTO(attendance);
+        return toDTO(findAttendanceInCurrentGuild(id));
     }
 
     @Override
     public AttendanceResponseDTO update(Long id, AttendanceRequestDTO dto) {
-        Attendance attendance = attendanceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Presença não encontrada"));
-
+        Attendance attendance = findAttendanceInCurrentGuild(id);
         attendance.setStatus(dto.getStatus());
+
         return toDTO(attendanceRepository.save(attendance));
     }
 
     @Override
     public void delete(Long id) {
-        attendanceRepository.deleteById(id);
+        attendanceRepository.delete(findAttendanceInCurrentGuild(id));
     }
+
     @Override
     public List<Long> findMembersWithConsecutiveAbsences(int threshold) {
-        // Busca todos os eventos ordenados por data
-        List<Long> eventIds = attendanceRepository.findAll().stream()
-            .map(a -> a.getEvent().getId())
-            .distinct()
-            .sorted()
-            .collect(Collectors.toList());
-        if (eventIds.size() < threshold) return List.of();
+        Long guildId = tenantService.getCurrentGuildId();
+        List<Long> eventIds = attendanceRepository.findAllByEventGuildId(guildId).stream()
+                .map(attendance -> attendance.getEvent().getId())
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
+
+        if (eventIds.size() < threshold) {
+            return List.of();
+        }
+
         List<Long> lastEventIds = eventIds.subList(eventIds.size() - threshold, eventIds.size());
-        // Busca todos os membros que faltaram nos últimos N eventos
-        List<Long> absents = attendanceRepository.findAllByStatusAndEventIds(AttendanceStatus.FALTOU, lastEventIds);
-        // Conta quantas vezes cada membro aparece
+        List<Long> absents = attendanceRepository.findAllByStatusAndEventIdsAndGuildId(
+                AttendanceStatus.FALTOU,
+                lastEventIds,
+                guildId
+        );
+
         return absents.stream()
-            .collect(Collectors.groupingBy(id -> id, Collectors.counting()))
-            .entrySet().stream()
-            .filter(e -> e.getValue() == threshold)
-            .map(e -> e.getKey())
-            .collect(Collectors.toList());
+                .collect(Collectors.groupingBy(id -> id, Collectors.counting()))
+                .entrySet().stream()
+                .filter(entry -> entry.getValue() == threshold)
+                .map(entry -> entry.getKey())
+                .collect(Collectors.toList());
+    }
+
+    private Attendance findAttendanceInCurrentGuild(Long id) {
+        return attendanceRepository.findByIdAndEventGuildId(id, tenantService.getCurrentGuildId())
+                .orElseThrow(() -> new EntityNotFoundException("Presenca nao encontrada"));
     }
 
     private AttendanceResponseDTO toDTO(Attendance attendance) {

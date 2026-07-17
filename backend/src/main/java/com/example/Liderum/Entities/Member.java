@@ -13,6 +13,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
@@ -39,6 +40,10 @@ public class Member {
 
     private String rank; 
 
+    @ManyToOne
+    @JoinColumn(name = "guild_id")
+    @JsonIgnore
+    private Guild guild;
 
     @ManyToOne
     @JsonIgnore

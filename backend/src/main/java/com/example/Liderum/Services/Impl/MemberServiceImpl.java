@@ -1,15 +1,17 @@
 package com.example.Liderum.Services.Impl;
+
+import com.example.Liderum.Entities.Guild;
 import com.example.Liderum.Entities.Member;
 import com.example.Liderum.Entities.Team;
 import com.example.Liderum.Repository.MemberRepository;
 import com.example.Liderum.Repository.TeamRepository;
 import com.example.Liderum.Services.MemberService;
+import com.example.Liderum.Tenancy.TenantService;
 import com.example.Liderum.dto.MemberRequestDTO;
 import com.example.Liderum.dto.MemberResponseDTO;
+import com.example.Liderum.exceptions.MemberNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.example.Liderum.exceptions.MemberNotFoundException;
-
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,65 +22,70 @@ public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
     private final TeamRepository teamRepository;
+    private final TenantService tenantService;
 
     @Override
-public MemberResponseDTO create(MemberRequestDTO dto) {
-    Team team = null;
-    if (dto.getTeamId() != null) {
-        team = teamRepository.findById(dto.getTeamId())
-            .orElseThrow(() -> new RuntimeException("Team not found"));
+    public MemberResponseDTO create(MemberRequestDTO dto) {
+        Guild guild = tenantService.getCurrentGuild();
+        Team team = resolveTeam(dto.getTeamId(), guild.getId());
+
+        Member member = Member.builder()
+                .nickname(dto.getNickname())
+                .phone(dto.getPhone())
+                .guildRole(dto.getGuildRole())
+                .rank(dto.getRank())
+                .classe(dto.getClasse())
+                .team(team)
+                .guild(guild)
+                .build();
+
+        return toDTO(memberRepository.save(member));
     }
 
-    Member member = Member.builder()
-            .nickname(dto.getNickname())
-            .phone(dto.getPhone())
-            .guildRole(dto.getGuildRole())
-            .rank(dto.getRank())
-            .classe(dto.getClasse())
-            .team(team)
-            .build();
+    @Override
+    public MemberResponseDTO update(Long id, MemberRequestDTO dto) {
+        Long guildId = tenantService.getCurrentGuildId();
+        Member existing = findMemberInCurrentGuild(id, guildId);
 
-    Member saved = memberRepository.save(member);
-    return toDTO(saved);
-}
-public MemberResponseDTO update(Long id, MemberRequestDTO dto) {
-    Member existing = memberRepository.findById(id)
-        .orElseThrow(() -> new RuntimeException("Membro não encontrado com ID: " + id));
+        existing.setNickname(dto.getNickname());
+        existing.setPhone(dto.getPhone());
+        existing.setClasse(dto.getClasse());
+        existing.setGuildRole(dto.getGuildRole());
+        existing.setRank(dto.getRank());
+        existing.setTeam(resolveTeam(dto.getTeamId(), guildId));
 
-  
-    existing.setNickname(dto.getNickname());
-    existing.setPhone(dto.getPhone());
-    existing.setClasse(dto.getClasse());
-    existing.setGuildRole(dto.getGuildRole());
-    existing.setRank(dto.getRank());
-
-   
-  // existing.setTeam(teamRepository.findById(dto.getTeamId()).orElseThrow(...));
-
-    Member updated = memberRepository.save(existing);
-    return toDTO(updated);
-}
-
-
+        return toDTO(memberRepository.save(existing));
+    }
 
     @Override
     public List<MemberResponseDTO> findAll() {
-        return memberRepository.findAll().stream()
+        return memberRepository.findAllByGuildId(tenantService.getCurrentGuildId()).stream()
                 .map(this::toDTO)
                 .collect(Collectors.toList());
     }
 
     @Override
-public MemberResponseDTO findById(Long id) {
-    Member member = memberRepository.findById(id)
-            .orElseThrow(() -> new MemberNotFoundException("Member with ID " + id + " not found."));
-  
-    return toDTO(member);
-}
+    public MemberResponseDTO findById(Long id) {
+        return toDTO(findMemberInCurrentGuild(id, tenantService.getCurrentGuildId()));
+    }
 
     @Override
     public void delete(Long id) {
-        memberRepository.deleteById(id);
+        memberRepository.delete(findMemberInCurrentGuild(id, tenantService.getCurrentGuildId()));
+    }
+
+    private Member findMemberInCurrentGuild(Long id, Long guildId) {
+        return memberRepository.findByIdAndGuildId(id, guildId)
+                .orElseThrow(() -> new MemberNotFoundException("Member with ID " + id + " not found."));
+    }
+
+    private Team resolveTeam(Long teamId, Long guildId) {
+        if (teamId == null) {
+            return null;
+        }
+
+        return teamRepository.findByIdAndGuildId(teamId, guildId)
+                .orElseThrow(() -> new RuntimeException("Team not found"));
     }
 
     private MemberResponseDTO toDTO(Member member) {

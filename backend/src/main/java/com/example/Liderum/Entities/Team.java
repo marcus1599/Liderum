@@ -30,6 +30,10 @@ public class Team {
     private String description;
 
     @ManyToOne
+    @JoinColumn(name = "guild_id")
+    private Guild guild;
+
+    @ManyToOne
     @JoinColumn(name = "leader_id")
     private User leader;
     
