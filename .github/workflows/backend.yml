@@ -1,4 +1,4 @@
-name: Backend CI
+name: Build Backend
 
 on:
   push:
@@ -24,9 +24,10 @@ jobs:
         with:
           distribution: temurin
           java-version: '21'
+          cache: maven
 
       - name: Grant execute permission
         run: chmod +x mvnw
 
       - name: Build project
-        run: ./mvnw clean compile
+        run: ./mvnw clean verify
