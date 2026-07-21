@@ -3,11 +3,14 @@ package com.example.Liderum.Config;
 import com.example.Liderum.Entities.User;
 import com.example.Liderum.Entities.Member;
 import com.example.Liderum.Entities.Event;
+import com.example.Liderum.Entities.Guild;
 import com.example.Liderum.Enums.GuildRole;
 import com.example.Liderum.Enums.Classe;
 import com.example.Liderum.Repository.UserRepository;
 import com.example.Liderum.Repository.MemberRepository;
 import com.example.Liderum.Repository.EventRepository;
+import com.example.Liderum.Repository.GuildRepository;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -24,15 +27,22 @@ public class DataInitializer {
     private final PasswordEncoder passwordEncoder;
 
     @Bean
-    public CommandLineRunner initData(UserRepository userRepository, MemberRepository memberRepository, EventRepository eventRepository) {
+    public CommandLineRunner initData(UserRepository userRepository, MemberRepository memberRepository, EventRepository eventRepository, GuildRepository guildRepository) {
         return args -> {
             // Usuários padrão
             if (userRepository.findAll().isEmpty()) {
+                Guild guild = Guild.builder()
+                        .name("Guilda Exemplo")
+                        .serverName("Servidor Exemplo")
+                        .build();
+                guildRepository.save(guild);
+
                 User admin = User.builder()
                         .username("admin")
                         .email("admin@email.com")
                         .password(passwordEncoder.encode("admin123"))
                         .guildRole(GuildRole.MARECHAL)
+                        .guild(guild)
                         .build();
                 userRepository.save(admin);
             }
@@ -47,6 +57,7 @@ public class DataInitializer {
                         .guildRole(GuildRole.SOLDADO)
                         .rank("S")
                         .classe(Classe.values()[i % Classe.values().length])
+                        .guild(guildRepository.findAll().get(0))  // Assuming there's at least one guild
                         .build());
                 }
                 memberRepository.saveAll(members);
@@ -55,9 +66,9 @@ public class DataInitializer {
             // Eventos mock
             if (eventRepository.findAll().isEmpty()) {
                 List<Event> events = List.of(
-                    Event.builder().name("Evento Inicial").date(LocalDateTime.now().minusDays(7)).description("Primeiro evento").build(),
-                    Event.builder().name("Evento Recente").date(LocalDateTime.now().minusDays(2)).description("Segundo evento").build(),
-                    Event.builder().name("Evento Atual").date(LocalDateTime.now()).description("Terceiro evento").build()
+                    Event.builder().name("Evento Inicial").date(LocalDateTime.now().minusDays(7)).description("Primeiro evento").guild(guildRepository.findAll().get(0)).build(),
+                    Event.builder().name("Evento Recente").date(LocalDateTime.now().minusDays(2)).description("Segundo evento").guild(guildRepository.findAll().get(0)).build(),
+                    Event.builder().name("Evento Atual").date(LocalDateTime.now()).description("Terceiro evento").guild(guildRepository.findAll().get(0)).build()
                 );
                 eventRepository.saveAll(events);
             }
