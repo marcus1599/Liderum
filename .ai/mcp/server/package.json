@@ -1,0 +1,21 @@
+{
+  "name": "liderum-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP Server for Liderum AI Agent System",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx src/index.ts",
+    "test": "node dist/test-server.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.2",
+    "tsx": "^4.19.2"
+  }
+}

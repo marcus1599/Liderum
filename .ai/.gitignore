@@ -1,0 +1,10 @@
+# Dependências e artefatos locais do MCP
+mcp/server/node_modules/
+mcp/server/dist/
+
+# Configuração específica da máquina/cliente MCP
+mcp/config/mcp-config.json
+
+# Arquivos temporários e logs
+*.log
+*.tmp

@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "liderum-mcp": {
+      "command": "node",
+      "args": [
+        "<CAMINHO-DO-PROJETO>/.ai/mcp/server/dist/index.js"
+      ]
+    }
+  }
+}
