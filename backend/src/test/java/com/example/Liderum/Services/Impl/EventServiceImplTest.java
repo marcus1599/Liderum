@@ -1,9 +1,11 @@
 package com.example.Liderum.Services.Impl;
 
 import com.example.Liderum.Entities.Event;
+import com.example.Liderum.Entities.Guild;
 import com.example.Liderum.Messaging.GuildEventCreatedMessage;
 import com.example.Liderum.Messaging.GuildEventCreatedPublisher;
 import com.example.Liderum.Repository.EventRepository;
+import com.example.Liderum.Tenancy.TenantService;
 import com.example.Liderum.dto.EventRequestDTO;
 import com.example.Liderum.dto.EventResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -29,14 +31,23 @@ public class EventServiceImplTest {
     @Mock
     private GuildEventCreatedPublisher guildEventCreatedPublisher;
 
+    @Mock
+    private TenantService tenantService;
+
     @InjectMocks
     private EventServiceImpl eventService;
 
     private EventRequestDTO request;
     private Event event;
+    private Guild guild;
 
     @BeforeEach
     void setup() {
+        guild = Guild.builder().id(1L).name("Guilda Teste").build();
+
+        lenient().when(tenantService.getCurrentGuild()).thenReturn(guild);
+        lenient().when(tenantService.getCurrentGuildId()).thenReturn(1L);
+
         request = EventRequestDTO.builder()
                 .name("Missão Principal")
                 .date(LocalDateTime.of(2025, 4, 10, 20, 0))
@@ -48,6 +59,7 @@ public class EventServiceImplTest {
                 .name(request.getName())
                 .date(request.getDate())
                 .description(request.getDescription())
+                .guild(guild)
                 .build();
     }
 
@@ -65,7 +77,7 @@ public class EventServiceImplTest {
 
     @Test
     void shouldFindAllEvents() {
-        when(eventRepository.findAll()).thenReturn(List.of(event));
+        when(eventRepository.findAllByGuildId(1L)).thenReturn(List.of(event));
 
         List<EventResponseDTO> result = eventService.findAll();
 
@@ -75,7 +87,7 @@ public class EventServiceImplTest {
 
     @Test
     void shouldFindEventById() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        when(eventRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(event));
 
         EventResponseDTO result = eventService.findById(1L);
 
@@ -84,7 +96,7 @@ public class EventServiceImplTest {
 
     @Test
     void shouldUpdateEvent() {
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        when(eventRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(event));
         when(eventRepository.save(any(Event.class))).thenReturn(event);
 
         EventRequestDTO updateRequest = EventRequestDTO.builder()
@@ -101,10 +113,11 @@ public class EventServiceImplTest {
 
     @Test
     void shouldDeleteEvent() {
-        doNothing().when(eventRepository).deleteById(1L);
+        when(eventRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(event));
+        doNothing().when(eventRepository).delete(event);
 
         eventService.delete(1L);
 
-        verify(eventRepository, times(1)).deleteById(1L);
+        verify(eventRepository, times(1)).delete(event);
     }
 }

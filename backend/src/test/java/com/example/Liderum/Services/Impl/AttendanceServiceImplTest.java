@@ -2,11 +2,13 @@ package com.example.Liderum.Services.Impl;
 
 import com.example.Liderum.Entities.Attendance;
 import com.example.Liderum.Entities.Event;
+import com.example.Liderum.Entities.Guild;
 import com.example.Liderum.Entities.Member;
 import com.example.Liderum.Enums.AttendanceStatus;
 import com.example.Liderum.Repository.AttendanceRepository;
 import com.example.Liderum.Repository.EventRepository;
 import com.example.Liderum.Repository.MemberRepository;
+import com.example.Liderum.Tenancy.TenantService;
 import com.example.Liderum.dto.AttendanceRequestDTO;
 import com.example.Liderum.dto.AttendanceResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,16 +36,25 @@ public class AttendanceServiceImplTest {
     @Mock
     private EventRepository eventRepository;
 
+    @Mock
+    private TenantService tenantService;
+
     @InjectMocks
     private AttendanceServiceImpl attendanceService;
 
+    private Guild guild;
     private Member member;
     private Event event;
 
     @BeforeEach
     public void setup() {
-        member = Member.builder().id(1L).nickname("Marcus").build();
-        event = Event.builder().id(1L).name("Evento RPG").build();
+        guild = Guild.builder().id(1L).name("Guilda Teste").build();
+
+        lenient().when(tenantService.getCurrentGuild()).thenReturn(guild);
+        lenient().when(tenantService.getCurrentGuildId()).thenReturn(1L);
+
+        member = Member.builder().id(1L).nickname("Marcus").guild(guild).build();
+        event = Event.builder().id(1L).name("Evento RPG").guild(guild).build();
     }
 
     @Test
@@ -60,8 +71,8 @@ public class AttendanceServiceImplTest {
                 .status(AttendanceStatus.PRESENTE)
                 .build();
 
-        when(memberRepository.findById(1L)).thenReturn(Optional.of(member));
-        when(eventRepository.findById(1L)).thenReturn(Optional.of(event));
+        when(memberRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(member));
+        when(eventRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(event));
         when(attendanceRepository.save(any(Attendance.class))).thenReturn(attendance);
 
         AttendanceResponseDTO response = attendanceService.create(dto);
@@ -81,7 +92,7 @@ public class AttendanceServiceImplTest {
                 .status(AttendanceStatus.FALTOU)
                 .build();
 
-        when(attendanceRepository.findAll()).thenReturn(List.of(attendance));
+        when(attendanceRepository.findAllByEventGuildId(1L)).thenReturn(List.of(attendance));
 
         List<AttendanceResponseDTO> list = attendanceService.findAll();
 
@@ -98,7 +109,7 @@ public class AttendanceServiceImplTest {
                 .status(AttendanceStatus.JUSTIFICOU)
                 .build();
 
-        when(attendanceRepository.findById(1L)).thenReturn(Optional.of(attendance));
+        when(attendanceRepository.findByIdAndEventGuildId(1L, 1L)).thenReturn(Optional.of(attendance));
 
         AttendanceResponseDTO dto = attendanceService.findById(1L);
 
@@ -127,7 +138,7 @@ public class AttendanceServiceImplTest {
                 .status(AttendanceStatus.PRESENTE)
                 .build();
 
-        when(attendanceRepository.findById(1L)).thenReturn(Optional.of(existing));
+        when(attendanceRepository.findByIdAndEventGuildId(1L, 1L)).thenReturn(Optional.of(existing));
         when(attendanceRepository.save(any(Attendance.class))).thenReturn(updated);
 
         AttendanceResponseDTO response = attendanceService.update(1L, dto);
@@ -137,10 +148,18 @@ public class AttendanceServiceImplTest {
 
     @Test
     public void shouldDeleteAttendance() {
-        doNothing().when(attendanceRepository).deleteById(1L);
+        Attendance attendance = Attendance.builder()
+                .id(1L)
+                .member(member)
+                .event(event)
+                .status(AttendanceStatus.PRESENTE)
+                .build();
+
+        when(attendanceRepository.findByIdAndEventGuildId(1L, 1L)).thenReturn(Optional.of(attendance));
+        doNothing().when(attendanceRepository).delete(attendance);
 
         attendanceService.delete(1L);
 
-        verify(attendanceRepository, times(1)).deleteById(1L);
+        verify(attendanceRepository, times(1)).delete(attendance);
     }
 }
