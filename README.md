@@ -1,92 +1,145 @@
-# 🚀 Liderum
+# Liderum
 
-Liderum é uma aplicação web voltada para a organização de guildas de RPG, com o objetivo de centralizar e facilitar a gestão de membros, equipes e eventos.
+Aplicação web para organizar guildas de RPG. O Liderum centraliza usuários, membros, equipes, eventos e presença, com autenticação JWT, isolamento por guilda e notificações assíncronas.
 
-## 🧠 Sobre o projeto
+## Funcionalidades
 
-A ideia do Liderum surgiu da necessidade de organizar informações de guildas que, na maioria das vezes, são gerenciadas de forma manual ou utilizando múltiplas ferramentas desconectadas.
+- Autenticação e autorização com JWT.
+- Gerenciamento de guildas, usuários, membros e equipes.
+- Criação de eventos e controle de presença.
+- Isolamento multi-tenant: cada `Guild` é o tenant da aplicação.
+- Dashboard e interface Angular para os fluxos principais.
+- Eventos de guilda publicados via RabbitMQ e consumidos pelo serviço de notificações.
+- Documentação OpenAPI/Swagger e endpoints de Actuator no backend.
 
-A proposta é oferecer uma solução única, intuitiva e escalável para líderes e membros de guildas.
+## Arquitetura
 
----
+```text
+Angular frontend
+      |
+      v
+Spring Boot backend ---- PostgreSQL / H2
+      |
+      v
+   RabbitMQ
+      |
+      v
+Notification Service
+```
 
-## ✨ Funcionalidades
+O repositório contém três aplicações:
 
-- 👥 Gerenciamento de membros
-- 🛡️ Controle de cargos e permissões
-- 🧩 Organização de equipes/grupos
-- 📅 Criação de eventos
-- ✅ Controle de presença (attendance)
-- 🔐 Autenticação com JWT
-- 📊 Dashboard com visualização de dados
+- `frontend/`: cliente Angular.
+- `backend/`: API principal Spring Boot.
+- `notification-service/`: consumidor de eventos RabbitMQ.
 
----
+## Tecnologias
 
-## 🖼️ Interface
+| Área | Tecnologias |
+| --- | --- |
+| Backend | Java 21, Spring Boot 3.2, Spring Security, JPA/Hibernate, Flyway, PostgreSQL, H2 |
+| Frontend | Angular 19, TypeScript, Angular Material, RxJS, Chart.js |
+| Integração | RabbitMQ, Spring AMQP |
+| API e operação | Springdoc OpenAPI, Actuator, Docker Compose |
+| Testes | JUnit 5, Mockito, Spring Boot Test, Jasmine e Karma |
 
-### Dashboard
-Visão geral com informações e indicadores da guilda.
+## Pré-requisitos
 
-### Membros
-Gerenciamento completo de membros, incluindo dados e cargos.
+- Java 21
+- Node.js e npm
+- Docker Desktop e Docker Compose (recomendado para executar todos os serviços)
 
-### Grupos
-Organização de equipes dentro da guilda.
+## Configuração de ambiente
 
----
+Copie o exemplo de variáveis antes de executar o backend ou os containers:
 
-## 🛠️ Tecnologias utilizadas
+```powershell
+Copy-Item .env.example .env
+```
 
-### Back-end
-- Java
-- Spring Boot
-- Spring Security
-- JPA / Hibernate
+Defina um valor aleatório, secreto e com pelo menos 32 bytes para `JWT_SECRET` em `.env`.
 
-### Front-end
-- Angular
-- Angular Material
-- TypeScript
+`JWT_SECRET` é obrigatório. A aplicação não possui fallback versionado para esse segredo e o arquivo `.env` não deve ser commitado.
 
-### Outros
-- JWT (autenticação)
-- Docker (planejado)
-- Swagger (planejado)
+## Executando com Docker Compose
 
----
+Com o `.env` configurado:
 
-## 🌐 Acesso ao projeto
+```powershell
+docker compose up --build
+```
 
-🔗 https://theliderum.vercel.app/
+Serviços expostos localmente:
 
-> ⚠️ Observação: o backend pode levar alguns segundos para iniciar devido ao uso de hospedagem gratuita.
+- Backend: `http://localhost:8080`
+- Notification Service: `http://localhost:8081`
+- RabbitMQ Management: `http://localhost:15672`
 
----
+## Desenvolvimento local
 
-## 🎯 Objetivo
+### Backend
 
-O objetivo do projeto é evoluir continuamente até se tornar um SaaS completo, oferecendo uma solução robusta para gestão de guildas.
+```powershell
+cd backend
+.\mvnw.cmd spring-boot:run
+```
 
----
+O profile de desenvolvimento usa H2. Para documentação da API, acesse `http://localhost:8080/swagger-ui/index.html` após iniciar o backend.
 
-## 📈 Roadmap (próximos passos)
+### Frontend
 
-- [ ] Melhorias de UX/UI
-- [ ] Sistema de notificações
-- [ ] Dashboard mais completo
-- [ ] Deploy com maior disponibilidade
-- [ ] Planos e monetização (SaaS)
+```powershell
+cd frontend
+npm install
+npm start
+```
 
----
+### Notification Service
 
-## 🤝 Contribuição
+```powershell
+cd notification-service
+.\mvnw.cmd spring-boot:run
+```
 
-Feedbacks são muito bem-vindos!
+## Testes e validação
 
-Se você tiver sugestões, ideias ou encontrar algum problema, fique à vontade para abrir uma issue ou entrar em contato.
+Backend:
 
----
+```powershell
+cd backend
+.\mvnw.cmd clean verify
+```
 
-## 📌 Autor
+A última validação local executou 24 testes, sem failures ou errors.
 
-Desenvolvido por Marcus Ferreira  
+Frontend:
+
+```powershell
+cd frontend
+npm test
+npm run build
+```
+
+## CI
+
+O workflow do GitHub Actions em `.github/workflows/backend.yml` executa `./mvnw clean verify` com Java 21 para a branch `main`.
+
+## Desenvolvimento assistido por IA
+
+O diretório `.ai/` é versionado e contém o sistema de desenvolvimento assistido do projeto:
+
+- regras, snapshot técnico e handoff operacional;
+- oito Agents e nove Skills reutilizáveis;
+- tasks, auditorias e documentação de decisões;
+- Router declarativo de Agent/Skill;
+- servidor MCP somente leitura para contexto seguro do repositório.
+
+Para configurar e testar o MCP localmente, consulte [.ai/mcp/README.md](.ai/mcp/README.md).
+
+## Contribuição
+
+Antes de abrir uma alteração, verifique o estado do Git, mantenha o escopo controlado e execute as validações proporcionais ao impacto. Mudanças em autenticação, autorização, multi-tenancy, secrets e dados sensíveis exigem revisão de segurança.
+
+## Autor
+
+Desenvolvido por Marcus Ferreira.
