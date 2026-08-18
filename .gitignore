@@ -1,0 +1,14 @@
+# Environment files
+.env
+.env.local
+*.env
+
+# IDE and OS files
+.idea/
+.vscode/
+*.swp
+*.DS_Store
+
+# Build artifacts
+.ai/mcp/server/dist/
+.ai/mcp/server/node_modules/
