@@ -30,22 +30,17 @@ public class JwtFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String header = request.getHeader("Authorization");
-        System.out.println("Authorization Header: " + header);
 
         if (header != null && header.startsWith("Bearer ")) {
             String token = header.substring(7);
-            System.out.println("Token recebido: " + token);
 
             boolean valido = jwtUtil.validateToken(token);
-            System.out.println("Token válido? " + valido);
 
             if (valido) {
                 String username = jwtUtil.extractUsername(token);
-                System.out.println("Username extraído: " + username);
 
                 // Extrai as roles do token
                 List<String> roles = jwtUtil.extractRoles(token);
-                System.out.println("Roles extraídas: " + roles);
 
                 // Mapeia as roles para SimpleGrantedAuthority com prefixo ROLE_
                 var authorities = roles.stream()
@@ -59,10 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
                 // Configura o contexto de segurança do Spring
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                System.out.println("Usuário autenticado no contexto de segurança");
             }
-        } else {
-            System.out.println("Token não encontrado ou não começa com Bearer");
         }
 
         filterChain.doFilter(request, response);
