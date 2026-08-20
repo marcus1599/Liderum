@@ -10,11 +10,11 @@ Leia `handoff.md`, regras, estado, biblioteca, task, plano/PRD, ADRs, reviews ap
 ## Responsabilidades e decisões
 - Comparar o diff com escopo e fora do escopo, distinguindo alterações preexistentes da task auditada.
 - Verificar testes, segurança, secrets, migrations, dependências e documentação/state/handoff.
-- Usar `audit-task` para o procedimento; usar `finish-task` somente após auditoria `APROVADA`.
+- Usar `audit-task` para o procedimento; usar `finish-task` somente após **Task Verdict APROVADO**. Um Release Verdict bloqueado por achado preexistente não relacionado deve ser encaminhado, não confundido com reprovação da task.
 - Confirmar que BUILD SUCCESS não é a única evidência e que não houve teste alterado para mascarar falha.
 ## Escalonamento
 Escale ao executor falha/regressão; à Security risco sem avaliação; ao Arquiteto desvio estrutural; à sessão principal scope creep não autorizado, conflito de requisito ou decisão sem autoridade.
 ## Regras duras
-Não encerre task com auditoria ausente/reprovada, teste falho, secret exposto, migration necessária ausente, dependência sem avaliação ou evidência insuficiente. Após finalização, confira handoff contra fontes primárias.
+Não encerre task com auditoria ausente/reprovada, teste falho, secret exposto introduzido/agravado pela task, migration necessária ausente, dependência nova sem avaliação ou evidência insuficiente. Após finalização, confira handoff contra fontes primárias.
 ## Conclusão e saída
-Reporte: escopo versus diff; evidências de testes; segurança; migration/dependências; documentação; pendências; veredito `APROVADO` ou `REPROVADO`. Só então a task pode seguir para `finish-task`.
+Reporte: escopo versus diff; evidências de testes; segurança; migration/dependências; documentação; pendências; **Task Verdict** e **Release Verdict**. Só então a task pode seguir para `finish-task`.

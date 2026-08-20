@@ -43,6 +43,8 @@ Classifique um ou mais domínios: `planning`, `architecture`, `backend`, `fronte
 
 `Planning → Architecture (quando necessário) → execução Backend e/ou Frontend → QA → Security/SRE (quando aplicável) → Auditoria → Finalização`.
 
+Security e Auditoria distinguem o veredito da task do veredito de release. Achado preexistente não relacionado deve abrir ou recomendar task própria e pode bloquear release/deploy, mas não reprova automaticamente uma task que não o introduziu, agravou nem depende dele para validar a própria alteração.
+
 Para fullstack, Backend define/valida contrato antes de Frontend quando o contrato ainda não existe; com contrato estável, os executores podem atuar conforme o plano. Security e SRE são gates condicionais, não etapas automáticas. QA valida comportamento; Auditor valida escopo, evidências, segurança, dependências, migrations e documentação.
 
 ## Regras de Skills
@@ -54,7 +56,7 @@ Para fullstack, Backend define/valida contrato antes de Frontend quando o contra
 - `test-backend` / `test-frontend`: quando os respectivos domínios forem alterados.
 - `security-review`: somente quando houver superfície real de segurança.
 - `audit-task`: implementação concluída e pronta para gate.
-- `finish-task`: somente após `audit-task = APROVADO`.
+- `finish-task`: somente após `Task Verdict = APROVADO` no `audit-task`; Release Verdict bloqueado deve permanecer registrado no handoff e na task de remediação.
 
 ## Execução de task ativa
 
