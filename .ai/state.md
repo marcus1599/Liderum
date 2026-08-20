@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-08-18
+> **Última inspeção:** 2026-08-19
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -210,6 +210,8 @@ Implementado.
 
 Os testes de serviço que acompanham o isolamento por Guild foram ajustados e validados na task `align-service-tests-with-multi-tenancy`.
 
+A task `validate-multi-tenant-isolation-integration-tests` acrescentou seis testes de integração reais para Member e Team, com H2, `SecurityContext`, repositories e `TenantService`. Eles validam a fronteira Guild em listagem, leitura, atualização, exclusão e referências cross-tenant; a suíte backend passou com 30 testes, sem failures ou errors.
+
 ## Tenant
 
 A entidade `Guild` representa o tenant da aplicação.
@@ -249,6 +251,10 @@ Existe configuração específica de segurança.
 * isolamento entre tenants;
 * exposição de dados;
 * validação de endpoints administrativos.
+
+## Remediação de logs JWT
+
+O bloqueador de release causado por logs de Authorization/JWT em `JwtFilter` foi removido e coberto por teste de regressão. A remoção preservou a autenticação e não alterou segredo, claims, expiração ou autorização.
 
 Alterações nessa área devem envolver o agente Security.
 
@@ -394,7 +400,7 @@ O README descreve o produto e suas principais funcionalidades.
 | Flyway               | Implementado                              |
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
-| Testes Backend       | Validados localmente: 24 testes, 0 failures, 0 errors |
+| Testes Backend       | Validados localmente: 31 testes, 0 failures, 0 errors |
 | Testes Frontend      | Configurados / necessitam avaliação       |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |

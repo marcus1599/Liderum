@@ -8,26 +8,26 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `fix-duplicate-junit-dependency`
-- Resultado: APROVADA; Maven `clean verify` com 24 testes, 0 failures e 0 errors.
-- Data: 2026-08-16
-- Referência: [[tasks/completed/fix-duplicate-junit-dependency/audit.md]]
+- Nome: `remove-jwt-authorization-logs`
+- Resultado: Task Verdict e Release Verdict APROVADOS; logs sensíveis do `JwtFilter` removidos, com 31 testes backend aprovados.
+- Data: 2026-08-19
+- Referência: [[tasks/completed/remove-jwt-authorization-logs/audit.md]]
 
 ## Task ativa
 
-`Nenhuma task ativa.`
+`Nenhuma task ativa com plano.`
 
 ## Bloqueadores
 
-`Nenhum bloqueador conhecido.`
+`Nenhum bloqueador técnico conhecido.`
 
 ## Próximo passo recomendado
 
-- Criar a próxima task pelo Router quando houver novo objetivo de produto.
+- Selecionar a próxima melhoria priorizada do roadmap e criar a task pelo Router.
 
 ## Contexto relevante
 
 - [[state.md]]
-- [[tasks/completed/fix-duplicate-junit-dependency/plan.md]]
-- [[tasks/completed/fix-duplicate-junit-dependency/audit.md]]
+- [[tasks/completed/remove-jwt-authorization-logs/audit.md]]
+- [[tasks/completed/validate-multi-tenant-isolation-integration-tests/audit.md]]
 - Não há ADR relacionado no momento.
