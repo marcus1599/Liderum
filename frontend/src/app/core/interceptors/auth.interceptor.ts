@@ -2,6 +2,8 @@ import { HttpInterceptorFn } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { HttpErrorResponse } from '@angular/common/http';
 import { AuthService } from '../../auth/auth.service';
 
 export const AuthInterceptor: HttpInterceptorFn = (
@@ -17,5 +19,13 @@ export const AuthInterceptor: HttpInterceptorFn = (
       })
     : req;
 
-  return next(authReq);
+  return next(authReq).pipe(
+    catchError((error: HttpErrorResponse) => {
+      const isPublic = req.url.includes('/auth/login') || req.url.includes('/auth/register-guild');
+      if (error.status === 401 && !isPublic) {
+        authService.expireSession();
+      }
+      throw error;
+    })
+  );
 };

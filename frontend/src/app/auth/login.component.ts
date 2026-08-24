@@ -45,26 +45,19 @@ export class LoginComponent {
   }
 
   onSubmit() {
-    if (this.form.valid) {
+    if (this.form.valid && !this.isLoading) {
+      this.isLoading = true;
       this.authService.login(this.form.value).subscribe({
-        next: () => this.router.navigate(['/dashboard']),
-        error: err => console.error('Login falhou', err)
+        next: () => {
+          this.isLoading = false;
+          this.router.navigate(['/dashboard']);
+        },
+        error: () => {
+          this.isLoading = false;
+          this.snackbar.open('Usuário ou senha inválidos', 'Fechar');
+        }
       });
     }
   }
   isLoading = false;
-
-login() {
-  this.isLoading = true;
-  this.authService.login(this.form.value).subscribe({
-    next: () => {
-      this.isLoading = false;
-      this.router.navigate(['/dashboard']);
-    },
-    error: () => {
-      this.isLoading = false;
-      this.snackbar.open('Usuário ou senha inválidos', 'Fechar');
-    }
-  });
-}
 }
