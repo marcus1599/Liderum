@@ -7,6 +7,7 @@ import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,6 +16,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -42,8 +44,8 @@ class JwtFilterTest {
 
         when(jwtUtil.validateToken(token)).thenReturn(true);
         when(jwtUtil.extractUsername(token)).thenReturn(username);
-        when(jwtUtil.extractRoles(token)).thenReturn(roles);
         when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
+        doReturn(List.of(new SimpleGrantedAuthority("ROLE_MARECHAL"))).when(userDetails).getAuthorities();
 
         jwtFilter.doFilter(request, response, filterChain);
 

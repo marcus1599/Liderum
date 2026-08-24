@@ -3,6 +3,8 @@ package com.example.Liderum.Controllers;
 import com.example.Liderum.dto.AuthRequestDTO;
 import com.example.Liderum.dto.AuthResponseDTO;
 import com.example.Liderum.Security.JwtUtil;
+import com.example.Liderum.Services.GuildOnboardingService;
+import com.example.Liderum.dto.GuildRegistrationRequestDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,6 +26,13 @@ public class AuthController {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final GuildOnboardingService guildOnboardingService;
+
+    @PostMapping("/register-guild")
+    public ResponseEntity<com.example.Liderum.dto.UserResponseDTO> registerGuild(
+            @RequestBody @Valid GuildRegistrationRequestDTO request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(guildOnboardingService.register(request));
+    }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> login(@RequestBody @Valid AuthRequestDTO request) {

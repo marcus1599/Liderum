@@ -3,10 +3,13 @@ package com.example.Liderum.Services.Impl;
 import com.example.Liderum.Entities.User;
 import com.example.Liderum.Repository.UserRepository;
 import com.example.Liderum.Services.UserService;
+import com.example.Liderum.Tenancy.TenantService;
 import com.example.Liderum.dto.UserRequestDTO;
 import com.example.Liderum.dto.UserResponseDTO;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
 
@@ -15,13 +18,17 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final TenantService tenantService;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public UserResponseDTO create(UserRequestDTO dto) {
         User user = User.builder()
                 .username(dto.getUsername())
                 .email(dto.getEmail())
-                .password(dto.getPassword()) // (Atenção futura: criptografar senha)
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .guildRole(dto.getGuildRole())
+                .guild(tenantService.getCurrentGuild())
                 .build();
 
         user = userRepository.save(user);
@@ -31,22 +38,24 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserResponseDTO> findAll() {
-        return userRepository.findAll().stream()
+        return userRepository.findAllByGuildId(tenantService.getCurrentGuildId()).stream()
                 .map(this::toDTO)
                 .toList();
     }
 
     @Override
     public UserResponseDTO findById(Long id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByIdAndGuildId(id, tenantService.getCurrentGuildId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
 
         return toDTO(user);
     }
 
     @Override
     public void delete(Long id) {
-        userRepository.deleteById(id);
+        User user = userRepository.findByIdAndGuildId(id, tenantService.getCurrentGuildId())
+                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+        userRepository.delete(user);
     }
 
     private UserResponseDTO toDTO(User user) {

@@ -1,8 +1,6 @@
 package com.example.Liderum.Security;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -39,17 +37,10 @@ public class JwtFilter extends OncePerRequestFilter {
             if (valido) {
                 String username = jwtUtil.extractUsername(token);
 
-                // Extrai as roles do token
-                List<String> roles = jwtUtil.extractRoles(token);
-
-                // Mapeia as roles para SimpleGrantedAuthority com prefixo ROLE_
-                var authorities = roles.stream()
-                        .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-                        .collect(Collectors.toList());
-
                 var userDetails = userDetailsService.loadUserByUsername(username);
 
-                var authToken = new UsernamePasswordAuthenticationToken(userDetails, null, authorities);
+                var authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 // Configura o contexto de segurança do Spring
