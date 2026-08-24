@@ -1,7 +1,8 @@
 package com.example.Liderum.Controllers;
 
 import com.example.Liderum.Services.UserService;
-import com.example.Liderum.dto.UserRequestDTO;
+import com.example.Liderum.dto.UserCreateRequestDTO;
+import com.example.Liderum.dto.UserRoleUpdateRequestDTO;
 import com.example.Liderum.dto.UserResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,28 +22,42 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    @PreAuthorize("hasRole('MARECHAL')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL')")
     @Operation(summary = "Criar usuário")
-    public ResponseEntity<UserResponseDTO> create(@RequestBody @jakarta.validation.Valid UserRequestDTO request) {
+    public ResponseEntity<UserResponseDTO> create(@RequestBody @jakarta.validation.Valid UserCreateRequestDTO request) {
         return ResponseEntity.ok(userService.create(request));
     }
 
     @GetMapping
-    @PreAuthorize("hasRole('MARECHAL')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL')")
     @Operation(summary = "Listar todos os usuários")
     public ResponseEntity<List<UserResponseDTO>> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
 
+    @GetMapping("/me")
+    @Operation(summary = "Consultar o próprio perfil")
+    public ResponseEntity<UserResponseDTO> findCurrentUser() {
+        return ResponseEntity.ok(userService.findCurrentUser());
+    }
+
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('MARECHAL')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL')")
     @Operation(summary = "Buscar usuário por ID")
     public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.findById(id));
     }
 
+    @PutMapping("/{id}/role")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL')")
+    @Operation(summary = "Alterar role de usuário")
+    public ResponseEntity<UserResponseDTO> updateRole(@PathVariable Long id,
+            @RequestBody @jakarta.validation.Valid UserRoleUpdateRequestDTO request) {
+        return ResponseEntity.ok(userService.updateRole(id, request));
+    }
+
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('MARECHAL')")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL')")
     @Operation(summary = "Deletar usuário por ID")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         userService.delete(id);

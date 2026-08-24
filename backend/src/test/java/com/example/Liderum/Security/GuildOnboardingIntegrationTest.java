@@ -53,7 +53,7 @@ class GuildOnboardingIntegrationTest {
     void shouldAllowOwnerToProvisionUserOnlyInsideOwnGuild() throws Exception {
         String token = registerAndLogin("owner-provision", "owner-provision@example.com", "Guild Provision");
         String userBody = """
-                {"username":"member-provision","email":"member-provision@example.com","password":"password123","guildRole":"SOLDADO"}
+                {"username":"member-provision","email":"member-provision@example.com","password":"password123","role":"SOLDADO"}
                 """;
 
         mockMvc.perform(post("/users").header("Authorization", "Bearer " + token)
@@ -65,7 +65,7 @@ class GuildOnboardingIntegrationTest {
     void shouldRejectUserAdministrationWithoutMarechalRole() throws Exception {
         String token = registerAndLogin("owner-rbac", "owner-rbac@example.com", "Guild RBAC");
         String userBody = """
-                {"username":"soldier-rbac","email":"soldier-rbac@example.com","password":"password123","guildRole":"SOLDADO"}
+                {"username":"soldier-rbac","email":"soldier-rbac@example.com","password":"password123","role":"SOLDADO"}
                 """;
         mockMvc.perform(post("/users").header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON).content(userBody))
@@ -81,7 +81,7 @@ class GuildOnboardingIntegrationTest {
         String tokenA = registerAndLogin("owner-a", "owner-a@example.com", "Guild A onboarding");
         String tokenB = registerAndLogin("owner-b", "owner-b@example.com", "Guild B onboarding");
         String body = """
-                {"username":"member-b","email":"member-b@example.com","password":"password123","guildRole":"SOLDADO"}
+                {"username":"member-b","email":"member-b@example.com","password":"password123","role":"SOLDADO"}
                 """;
         String created = mockMvc.perform(post("/users").header("Authorization", "Bearer " + tokenB)
                         .contentType(MediaType.APPLICATION_JSON).content(body))

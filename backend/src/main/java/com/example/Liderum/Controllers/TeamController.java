@@ -49,6 +49,7 @@ public class TeamController {
         return ResponseEntity.noContent().build();
     }
     @PostMapping("/{teamId}/add-member/{memberId}")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Adicionar um membro a uma equipe")
     public ResponseEntity<Void> addMemberToTeam(@PathVariable Long teamId, @PathVariable Long memberId) {
         teamService.addMemberToTeam(teamId, memberId);
@@ -57,6 +58,7 @@ public class TeamController {
     }
 
     @PutMapping("/{teamId}")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Atualizar a  equipe")
 public ResponseEntity<Void> update(@PathVariable Long teamId) {
     teamService.update(teamId);
