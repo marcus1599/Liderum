@@ -1,6 +1,10 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { AttendenceComponent } from './attendence.component';
+import { MemberService } from '../services/member.service';
+import { EventService } from '../services/event.service';
+import { AttendanceService } from '../services/attendance.service';
+import { of } from 'rxjs';
 
 describe('AttendenceComponent', () => {
   let component: AttendenceComponent;
@@ -8,7 +12,18 @@ describe('AttendenceComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AttendenceComponent]
+      imports: [AttendenceComponent],
+      providers: [
+        { provide: MemberService, useValue: { getMembers: () => of([]) } },
+        { provide: EventService, useValue: { getEvents: () => of([]) } },
+        {
+          provide: AttendanceService,
+          useValue: {
+            getAttendances: () => of([]),
+            getMembersWithConsecutiveAbsences: () => of([])
+          }
+        }
+      ]
     })
     .compileComponents();
 

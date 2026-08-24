@@ -1,6 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GroupsComponent } from './groups.component';
+import { GroupService } from '../services/group.service';
+import { of } from 'rxjs';
 
 describe('GroupsComponent', () => {
   let component: GroupsComponent;
@@ -8,7 +10,14 @@ describe('GroupsComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [GroupsComponent]
+      imports: [GroupsComponent],
+      providers: [{
+        provide: GroupService,
+        useValue: {
+          getGroups: () => of([]),
+          getMembers: () => of([])
+        }
+      }]
     })
     .compileComponents();
 
