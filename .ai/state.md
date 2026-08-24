@@ -16,7 +16,7 @@
 
 ## Estado geral
 
-O roadmap SaaS canônico foi aprovado e está registrado em `roadmap.md`. A Fase 1 — Fundação segura de identidade e tenancy — continua sendo a fase atual. As tasks `secure-user-provisioning-and-guild-onboarding` e `enforce-rbac-and-user-tenant-boundaries` foram concluídas com onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo e 46 testes backend aprovados. Ambas têm Task Verdict **APROVADO**; o Release Verdict permanece **BLOQUEADO** por bootstrap demo/CORS, migrations e proteção antiabuso do registro público. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
+O roadmap SaaS canônico foi aprovado e está registrado em `roadmap.md`. A Fase 2 — Persistência versionada e contratos de API — está em execução após a conclusão das tasks da Fase 1. As tasks `secure-user-provisioning-and-guild-onboarding`, `enforce-rbac-and-user-tenant-boundaries`, `remove-production-demo-bootstrap-and-fix-cors` e `baseline-flyway-and-production-database-schema` foram concluídas. O backend possui onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo, bootstrap demo exclusivo de `dev`, CORS configurável sem wildcard, schema Flyway validado e 52 testes backend aprovados. Todas têm Task Verdict **APROVADO**; o Release Verdict permanece **BLOQUEADO** pela proteção antiabuso do registro público. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
 
 ### Consolidação de produto concluída (2026-08-18)
 
@@ -399,10 +399,10 @@ O README descreve o produto e suas principais funcionalidades.
 | RabbitMQ             | Implementado                              |
 | Notification Service | Implementado                              |
 | Docker               | Implementado                              |
-| Flyway               | Planejado para a Fase 2; migrations ainda ausentes |
+| Flyway               | Implementado; baseline V1 validada e `ddl-auto=validate` |
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
-| Testes Backend       | Validados localmente: 46 testes, 0 failures, 0 errors, 0 skipped |
+| Testes Backend       | Validados localmente: 52 testes, 0 failures, 0 errors, 0 skipped |
 | Testes Frontend      | Configurados / necessitam avaliação       |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |
@@ -410,5 +410,4 @@ O README descreve o produto e suas principais funcionalidades.
 ## Pendências técnicas não bloqueantes
 
 * proteção antiabuso para registro público (rate limiting/CAPTCHA) ainda não implementada;
-* bootstrap de demonstração e CORS permanecem pendências da task P0 correspondente;
-* migrations Flyway permanecem pendência da Fase 2.
+* migration validada automaticamente em H2; validação PostgreSQL real pendente.

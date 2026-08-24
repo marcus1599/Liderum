@@ -66,8 +66,8 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 | --- | --- | --- | --- | --- |
 | P0 | `secure-user-provisioning-and-guild-onboarding` — concluída em 2026-08-24 | Segurança / funcionalidade | STRUCTURAL | Guild e primeiro administrador seguros e isolados |
 | P0 | `enforce-rbac-and-user-tenant-boundaries` — concluída em 2026-08-24 | Segurança | LARGE | Matriz de permissões aplicada e testada |
-| P0 | `remove-production-demo-bootstrap-and-fix-cors` | Segurança / infraestrutura | MEDIUM | Bootstrap apenas em dev e CORS configurável correto |
-| P1 | `baseline-flyway-and-production-database-schema` | Infraestrutura / qualidade | STRUCTURAL | Schema PostgreSQL criado por migrations |
+| P0 | `remove-production-demo-bootstrap-and-fix-cors` — concluída em 2026-08-24 | Segurança / infraestrutura | MEDIUM | Bootstrap apenas em dev e CORS configurável correto |
+| P1 | `baseline-flyway-and-production-database-schema` — concluída em 2026-08-24 | Infraestrutura / qualidade | STRUCTURAL | Baseline versionada e validada automaticamente em H2; validação PostgreSQL real pendente |
 | P1 | `complete-guild-onboarding-and-user-management-ui` | Funcionalidade | LARGE | Lifecycle SaaS acessível no Angular |
 | P1 | `route-domain-areas-and-add-http-ux-feedback` | Funcionalidade / qualidade | MEDIUM | Áreas do domínio roteadas com feedback consistente |
 | P1 | `extend-tenant-integration-coverage-to-events-and-attendance` | Qualidade / segurança | MEDIUM | IDOR cross-Guild bloqueado nos quatro domínios |

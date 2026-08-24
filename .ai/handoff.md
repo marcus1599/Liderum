@@ -8,23 +8,23 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `enforce-rbac-and-user-tenant-boundaries`
-- Resultado: Task Verdict APROVADO; matriz MARECHAL/GENERAL, perfil próprio, contratos explícitos de User, proteção do último MARECHAL, Team/AdminController e isolamento HTTP validados com 46 testes backend.
+- Nome: `baseline-flyway-and-production-database-schema`
+- Resultado: Task Verdict APROVADO; baseline Flyway V1 aplicada em H2 vazio, Hibernate em `validate`, sem seeds/credenciais e suite backend validada com 52 testes. Validação PostgreSQL real permanece pendente.
 - Release Verdict: BLOQUEADO por pendências globais preexistentes registradas na auditoria.
 - Data: 2026-08-24
-- Referência: [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/audit.md]]
+- Referência: [[tasks/completed/baseline-flyway-and-production-database-schema/audit.md]]
 
 ## Task ativa
 
-`Nenhuma task ativa com plano.`
+- Nenhuma.
 
 ## Bloqueadores
 
-- Release/deploy público permanece bloqueado por três pendências globais preexistentes: bootstrap demo/CORS, migrations Flyway ausentes e proteção antiabuso para registro público.
+- Release/deploy público permanece bloqueado pela proteção antiabuso para registro público.
 
 ## Próximo passo recomendado
 
-- Priorizar a task P0 `remove-production-demo-bootstrap-and-fix-cors`, mantendo o Release bloqueado até tratar bootstrap/CORS, migrations e proteção antiabuso do registro público.
+- Planejar a próxima melhoria da Fase 2, mantendo o Release bloqueado até tratar a proteção antiabuso do registro público.
 
 ## Contexto relevante
 
@@ -38,5 +38,7 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 - [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/prd.md]]
 - [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/plan.md]]
 - [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/audit.md]]
+- [[tasks/completed/remove-production-demo-bootstrap-and-fix-cors/audit.md]]
+- [[tasks/completed/baseline-flyway-and-production-database-schema/audit.md]]
 - [[tasks/completed/remove-jwt-authorization-logs/audit.md]]
 - [[tasks/completed/validate-multi-tenant-isolation-integration-tests/audit.md]]
