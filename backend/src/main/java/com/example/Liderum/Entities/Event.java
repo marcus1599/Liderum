@@ -6,6 +6,7 @@ import java.util.List;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -23,7 +24,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class Event {
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
@@ -33,7 +34,7 @@ public class Event {
     private String description;
 
     @ManyToOne
-    @JoinColumn(name = "guild_id")
+    @JoinColumn(name = "guild_id", nullable = false)
     private Guild guild;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -41,7 +41,7 @@ public class Member {
     private String rank; 
 
     @ManyToOne
-    @JoinColumn(name = "guild_id")
+    @JoinColumn(name = "guild_id", nullable = false)
     @JsonIgnore
     private Guild guild;
 
