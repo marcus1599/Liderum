@@ -6,6 +6,7 @@
 
 - Roteie pelo estado real da task, não apenas por palavras do pedido.
 - `handoff.md` é entrada rápida; código, Git, task, `state.md` e ADRs específicos prevalecem.
+- Consulte `roadmap.md` ao criar ou priorizar task, planejar trabalho, avaliar decisão arquitetural ou concluir uma fase; não o releia obrigatoriamente em execução pequena já delimitada por PRD e plano.
 - Selecione somente Agents e Skills necessários; consultivos não implementam e executores não aprovam a própria task.
 - Registre uma seleção curta em `plan.md` ou no relatório operacional. Não repita Agent sem nova evidência e não faça loops de escalonamento.
 
@@ -20,6 +21,7 @@
 7. `prd.md`, quando existir
 8. ADRs relacionados
 9. Git/diff, quando relevante
+10. `roadmap.md`, somente para criação/priorização/planejamento de task, decisão arquitetural ou conclusão de fase
 
 Sem task ativa, plano ou requisito suficiente, pare e informe a lacuna; não invente task nem workflow.
 

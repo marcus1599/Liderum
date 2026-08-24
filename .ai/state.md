@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-08-19
+> **Última inspeção:** 2026-08-24
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -15,6 +15,8 @@
 # 1. Snapshot
 
 ## Estado geral
+
+O roadmap SaaS canônico foi aprovado e está registrado em `roadmap.md`. A Fase 1 — Fundação segura de identidade e tenancy — continua sendo a fase atual. A task `secure-user-provisioning-and-guild-onboarding` foi concluída com onboarding transacional, User tenant-scoped, BCrypt, RBAC administrativo e 34 testes backend aprovados. Seu Task Verdict é **APROVADO**; o Release Verdict permanece **BLOQUEADO** por bootstrap demo/CORS, migrations e proteção antiabuso do registro público. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
 
 ### Consolidação de produto concluída (2026-08-18)
 
@@ -397,14 +399,16 @@ O README descreve o produto e suas principais funcionalidades.
 | RabbitMQ             | Implementado                              |
 | Notification Service | Implementado                              |
 | Docker               | Implementado                              |
-| Flyway               | Implementado                              |
+| Flyway               | Planejado para a Fase 2; migrations ainda ausentes |
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
-| Testes Backend       | Validados localmente: 31 testes, 0 failures, 0 errors |
+| Testes Backend       | Validados localmente: 34 testes, 0 failures, 0 errors, 0 skipped |
 | Testes Frontend      | Configurados / necessitam avaliação       |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |
 
 ## Pendências técnicas não bloqueantes
 
-Nenhuma pendência técnica não bloqueante registrada nesta consolidação.
+* proteção antiabuso para registro público (rate limiting/CAPTCHA) ainda não implementada;
+* bootstrap de demonstração e CORS permanecem pendências da task P0 correspondente;
+* migrations Flyway permanecem pendência da Fase 2.
