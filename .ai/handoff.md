@@ -8,11 +8,11 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `baseline-flyway-and-production-database-schema`
-- Resultado: Task Verdict APROVADO; baseline Flyway V1 aplicada em H2 vazio, Hibernate em `validate`, sem seeds/credenciais e suite backend validada com 52 testes. Validação PostgreSQL real permanece pendente.
+- Nome: `stabilize-angular-test-baseline`
+- Resultado: Task Verdict APROVADO; TestBed e expectations corrigidos sem alterar produção, suíte Angular validada duas vezes com 16 testes aprovados e build aprovado.
 - Release Verdict: BLOQUEADO por pendências globais preexistentes registradas na auditoria.
 - Data: 2026-08-24
-- Referência: [[tasks/completed/baseline-flyway-and-production-database-schema/audit.md]]
+- Referência: [[tasks/completed/stabilize-angular-test-baseline/audit.md]]
 
 ## Task ativa
 
@@ -24,7 +24,7 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Próximo passo recomendado
 
-- Planejar a próxima melhoria da Fase 2, mantendo o Release bloqueado até tratar a proteção antiabuso do registro público.
+- Planejar a próxima task da Fase 3, mantendo o Release bloqueado pela proteção antiabuso do registro público.
 
 ## Contexto relevante
 
@@ -40,5 +40,6 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 - [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/audit.md]]
 - [[tasks/completed/remove-production-demo-bootstrap-and-fix-cors/audit.md]]
 - [[tasks/completed/baseline-flyway-and-production-database-schema/audit.md]]
+- [[tasks/completed/stabilize-angular-test-baseline/audit.md]]
 - [[tasks/completed/remove-jwt-authorization-logs/audit.md]]
 - [[tasks/completed/validate-multi-tenant-isolation-integration-tests/audit.md]]
