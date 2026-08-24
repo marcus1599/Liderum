@@ -8,11 +8,11 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `stabilize-angular-test-baseline`
-- Resultado: Task Verdict APROVADO; TestBed e expectations corrigidos sem alterar produção, suíte Angular validada duas vezes com 16 testes aprovados e build aprovado.
+- Nome: `align-frontend-auth-session-and-api-configuration`
+- Resultado: Task Verdict APROVADO; sessão Angular, `/users/me`, guard, 401 e environments alinhados, suíte validada duas vezes com 22 testes aprovados e builds production/development aprovados.
 - Release Verdict: BLOQUEADO por pendências globais preexistentes registradas na auditoria.
 - Data: 2026-08-24
-- Referência: [[tasks/completed/stabilize-angular-test-baseline/audit.md]]
+- Referência: [[tasks/completed/align-frontend-auth-session-and-api-configuration/audit.md]]
 
 ## Task ativa
 
@@ -24,7 +24,7 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Próximo passo recomendado
 
-- Planejar a próxima task da Fase 3, mantendo o Release bloqueado pela proteção antiabuso do registro público.
+- Planejar a próxima task da Fase 3 para onboarding frontend, mantendo o Release bloqueado pela proteção antiabuso do registro público.
 
 ## Contexto relevante
 
@@ -41,5 +41,6 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 - [[tasks/completed/remove-production-demo-bootstrap-and-fix-cors/audit.md]]
 - [[tasks/completed/baseline-flyway-and-production-database-schema/audit.md]]
 - [[tasks/completed/stabilize-angular-test-baseline/audit.md]]
+- [[tasks/completed/align-frontend-auth-session-and-api-configuration/audit.md]]
 - [[tasks/completed/remove-jwt-authorization-logs/audit.md]]
 - [[tasks/completed/validate-multi-tenant-isolation-integration-tests/audit.md]]

@@ -403,7 +403,7 @@ O README descreve o produto e suas principais funcionalidades.
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
 | Testes Backend       | Validados localmente: 52 testes, 0 failures, 0 errors, 0 skipped |
-| Testes Frontend      | Gate validado: 16 testes, 0 failures, 0 errors, 0 skipped |
+| Testes Frontend      | Gate validado: 22 testes, 0 failures, 0 errors, 0 skipped; sessão/auth alinhados |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |
 
