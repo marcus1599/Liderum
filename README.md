@@ -81,10 +81,11 @@ Serviços expostos localmente:
 
 ```powershell
 cd backend
+$env:SPRING_PROFILES_ACTIVE = "dev"
 .\mvnw.cmd spring-boot:run
 ```
 
-O profile de desenvolvimento usa H2. Para documentação da API, acesse `http://localhost:8080/swagger-ui/index.html` após iniciar o backend.
+O profile `dev` usa H2 e é o único que carrega dados de demonstração. Sem profile explícito, a aplicação não cria dados demo. Para documentação da API, acesse `http://localhost:8080/swagger-ui/index.html` após iniciar o backend.
 
 ### Frontend
 
