@@ -8,11 +8,11 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `secure-user-provisioning-and-guild-onboarding`
-- Resultado: Task Verdict APROVADO; onboarding Guild + primeiro `MARECHAL`, BCrypt, User tenant-scoped, RBAC administrativo e isolamento HTTP validados com 34 testes backend.
+- Nome: `enforce-rbac-and-user-tenant-boundaries`
+- Resultado: Task Verdict APROVADO; matriz MARECHAL/GENERAL, perfil próprio, contratos explícitos de User, proteção do último MARECHAL, Team/AdminController e isolamento HTTP validados com 46 testes backend.
 - Release Verdict: BLOQUEADO por pendências globais preexistentes registradas na auditoria.
 - Data: 2026-08-24
-- Referência: [[tasks/completed/secure-user-provisioning-and-guild-onboarding/audit.md]]
+- Referência: [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/audit.md]]
 
 ## Task ativa
 
@@ -24,7 +24,7 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Próximo passo recomendado
 
-- Priorizar a próxima task P0: `enforce-rbac-and-user-tenant-boundaries`, mantendo o Release bloqueado até tratar as pendências globais.
+- Priorizar a task P0 `remove-production-demo-bootstrap-and-fix-cors`, mantendo o Release bloqueado até tratar bootstrap/CORS, migrations e proteção antiabuso do registro público.
 
 ## Contexto relevante
 
@@ -35,5 +35,8 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 - [[tasks/completed/secure-user-provisioning-and-guild-onboarding/security-review.md]]
 - [[tasks/completed/secure-user-provisioning-and-guild-onboarding/prd.md]]
 - [[tasks/completed/secure-user-provisioning-and-guild-onboarding/plan.md]]
+- [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/prd.md]]
+- [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/plan.md]]
+- [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/audit.md]]
 - [[tasks/completed/remove-jwt-authorization-logs/audit.md]]
 - [[tasks/completed/validate-multi-tenant-isolation-integration-tests/audit.md]]

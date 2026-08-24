@@ -16,7 +16,7 @@
 
 ## Estado geral
 
-O roadmap SaaS canônico foi aprovado e está registrado em `roadmap.md`. A Fase 1 — Fundação segura de identidade e tenancy — continua sendo a fase atual. A task `secure-user-provisioning-and-guild-onboarding` foi concluída com onboarding transacional, User tenant-scoped, BCrypt, RBAC administrativo e 34 testes backend aprovados. Seu Task Verdict é **APROVADO**; o Release Verdict permanece **BLOQUEADO** por bootstrap demo/CORS, migrations e proteção antiabuso do registro público. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
+O roadmap SaaS canônico foi aprovado e está registrado em `roadmap.md`. A Fase 1 — Fundação segura de identidade e tenancy — continua sendo a fase atual. As tasks `secure-user-provisioning-and-guild-onboarding` e `enforce-rbac-and-user-tenant-boundaries` foram concluídas com onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo e 46 testes backend aprovados. Ambas têm Task Verdict **APROVADO**; o Release Verdict permanece **BLOQUEADO** por bootstrap demo/CORS, migrations e proteção antiabuso do registro público. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
 
 ### Consolidação de produto concluída (2026-08-18)
 
@@ -402,7 +402,7 @@ O README descreve o produto e suas principais funcionalidades.
 | Flyway               | Planejado para a Fase 2; migrations ainda ausentes |
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
-| Testes Backend       | Validados localmente: 34 testes, 0 failures, 0 errors, 0 skipped |
+| Testes Backend       | Validados localmente: 46 testes, 0 failures, 0 errors, 0 skipped |
 | Testes Frontend      | Configurados / necessitam avaliação       |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |
