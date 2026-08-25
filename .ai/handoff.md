@@ -8,11 +8,11 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `add-guild-onboarding-ui`
-- Resultado: Task Verdict APROVADO; onboarding público de Guild criado sem auto-login, suíte Angular validada duas vezes com 30 testes aprovados e build aprovado.
+- Nome: `add-user-management-ui`
+- Resultado: Task Verdict APROVADO; gestão frontend tenant-scoped de Users criada com RBAC visual, suíte Angular validada duas vezes com 35 testes aprovados e build aprovado.
 - Release Verdict: BLOQUEADO por pendências globais preexistentes registradas na auditoria.
 - Data: 2026-08-24
-- Referência: [[tasks/completed/add-guild-onboarding-ui/audit.md]]
+- Referência: [[tasks/completed/add-user-management-ui/audit.md]]
 
 ## Task ativa
 
@@ -24,7 +24,7 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Próximo passo recomendado
 
-- Planejar a próxima task da Fase 3 para gestão de usuários ou roteamento de áreas de domínio, mantendo o Release bloqueado pela proteção antiabuso do registro público.
+- Planejar `route-domain-areas-and-add-http-ux-feedback`, mantendo o Release bloqueado pela proteção antiabuso do registro público.
 
 ## Contexto relevante
 
@@ -43,5 +43,6 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 - [[tasks/completed/stabilize-angular-test-baseline/audit.md]]
 - [[tasks/completed/align-frontend-auth-session-and-api-configuration/audit.md]]
 - [[tasks/completed/add-guild-onboarding-ui/audit.md]]
+- [[tasks/completed/add-user-management-ui/audit.md]]
 - [[tasks/completed/remove-jwt-authorization-logs/audit.md]]
 - [[tasks/completed/validate-multi-tenant-isolation-integration-tests/audit.md]]

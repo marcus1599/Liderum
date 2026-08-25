@@ -1,0 +1,10 @@
+.users-page { padding: 2rem; max-width: 1100px; margin: auto; }
+header { margin-bottom: 1.5rem; }
+.create-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: center; margin-bottom: 2rem; }
+.create-form h2 { grid-column: 1 / -1; }
+.user-list { display: grid; gap: .75rem; }
+.user-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: .75rem; align-items: center; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; }
+.user-row div { display: flex; flex-direction: column; }
+.user-row span { opacity: .75; }
+.error { color: #b00020; }.denied { padding: 2rem; }.empty { opacity: .7; }
+@media (max-width: 700px) { .users-page { padding: 1rem; }.user-row { grid-template-columns: 1fr; } }

@@ -1,0 +1,27 @@
+<section class="users-page">
+  <header><h1>Usuários da Guild</h1><p>Administração limitada à Guild da sessão atual.</p></header>
+
+  <div class="denied" *ngIf="!canManageUsers() && !isLoading">Você não possui permissão para administrar usuários.</div>
+  <mat-spinner *ngIf="isLoading" diameter="42"></mat-spinner>
+
+  <ng-container *ngIf="canManageUsers() && !isLoading">
+    <form class="create-form" [formGroup]="form" (ngSubmit)="createUser()">
+      <h2>Criar usuário</h2>
+      <mat-form-field><mat-label>Usuário</mat-label><input matInput formControlName="username" /></mat-form-field>
+      <mat-form-field><mat-label>E-mail</mat-label><input matInput type="email" formControlName="email" /></mat-form-field>
+      <mat-form-field><mat-label>Senha</mat-label><input matInput type="password" formControlName="password" autocomplete="new-password" /></mat-form-field>
+      <mat-form-field><mat-label>Role</mat-label><mat-select formControlName="role"><mat-option *ngFor="let role of allowedCreateRoles()" [value]="role">{{ role }}</mat-option></mat-select></mat-form-field>
+      <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || isSaving">Criar usuário</button>
+    </form>
+
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    <p class="empty" *ngIf="!users.length">Nenhum usuário encontrado.</p>
+    <div class="user-list" *ngIf="users.length">
+      <article class="user-row" *ngFor="let user of users">
+        <div><strong>{{ user.username }}</strong><span>{{ user.email }}</span></div>
+        <ng-container *ngIf="canActOn(user); else readOnlyRole"><mat-select [(ngModel)]="roleChanges[user.id]" [ngModelOptions]="{standalone: true}"><mat-option *ngFor="let role of allowedCreateRoles()" [value]="role">{{ role }}</mat-option></mat-select><button mat-button (click)="updateRole(user)">Salvar role</button><button mat-button color="warn" (click)="removeUser(user)">Remover</button></ng-container>
+        <ng-template #readOnlyRole><span class="role">{{ user.guildRole }}</span></ng-template>
+      </article>
+    </div>
+  </ng-container>
+</section>
