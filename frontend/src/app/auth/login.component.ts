@@ -9,6 +9,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { AuthService } from './auth.service';
 
 import { Router } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
@@ -23,6 +24,7 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     MatIconModule,
     MatSnackBarModule,
     MatProgressSpinner
+    ,RouterLink
     
   
   ],

@@ -1,0 +1,22 @@
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: linear-gradient(135deg, #10152b, #261d3b);
+}
+
+.register-container {
+  width: min(100%, 480px);
+  padding: 2rem;
+  border-radius: 14px;
+  background: rgba(8, 12, 26, .9);
+  color: #fff;
+  box-shadow: 0 14px 44px rgba(0, 0, 0, .45);
+}
+
+form { display: flex; flex-direction: column; gap: .35rem; }
+h2, .intro { text-align: center; }
+.intro { margin: 0 0 1rem; opacity: .8; }
+a { color: #9ddcff; text-align: center; margin-top: .75rem; }
