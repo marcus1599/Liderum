@@ -28,7 +28,10 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest(properties = "jwt.secret=test_only_rbac_tenant_boundaries_secret")
+@SpringBootTest(properties = {
+        "jwt.secret=test_only_rbac_tenant_boundaries_secret",
+        "liderum.registration.rate-limit.limit=100"
+})
 @AutoConfigureMockMvc
 @Transactional
 @ActiveProfiles("dev")

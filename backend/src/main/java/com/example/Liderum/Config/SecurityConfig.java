@@ -1,6 +1,7 @@
 package com.example.Liderum.Config;
 
 import com.example.Liderum.Security.JwtFilter;
+import com.example.Liderum.Security.RegistrationRateLimitFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
+    private final RegistrationRateLimitFilter registrationRateLimitFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -48,6 +50,7 @@ public class SecurityConfig {
             );
 
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(registrationRateLimitFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
