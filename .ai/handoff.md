@@ -8,11 +8,11 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `route-domain-areas-and-add-http-ux-feedback`
-- Resultado: Task Verdict APROVADO; áreas de domínio roteadas, contratos HTTP alinhados e contrato de atualização de Team corrigido, com suíte Angular 35/35 em duas execuções e backend 52/52.
-- Release Verdict: BLOQUEADO por pendências globais preexistentes registradas na auditoria.
+- Nome: `protect-public-guild-registration-against-abuse`
+- Resultado: Task Verdict APROVADO; registro público limitado por IP remoto observado, sem persistência após 429, com suíte backend 57/57.
+- Release Verdict: APROVADO; a proteção antiabuso foi validada. PostgreSQL real permanece pendência operacional não bloqueante.
 - Data: 2026-08-26
-- Referência: [[tasks/completed/route-domain-areas-and-add-http-ux-feedback/audit.md]]
+- Referência: [[tasks/completed/protect-public-guild-registration-against-abuse/audit.md]]
 
 ## Task ativa
 
@@ -20,11 +20,11 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Bloqueadores
 
-- Release/deploy público permanece bloqueado pela proteção antiabuso para registro público.
+- Nenhum bloqueador global de release conhecido. Validação PostgreSQL real permanece pendência operacional não bloqueante.
 
 ## Próximo passo recomendado
 
-- Planejar `extend-tenant-integration-coverage-to-events-and-attendance`, mantendo o Release bloqueado pela proteção antiabuso do registro público.
+- Planejar `extend-tenant-integration-coverage-to-events-and-attendance` como cobertura de segurança da Fase 4.
 
 ## Contexto relevante
 
@@ -39,6 +39,8 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 - [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/plan.md]]
 - [[tasks/completed/enforce-rbac-and-user-tenant-boundaries/audit.md]]
 - [[tasks/completed/remove-production-demo-bootstrap-and-fix-cors/audit.md]]
+- [[tasks/completed/protect-public-guild-registration-against-abuse/prd.md]]
+- [[tasks/completed/protect-public-guild-registration-against-abuse/plan.md]]
 - [[tasks/completed/baseline-flyway-and-production-database-schema/audit.md]]
 - [[tasks/completed/stabilize-angular-test-baseline/audit.md]]
 - [[tasks/completed/align-frontend-auth-session-and-api-configuration/audit.md]]

@@ -67,6 +67,7 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 | P0 | `secure-user-provisioning-and-guild-onboarding` — concluída em 2026-08-24 | Segurança / funcionalidade | STRUCTURAL | Guild e primeiro administrador seguros e isolados |
 | P0 | `enforce-rbac-and-user-tenant-boundaries` — concluída em 2026-08-24 | Segurança | LARGE | Matriz de permissões aplicada e testada |
 | P0 | `remove-production-demo-bootstrap-and-fix-cors` — concluída em 2026-08-24 | Segurança / infraestrutura | MEDIUM | Bootstrap apenas em dev e CORS configurável correto |
+| P0 | `protect-public-guild-registration-against-abuse` — concluída em 2026-08-26 | Segurança | MEDIUM | `POST /auth/register-guild` limitado no servidor, com resposta 429 previsível e sem criação parcial |
 | P1 | `baseline-flyway-and-production-database-schema` — concluída em 2026-08-24 | Infraestrutura / qualidade | STRUCTURAL | Baseline versionada e validada automaticamente em H2; validação PostgreSQL real pendente |
 | P1 | `complete-guild-onboarding-and-user-management-ui` | Funcionalidade | LARGE | Lifecycle SaaS acessível no Angular |
 | P1 | `route-domain-areas-and-add-http-ux-feedback` | Funcionalidade / qualidade | MEDIUM | Áreas do domínio roteadas com feedback consistente |

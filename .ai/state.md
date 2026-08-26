@@ -16,7 +16,7 @@
 
 ## Estado geral
 
-O roadmap SaaS canônico foi aprovado e está registrado em `roadmap.md`. A Fase 2 — Persistência versionada e contratos de API — está em execução após a conclusão das tasks da Fase 1. As tasks `secure-user-provisioning-and-guild-onboarding`, `enforce-rbac-and-user-tenant-boundaries`, `remove-production-demo-bootstrap-and-fix-cors` e `baseline-flyway-and-production-database-schema` foram concluídas. O backend possui onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo, bootstrap demo exclusivo de `dev`, CORS configurável sem wildcard, schema Flyway validado e 52 testes backend aprovados. Todas têm Task Verdict **APROVADO**; o Release Verdict permanece **BLOQUEADO** pela proteção antiabuso do registro público. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
+O roadmap SaaS canônico foi aprovado e está registrado em `roadmap.md`. A Fase 2 — Persistência versionada e contratos de API — está em execução após a conclusão das tasks da Fase 1. As tasks `secure-user-provisioning-and-guild-onboarding`, `enforce-rbac-and-user-tenant-boundaries`, `remove-production-demo-bootstrap-and-fix-cors` e `baseline-flyway-and-production-database-schema` foram concluídas. O backend possui onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo, bootstrap demo exclusivo de `dev`, CORS configurável sem wildcard, schema Flyway validado e 57 testes backend aprovados. Todas têm Task Verdict **APROVADO**; a proteção antiabuso do registro público foi validada e o Release Verdict está **APROVADO**, com validação PostgreSQL real mantida como pendência operacional não bloqueante. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
 
 ### Consolidação de produto concluída (2026-08-18)
 
@@ -402,16 +402,16 @@ O README descreve o produto e suas principais funcionalidades.
 | Flyway               | Implementado; baseline V1 validada e `ddl-auto=validate` |
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
-| Testes Backend       | Validados localmente: 52 testes, 0 failures, 0 errors, 0 skipped |
+| Testes Backend       | Validados localmente: 57 testes, 0 failures, 0 errors, 0 skipped |
 | Testes Frontend      | Gate validado: 35 testes, 0 failures, 0 errors, 0 skipped em duas execuções; sessão/auth, onboarding, Users e rotas de domínio alinhados |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |
 
 ## Pendências técnicas não bloqueantes
 
-* proteção antiabuso para registro público (rate limiting/CAPTCHA) ainda não implementada;
 * migration validada automaticamente em H2; validação PostgreSQL real pendente.
 
 * rotas protegidas de Dashboard, Members, Teams, Events, Attendance e Users estão disponíveis; Settings permanece não persistente;
 * contratos frontend de Member/Team/Event/Attendance foram alinhados; update de Team agora aceita TeamRequestDTO e retorna TeamResponseDTO, preservando TenantService/RBAC;
-* a task `route-domain-areas-and-add-http-ux-feedback` foi concluída com Task Verdict APROVADO; Release continua BLOQUEADO pelo antiabuso do registro público.
+* a task `route-domain-areas-and-add-http-ux-feedback` foi concluída com Task Verdict APROVADO; o bloqueador antiabuso mencionado em sua auditoria foi tratado posteriormente.
+* a task `protect-public-guild-registration-against-abuse` foi concluída com Task Security Verdict, QA, SRE e Task Verdict APROVADOS; o registro público usa limitador local configurável e o Release Verdict foi liberado.
