@@ -403,7 +403,7 @@ O README descreve o produto e suas principais funcionalidades.
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
 | Testes Backend       | Validados localmente: 52 testes, 0 failures, 0 errors, 0 skipped |
-| Testes Frontend      | Gate validado: 35 testes, 0 failures, 0 errors, 0 skipped; sessão/auth, onboarding e gestão de Users alinhados |
+| Testes Frontend      | Gate validado: 35 testes, 0 failures, 0 errors, 0 skipped em duas execuções; sessão/auth, onboarding, Users e rotas de domínio alinhados |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |
 
@@ -411,3 +411,7 @@ O README descreve o produto e suas principais funcionalidades.
 
 * proteção antiabuso para registro público (rate limiting/CAPTCHA) ainda não implementada;
 * migration validada automaticamente em H2; validação PostgreSQL real pendente.
+
+* rotas protegidas de Dashboard, Members, Teams, Events, Attendance e Users estão disponíveis; Settings permanece não persistente;
+* contratos frontend de Member/Team/Event/Attendance foram alinhados; update de Team agora aceita TeamRequestDTO e retorna TeamResponseDTO, preservando TenantService/RBAC;
+* a task `route-domain-areas-and-add-http-ux-feedback` foi concluída com Task Verdict APROVADO; Release continua BLOQUEADO pelo antiabuso do registro público.

@@ -8,11 +8,11 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `add-user-management-ui`
-- Resultado: Task Verdict APROVADO; gestão frontend tenant-scoped de Users criada com RBAC visual, suíte Angular validada duas vezes com 35 testes aprovados e build aprovado.
+- Nome: `route-domain-areas-and-add-http-ux-feedback`
+- Resultado: Task Verdict APROVADO; áreas de domínio roteadas, contratos HTTP alinhados e contrato de atualização de Team corrigido, com suíte Angular 35/35 em duas execuções e backend 52/52.
 - Release Verdict: BLOQUEADO por pendências globais preexistentes registradas na auditoria.
-- Data: 2026-08-24
-- Referência: [[tasks/completed/add-user-management-ui/audit.md]]
+- Data: 2026-08-26
+- Referência: [[tasks/completed/route-domain-areas-and-add-http-ux-feedback/audit.md]]
 
 ## Task ativa
 
@@ -24,7 +24,7 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Próximo passo recomendado
 
-- Planejar `route-domain-areas-and-add-http-ux-feedback`, mantendo o Release bloqueado pela proteção antiabuso do registro público.
+- Planejar `extend-tenant-integration-coverage-to-events-and-attendance`, mantendo o Release bloqueado pela proteção antiabuso do registro público.
 
 ## Contexto relevante
 
