@@ -10,6 +10,8 @@ export interface Attendance {
   memberId: number;
   eventId: number;
   status: AttendanceStatus;
+  memberName?: string;
+  eventName?: string;
 }
 
 @Injectable({ providedIn: 'root' })

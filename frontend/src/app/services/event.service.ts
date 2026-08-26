@@ -10,6 +10,8 @@ export interface Event {
   description?: string;
 }
 
+export type EventRequest = Omit<Event, 'id'>;
+
 @Injectable({ providedIn: 'root' })
 export class EventService {
   private apiUrl = `${environment.apiUrl}/events`;

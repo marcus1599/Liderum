@@ -84,9 +84,12 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public void update(Long teamId) {
+    public TeamResponseDTO update(Long teamId, TeamRequestDTO request) {
         Team team = findTeamInCurrentGuild(teamId);
-        teamRepository.save(team);
+        if (request != null && request.getName() != null) {
+            team.setName(request.getName());
+        }
+        return toResponseDTO(teamRepository.save(team));
     }
 
     private User resolveLeader(Long leaderId, Long guildId) {

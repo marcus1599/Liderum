@@ -2,7 +2,7 @@ export interface Member {
     id: number;
     nickname: string;
     phone: string;
-    guildRole: 'MARECHAL' | 'GENERAL' | 'MAJOR' | 'CAPITÃO' | 'SOLDIER';
+    guildRole: 'MARECHAL' | 'GENERAL' | 'MAJOR' | 'CAPITÃO' | 'SOLDADO';
     rank: string;
     classe:
   | 'GUERREIRO'
@@ -17,10 +17,8 @@ export interface Member {
   | 'MERCENARIO'
   | 'ESPIRITUALISTA'
   | 'MISTICO'
+  | 'BARDO'
   | 'ARCANO';
-    team?: {
-      id: number;
-      name: string;
-    } | null;
+    teamName?: string | null;
+    teamId?: number | null;
   }
-  

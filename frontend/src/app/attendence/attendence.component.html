@@ -1,3 +1,6 @@
+<p *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+<p *ngIf="loading">Carregando presenças...</p>
+<p *ngIf="!loading && !errorMessage && attendances.length === 0">Nenhuma presença registrada.</p>
 <mat-card>
   <mat-card-title>Controle de Presença</mat-card-title>
   <mat-card-content>

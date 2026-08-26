@@ -60,9 +60,8 @@ public class TeamController {
     @PutMapping("/{teamId}")
     @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
     @Operation(summary = "Atualizar a  equipe")
-public ResponseEntity<Void> update(@PathVariable Long teamId) {
-    teamService.update(teamId);
-    return ResponseEntity.ok().build();
+    public ResponseEntity<TeamResponseDTO> update(@PathVariable Long teamId, @Valid @RequestBody(required = false) TeamRequestDTO request) {
+    return ResponseEntity.ok(teamService.update(teamId, request));
 }
 
 @DeleteMapping("/{teamId}/remove-member/{memberId}")

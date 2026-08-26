@@ -18,6 +18,7 @@ import { MatSortModule } from '@angular/material/sort';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-members',
@@ -52,18 +53,21 @@ export class MembersComponent implements OnInit, AfterViewInit {
     id: 0,
     nickname: '',
     phone: '',
-    guildRole: 'SOLDIER',
+    guildRole: 'SOLDADO',
     rank: '',
     classe: 'GUERREIRO'
   };
 
   isEditing: boolean = false;
+  loading = false;
+  errorMessage = '';
+  statusMessage = '';
 
   guildRoles: string[] = ['SOLDADO', 'CAPITÃO', 'MAJOR', 'GENERAL', 'MARECHAL'];
   ranks: string[] = ['C', 'B', 'A', 'S'];
   classes: string[] = [
     'GUERREIRO', 'MAGO', 'ATIRADORA', 'SACERDOTE', 'ARQUEIRO', 'PALADINO',
-    'BARBARO', 'FEITICEIRA', 'MACACO', 'MERCENARIO', 'ESPIRITUALISTA', 'MISTICO', 'ARCANO'
+    'BARBARO', 'FEITICEIRA', 'ANDARILHO', 'MERCENARIO', 'ESPIRITUALISTA', 'MISTICO', 'BARDO', 'ARCANO'
   ];
 
   constructor(private memberService: MemberService) { }
@@ -73,15 +77,21 @@ export class MembersComponent implements OnInit, AfterViewInit {
   }
 
   loadMembers(): void {
-    this.memberService.getMembers().subscribe((data) => {
-      this.members = data;
+    this.loading = true;
+    this.errorMessage = '';
+    this.memberService.getMembers().subscribe({ next: (data) => {
+      this.members = data as Member[];
       this.dataSource.data = data;
       // Atualiza paginator e sort após atualizar os dados
       setTimeout(() => {
         this.dataSource.paginator = this.paginator;
         this.dataSource.sort = this.sort;
       });
-    });
+      this.loading = false;
+    }, error: (error: HttpErrorResponse) => {
+      this.loading = false;
+      this.errorMessage = error.status === 403 ? 'Você não tem permissão para consultar membros.' : error.status === 404 ? 'Membros não encontrados.' : 'Não foi possível carregar os membros.';
+    }});
   }
 
   applyFilter(event: Event) {
@@ -98,11 +108,13 @@ export class MembersComponent implements OnInit, AfterViewInit {
     if (this.isEditing) {
       this.memberService.updateMember(this.newMember).subscribe(() => {
         this.loadMembers();
+        this.statusMessage = 'Membro atualizado.';
         this.resetForm();
       });
     } else {
       this.memberService.addMember(this.newMember).subscribe(() => {
         this.loadMembers();
+        this.statusMessage = 'Membro criado.';
         this.resetForm();
       });
     }
@@ -126,7 +138,7 @@ export class MembersComponent implements OnInit, AfterViewInit {
       id: 0,
       nickname: '',
       phone: '',
-      guildRole: 'SOLDIER',
+      guildRole: 'SOLDADO',
       rank: '',
       classe: 'GUERREIRO'
     };

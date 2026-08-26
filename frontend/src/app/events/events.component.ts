@@ -6,6 +6,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-events',
@@ -19,6 +20,9 @@ export class EventsComponent implements OnInit {
   newEvent: Partial<Event> = { name: '', date: '', description: '' };
   isEditing: boolean = false;
   editingEventId: number | null = null;
+  loading = false;
+  errorMessage = '';
+  statusMessage = '';
 
   constructor(private eventService: EventService) {}
 
@@ -27,7 +31,8 @@ export class EventsComponent implements OnInit {
   }
 
   loadEvents() {
-    this.eventService.getEvents().subscribe(events => this.events = events);
+    this.loading = true;
+    this.eventService.getEvents().subscribe({ next: events => { this.events = events; this.loading = false; }, error: (error: HttpErrorResponse) => { this.loading = false; this.errorMessage = error.status === 403 ? 'Você não tem permissão para consultar eventos.' : error.status === 404 ? 'Eventos não encontrados.' : 'Não foi possível carregar os eventos.'; } });
   }
 
   saveEvent() {
@@ -41,12 +46,12 @@ export class EventsComponent implements OnInit {
     }
     if (this.isEditing && this.editingEventId !== null) {
       this.eventService.updateEvent({ ...this.newEvent, id: this.editingEventId } as Event).subscribe(() => {
-        this.loadEvents();
+        this.loadEvents(); this.statusMessage = 'Evento atualizado.';
         this.resetForm();
       });
     } else {
       this.eventService.createEvent(this.newEvent).subscribe(() => {
-        this.loadEvents();
+        this.loadEvents(); this.statusMessage = 'Evento criado.';
         this.resetForm();
       });
     }

@@ -111,7 +111,7 @@ ngAfterViewInit() {
 
   saveGroup() {
     if (this.editingGroup) {
-      this.groupService.updateGroup({ ...this.editingGroup, name: this.groupForm.name! }).subscribe(() => {
+      this.groupService.updateGroup(this.editingGroup.id, { name: this.groupForm.name! }).subscribe(() => {
         this.loadGroups();
         this.cancelGroupForm();
       });
@@ -208,5 +208,4 @@ dropToGroup(event: CdkDragDrop<Member[]>, group: Group) {
     this.filterMembers();
   }
 }
-
 

@@ -11,6 +11,7 @@ import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
 import { AttendanceService, AttendanceStatus, Attendance } from '../services/attendance.service';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-attendence',
@@ -26,6 +27,8 @@ export class AttendenceComponent implements OnInit {
   selectedEventId: number | null = null;
   membersWithAlert: number[] = [];
   attendancesLoaded = false;
+  loading = false;
+  errorMessage = '';
 
   constructor(
     private memberService: MemberService,
@@ -36,11 +39,17 @@ export class AttendenceComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.memberService.getMembers().subscribe(members => this.members = members);
-    this.eventService.getEvents().subscribe(events => this.events = events);
-    this.attendanceService.getAttendances().subscribe(att => this.attendances = att);
+    this.loading = true;
+    this.memberService.getMembers().subscribe({ next: members => this.members = members, error: (e: HttpErrorResponse) => this.setError(e) });
+    this.eventService.getEvents().subscribe({ next: events => this.events = events, error: (e: HttpErrorResponse) => this.setError(e) });
+    this.attendanceService.getAttendances().subscribe({ next: att => { this.attendances = att; this.loading = false; }, error: (e: HttpErrorResponse) => this.setError(e) });
     this.attendanceService.getMembersWithConsecutiveAbsences(this.settingsService.maxAbsences)
       .subscribe(ids => this.membersWithAlert = ids);
+  }
+
+  private setError(error: HttpErrorResponse) {
+    this.loading = false;
+    this.errorMessage = error.status === 403 ? 'Você não tem permissão para consultar presenças.' : error.status === 404 ? 'Dados de presença não encontrados.' : 'Não foi possível carregar as presenças.';
   }
 
   markAttendance(memberId: number, status: AttendanceStatus) {

@@ -7,8 +7,11 @@ import { environment } from '../../environments/environment';
 export interface Group {
   id: number;
   name: string;
+  leaderName?: string | null;
   members: Member[];
 }
+
+export interface TeamRequest { name: string; leaderId?: number | null; }
 
 @Injectable({ providedIn: 'root' })
 export class GroupService {
@@ -21,12 +24,12 @@ export class GroupService {
     return this.http.get<Group[]>(this.apiUrl);
   }
 
-  createGroup(group: Partial<Group>): Observable<Group> {
+  createGroup(group: TeamRequest): Observable<Group> {
     return this.http.post<Group>(this.apiUrl, group);
   }
 
-  updateGroup(group: Group): Observable<Group> {
-    return this.http.put<Group>(`${this.apiUrl}/${group.id}`, group);
+  updateGroup(groupId: number, request: TeamRequest): Observable<Group> {
+    return this.http.put<Group>(`${this.apiUrl}/${groupId}`, request);
   }
 
   deleteGroup(groupId: number): Observable<void> {
@@ -38,12 +41,12 @@ export class GroupService {
   }
 
   // Adiciona membro ao grupo
-  addMemberToGroup(groupId: number, memberId: number): Observable<Group> {
-    return this.http.post<Group>(`${this.apiUrl}/${groupId}/add-member/${memberId}`, {});
+  addMemberToGroup(groupId: number, memberId: number): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/${groupId}/add-member/${memberId}`, {});
   }
 
   // Remove membro do grupo
-  removeMemberFromGroup(groupId: number, memberId: number): Observable<Group> {
-    return this.http.delete<Group>(`${this.apiUrl}/${groupId}/remove-member/${memberId}`);
+  removeMemberFromGroup(groupId: number, memberId: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${groupId}/remove-member/${memberId}`);
   }
 }

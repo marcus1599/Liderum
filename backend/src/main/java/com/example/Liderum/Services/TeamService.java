@@ -12,6 +12,6 @@ public interface TeamService {
     void delete(Long id);
     void addMemberToTeam(Long teamId, Long memberId);
     void removeMemberFromTeam(Long teamId, Long memberId);
-    void update(Long teamId);
+    TeamResponseDTO update(Long teamId, TeamRequestDTO request);
 
 }

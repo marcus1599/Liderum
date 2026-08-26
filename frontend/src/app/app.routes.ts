@@ -5,6 +5,9 @@ import { MembersComponent } from './members/members.component';
 import { authGuard } from './auth/auth.guard';
 import { RegisterGuildComponent } from './auth/register-guild.component';
 import { UsersComponent } from './users/users.component';
+import { GroupsComponent } from './groups/groups.component';
+import { EventsComponent } from './events/events.component';
+import { AttendenceComponent } from './attendence/attendence.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -13,5 +16,8 @@ export const routes: Routes = [
   { path: 'register', component: RegisterGuildComponent },
   { path: 'users', component: UsersComponent, canActivate: [authGuard] },
   { path: 'members', component: MembersComponent, canActivate: [authGuard] },
+  { path: 'teams', component: GroupsComponent, canActivate: [authGuard] },
+  { path: 'events', component: EventsComponent, canActivate: [authGuard] },
+  { path: 'attendance', component: AttendenceComponent, canActivate: [authGuard] },
   { path: '**', redirectTo: 'login' },
 ];

@@ -13,8 +13,8 @@ export class MemberService {
 
   constructor(private http: HttpClient) { }
 
-  getMembers(): Observable<any[]> {
-    return this.http.get<any[]>(this.apiUrl);  
+  getMembers(): Observable<Member[]> {
+    return this.http.get<Member[]>(this.apiUrl);
   }
 
   deleteMember(id: number): Observable<void> {
@@ -23,7 +23,7 @@ export class MemberService {
 
  
   addMember(member: Member): Observable<Member> {
-    return this.http.post<any>(this.apiUrl, member);
+    return this.http.post<Member>(this.apiUrl, member);
   }
   updateMember(member: Member): Observable<Member> {
     return this.http.put<Member>(`${this.apiUrl}/${member.id}`, member);

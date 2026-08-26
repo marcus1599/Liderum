@@ -1,3 +1,7 @@
+<p *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+<p *ngIf="statusMessage" role="status">{{ statusMessage }}</p>
+<p *ngIf="loading">Carregando membros...</p>
+<p *ngIf="!loading && !errorMessage && members.length === 0">Nenhum membro encontrado.</p>
 <mat-card class="form-card">
   <mat-card-header>
     <div class="card-title-row">

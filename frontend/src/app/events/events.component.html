@@ -1,3 +1,7 @@
+<p *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+<p *ngIf="statusMessage" role="status">{{ statusMessage }}</p>
+<p *ngIf="loading">Carregando eventos...</p>
+<p *ngIf="!loading && !errorMessage && events.length === 0">Nenhum evento encontrado.</p>
 <mat-card>
   <mat-card-title>{{ isEditing ? 'Editar Evento' : 'Novo Evento' }}</mat-card-title>
   <mat-card-content>
