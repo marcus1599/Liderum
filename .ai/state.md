@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-08-24
+> **Última inspeção:** 2026-09-01
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -16,7 +16,15 @@
 
 ## Estado geral
 
-O roadmap SaaS canônico foi aprovado e está registrado em `roadmap.md`. A Fase 2 — Persistência versionada e contratos de API — está em execução após a conclusão das tasks da Fase 1. As tasks `secure-user-provisioning-and-guild-onboarding`, `enforce-rbac-and-user-tenant-boundaries`, `remove-production-demo-bootstrap-and-fix-cors` e `baseline-flyway-and-production-database-schema` foram concluídas. O backend possui onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo, bootstrap demo exclusivo de `dev`, CORS configurável sem wildcard, schema Flyway validado e 57 testes backend aprovados. Todas têm Task Verdict **APROVADO**; a proteção antiabuso do registro público foi validada e o Release Verdict está **APROVADO**, com validação PostgreSQL real mantida como pendência operacional não bloqueante. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
+### Recuperação de produção Flyway (2026-08-26)
+
+- O banco legado do Render foi substituído por PostgreSQL 18.6 vazio em Oregon; V1 aplicou com sucesso em produção, Hibernate `validate` e Spring/Tomcat iniciaram. A causa raiz permanece o schema legado sem `flyway_schema_history` (SQLState `42P07`), não a V1 nem o warning Flyway/PostgreSQL 18.
+- `fix-production-flyway-baseline-postgresql` foi concluída com Task Verdict APROVADO. A remediação posterior de rate limit/CORS também foi concluída, sem alterar a conclusão da recuperação do banco.
+- O rate limiting do registro público foi corrigido em produção com `CF-Connecting-IP` confiado exclusivamente no profile `prod` do Render/Cloudflare; smoke final retornou `400,400,400,400,400,429`. `CORS_ALLOWED_ORIGINS` foi configurada para a origin Vercel e validada positiva e negativamente.
+- O Release Verdict está **APROVADO**. A validação PostgreSQL real de migrations no CI permanece recomendada como melhoria de qualidade não bloqueante.
+- A próxima melhoria de qualidade recomendada continua `validate-flyway-migrations-against-postgresql-in-ci`.
+
+O roadmap SaaS canônico está registrado em `roadmap.md`. A recuperação Flyway foi concluída com banco Render PostgreSQL 18.6 vazio, V1 aplicada e Hibernate `validate` aprovado; o warning de compatibilidade Flyway/PostgreSQL 18 permanece uma dívida técnica não bloqueante. A task P0 de rate limiting e CORS também foi concluída: produção usa `CF-Connecting-IP` na borda aprovada Render/Cloudflare, o smoke confirmou `429` na sexta tentativa e CORS liberou apenas a origin Vercel configurada. Não há task ativa; `extend-tenant-integration-coverage-to-events-and-attendance` continua pausada, mas pode ser retomada. As fundações de identidade/tenancy, Flyway e fluxos principais planejados da Fase 3 foram concluídos. O backend possui onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo, bootstrap demo exclusivo de `dev`, CORS configurável sem wildcard e schema Flyway com `ddl-auto=validate`. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
 
 ### Consolidação de produto concluída (2026-08-18)
 
@@ -409,9 +417,12 @@ O README descreve o produto e suas principais funcionalidades.
 
 ## Pendências técnicas não bloqueantes
 
-* migration validada automaticamente em H2; validação PostgreSQL real pendente.
+* Flyway 9.22.3 emite warning de suporte testado apenas até PostgreSQL 15, enquanto produção usa PostgreSQL 18.6. A V1 foi validada empiricamente em PostgreSQL 18.6 local e no Render; a validação contínua em PostgreSQL real no CI permanece recomendada.
 
 * rotas protegidas de Dashboard, Members, Teams, Events, Attendance e Users estão disponíveis; Settings permanece não persistente;
 * contratos frontend de Member/Team/Event/Attendance foram alinhados; update de Team agora aceita TeamRequestDTO e retorna TeamResponseDTO, preservando TenantService/RBAC;
 * a task `route-domain-areas-and-add-http-ux-feedback` foi concluída com Task Verdict APROVADO; o bloqueador antiabuso mencionado em sua auditoria foi tratado posteriormente.
 * a task `protect-public-guild-registration-against-abuse` foi concluída com Task Security Verdict, QA, SRE e Task Verdict APROVADOS; o registro público usa limitador local configurável e o Release Verdict foi liberado.
+
+* O rate limit de registro depende de memória local e da instância única atual. Escala horizontal exige store distribuído em task separada.
+* CORS de produção está configurado para `https://theliderum.vercel.app`, sem wildcard, e foi validado positiva e negativamente.

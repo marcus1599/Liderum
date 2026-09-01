@@ -8,23 +8,28 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `protect-public-guild-registration-against-abuse`
-- Resultado: Task Verdict APROVADO; registro público limitado por IP remoto observado, sem persistência após 429, com suíte backend 57/57.
-- Release Verdict: APROVADO; a proteção antiabuso foi validada. PostgreSQL real permanece pendência operacional não bloqueante.
-- Data: 2026-08-26
-- Referência: [[tasks/completed/protect-public-guild-registration-against-abuse/audit.md]]
+- Nome: `fix-production-rate-limit-and-cors-configuration`
+- Resultado: Task Verdict APROVADO. CORS foi validado para a origin Vercel e o rate limit de produção passou a usar a trust boundary aprovada `CF-Connecting-IP`; smoke final confirmou `429` na sexta tentativa.
+- Release Verdict: APROVADO.
+- Data: 2026-09-01
+- Referência: [[tasks/completed/fix-production-rate-limit-and-cors-configuration/audit.md]]
 
 ## Task ativa
 
-- Nenhuma.
+- Nenhuma task ativa.
+
+## Task pausada
+
+- Nome: `extend-tenant-integration-coverage-to-events-and-attendance`
+- Motivo: pausada durante a recuperação de produção; o Release Verdict agora está aprovado e a task pode voltar a ser candidata.
 
 ## Bloqueadores
 
-- Nenhum bloqueador global de release conhecido. Validação PostgreSQL real permanece pendência operacional não bloqueante.
+- Nenhum bloqueador global conhecido de release.
 
 ## Próximo passo recomendado
 
-- Planejar `extend-tenant-integration-coverage-to-events-and-attendance` como cobertura de segurança da Fase 4.
+- Retomar `extend-tenant-integration-coverage-to-events-and-attendance` ou priorizar `validate-flyway-migrations-against-postgresql-in-ci` como melhoria de qualidade. A primeira é a continuação recomendada do roadmap de segurança de tenant.
 
 ## Contexto relevante
 
