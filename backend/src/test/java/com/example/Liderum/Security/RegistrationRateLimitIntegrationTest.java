@@ -22,7 +22,8 @@ import static org.hamcrest.Matchers.not;
         "jwt.secret=test_only_registration_rate_limit_secret",
         "liderum.registration.rate-limit.limit=5",
         "liderum.registration.rate-limit.window=15m",
-        "liderum.registration.rate-limit.max-clients=100"
+        "liderum.registration.rate-limit.max-clients=100",
+        "liderum.registration.rate-limit.trust-cloudflare-client-ip=true"
 })
 @AutoConfigureMockMvc
 @ActiveProfiles("default")
@@ -71,6 +72,22 @@ class RegistrationRateLimitIntegrationTest {
                     .andExpect(status().isCreated());
         }
         mockMvc.perform(register(ip, "forwarded-blocked").header("X-Forwarded-For", "203.0.113.99"))
+                .andExpect(status().isTooManyRequests());
+    }
+
+    @Test
+    void cloudflareClientIpKeepsOneQuotaAcrossProxyAddresses() throws Exception {
+        String clientIp = "198.51.100.21";
+        for (int i = 0; i < 5; i++) {
+            mockMvc.perform(register("10.0.0." + i, "cloudflare-" + i)
+                            .header("CF-Connecting-IP", clientIp)
+                            .header("X-Forwarded-For", "203.0.113." + i))
+                    .andExpect(status().isCreated());
+        }
+
+        mockMvc.perform(register("10.0.0.99", "cloudflare-blocked")
+                        .header("CF-Connecting-IP", clientIp)
+                        .header("X-Forwarded-For", "203.0.113.99"))
                 .andExpect(status().isTooManyRequests());
     }
 
