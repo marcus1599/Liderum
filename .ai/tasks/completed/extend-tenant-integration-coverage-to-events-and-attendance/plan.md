@@ -20,6 +20,7 @@ P1, MEDIUM, qualidade e segurança. Cobrir Event e Attendance com evidência de 
 - Há testes unitários de Event e Attendance, mas todos mockam TenantService/repositórios; `MultiTenantIsolationIntegrationTest` integra apenas Member/Team e usa SecurityContext montado no teste, não HTTP/JWT.
 - O repositório já tem padrão `@SpringBootTest + @AutoConfigureMockMvc + @Transactional`, tokens emitidos por login real e H2/Flyway para integrações HTTP.
 - `EventServiceImpl.findEventInCurrentGuild` hoje lança `RuntimeException` quando não encontra Event. O handler genérico tende a traduzir isso em 500, diferente dos caminhos Attendance (`EntityNotFoundException` → 404). Isto não é evidência de acesso cross-tenant; será validado antes de qualquer mudança de produção.
+- Revalidação em 2026-09-01: os controllers expõem `GET/POST/PUT/DELETE` em `/events` e `/attendances`; mutações exigem `MARECHAL`, `GENERAL` ou `MAJOR`, enquanto leituras exigem autenticação. `AttendanceServiceImpl` resolve `Member` e `Event` por `id + guildId` antes de salvar. Nenhuma divergência exige alterar o escopo de testes planejado.
 
 ## Decisões de planejamento
 

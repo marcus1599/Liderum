@@ -8,6 +8,7 @@ import com.example.Liderum.Repository.EventRepository;
 import com.example.Liderum.Services.EventService;
 import com.example.Liderum.Tenancy.TenantService;
 import com.example.Liderum.dto.EventRequestDTO;
+import jakarta.persistence.EntityNotFoundException;
 import com.example.Liderum.dto.EventResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -74,7 +75,7 @@ public class EventServiceImpl implements EventService {
 
     private Event findEventInCurrentGuild(Long id) {
         return eventRepository.findByIdAndGuildId(id, tenantService.getCurrentGuildId())
-                .orElseThrow(() -> new RuntimeException("Event not found with ID: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("Event not found with ID: " + id));
     }
 
     private EventResponseDTO toResponseDTO(Event event) {
