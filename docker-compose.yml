@@ -1,4 +1,21 @@
 services:
+  postgres:
+    image: postgres:18.6
+    container_name: liderum-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: liderum
+      POSTGRES_USER: liderum
+      POSTGRES_PASSWORD: liderum_local_only
+    volumes:
+      - liderum-postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U liderum -d liderum"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   rabbitmq:
     image: rabbitmq:3.13-management
     container_name: liderum-rabbitmq
@@ -21,13 +38,18 @@ services:
     ports:
       - "8080:8080"
     environment:
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: prod
+      DB_URL: jdbc:postgresql://postgres:5432/liderum
+      DB_USERNAME: liderum
+      DB_PASSWORD: liderum_local_only
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET must be defined}
       JWT_EXPIRATION: ${JWT_EXPIRATION:-604800000}
       CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:4200}
       RABBITMQ_ADDRESSES: amqp://guest:guest@rabbitmq:5672
     depends_on:
       rabbitmq:
+        condition: service_healthy
+      postgres:
         condition: service_healthy
 
   notification-consumer:
@@ -41,3 +63,16 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: liderum-frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      liderum-producer:
+        condition: service_started
+
+volumes:
+  liderum-postgres-data:

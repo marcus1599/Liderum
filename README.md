@@ -72,8 +72,12 @@ docker compose up --build
 Serviços expostos localmente:
 
 - Backend: `http://localhost:8080`
+- Frontend: `http://localhost:4200`
 - Notification Service: `http://localhost:8081`
+- PostgreSQL: `localhost:5432` (somente desenvolvimento local)
 - RabbitMQ Management: `http://localhost:15672`
+
+O Compose usa PostgreSQL vazio com Flyway e `ddl-auto=validate`; o profile `prod` é usado dentro do ambiente local para reproduzir a configuração de produção. Registre uma Guild pela interface em `http://localhost:4200/register`. Para resetar somente o banco descartável local, pare os serviços e execute `docker compose down -v`.
 
 ## Desenvolvimento local
 
@@ -123,7 +127,7 @@ npm run build
 
 ## CI
 
-O workflow do GitHub Actions em `.github/workflows/backend.yml` executa `./mvnw clean verify` com Java 21 para a branch `main`.
+Os workflows do GitHub Actions validam o backend/Flyway em `.github/workflows/backend.yml` e, em `.github/workflows/fullstack.yml`, executam testes/build do frontend e testes/package do notification-service.
 
 ## Desenvolvimento assistido por IA
 
