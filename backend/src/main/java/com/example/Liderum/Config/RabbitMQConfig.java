@@ -7,6 +7,7 @@ import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.QueueBuilder;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -27,6 +28,9 @@ public class RabbitMQConfig {
     @Value("${liderum.rabbitmq.guild-event-created-queue}")
     private String guildEventCreatedQueue;
 
+    private static final String DEAD_LETTER_EXCHANGE = "liderum.events.dlx";
+    private static final String DEAD_LETTER_ROUTING_KEY = "guild.event.created.dlq";
+
     @Bean
     public DirectExchange liderumEventsExchange() {
         return new DirectExchange(exchangeName, true, false);
@@ -34,7 +38,27 @@ public class RabbitMQConfig {
 
     @Bean
     public Queue guildEventCreatedQueue() {
-        return new Queue(guildEventCreatedQueue, true);
+        return QueueBuilder.durable(guildEventCreatedQueue)
+                .deadLetterExchange(DEAD_LETTER_EXCHANGE)
+                .deadLetterRoutingKey(DEAD_LETTER_ROUTING_KEY)
+                .build();
+    }
+
+    @Bean
+    public DirectExchange liderumEventsDeadLetterExchange() {
+        return new DirectExchange(DEAD_LETTER_EXCHANGE, true, false);
+    }
+
+    @Bean
+    public Queue guildEventCreatedDeadLetterQueue() {
+        return QueueBuilder.durable(guildEventCreatedQueue + ".dlq").build();
+    }
+
+    @Bean
+    public Binding guildEventCreatedDeadLetterBinding() {
+        return BindingBuilder.bind(guildEventCreatedDeadLetterQueue())
+                .to(liderumEventsDeadLetterExchange())
+                .with(DEAD_LETTER_ROUTING_KEY);
     }
 
     @Bean
