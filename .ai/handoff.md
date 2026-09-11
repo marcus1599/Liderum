@@ -8,20 +8,16 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `fix-production-rate-limit-and-cors-configuration`
-- Resultado: Task Verdict APROVADO. CORS foi validado para a origin Vercel e o rate limit de produção passou a usar a trust boundary aprovada `CF-Connecting-IP`; smoke final confirmou `429` na sexta tentativa.
+- Nome: `make-event-notifications-reliable-and-testable`
+- Resultado: Task Verdict APROVADO. O GitHub Actions run #15 aprovou os jobs H2 e PostgreSQL 18.6, validando V1, `flyway_schema_history`, seis tabelas, FKs/índices e Hibernate `ddl-auto=validate` em banco descartável.
 - Release Verdict: APROVADO.
 - Data: 2026-09-01
-- Referência: [[tasks/completed/fix-production-rate-limit-and-cors-configuration/audit.md]]
+- Referência: [[tasks/completed/make-event-notifications-reliable-and-testable/audit.md]]
 
 ## Task ativa
 
-- Nenhuma task ativa.
-
-## Task pausada
-
-- Nome: `extend-tenant-integration-coverage-to-events-and-attendance`
-- Motivo: pausada durante a recuperação de produção; o Release Verdict agora está aprovado e a task pode voltar a ser candidata.
+- Nome: `establish-fullstack-ci-and-compose-demo-environment`
+- Estado: planejamento criado; implementação ainda não autorizada.
 
 ## Bloqueadores
 
@@ -29,7 +25,7 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Próximo passo recomendado
 
-- Retomar `extend-tenant-integration-coverage-to-events-and-attendance` ou priorizar `validate-flyway-migrations-against-postgresql-in-ci` como melhoria de qualidade. A primeira é a continuação recomendada do roadmap de segurança de tenant.
+- Revisar e autorizar a implementação de `establish-fullstack-ci-and-compose-demo-environment`.
 
 ## Contexto relevante
 

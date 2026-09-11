@@ -18,7 +18,7 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 
 **Entregável:** onboarding seguro, senha armazenada com hash, limites de User por Guild, RBAC inicial e testes HTTP/de integração correspondentes.
 
-**Dependências:** nenhuma. Esta é a fase atual.
+**Dependências:** nenhuma. Concluída.
 
 ### Fase 2 — Persistência versionada e contratos de API
 
@@ -26,7 +26,7 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 
 **Entregável:** baseline Flyway, constraints relevantes, profiles coerentes e respostas de erro padronizadas.
 
-**Dependências:** estabilização do modelo User/Guild da Fase 1.
+**Dependências:** estabilização do modelo User/Guild da Fase 1. Concluída.
 
 ### Fase 3 — Fluxo funcional de Guild no frontend
 
@@ -34,7 +34,7 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 
 **Entregável:** onboarding, gestão de usuários e rotas para membros, equipes, eventos, presença e configurações, com feedback de erro/loading e responsividade básica.
 
-**Dependências:** contratos estáveis das Fases 1 e 2.
+**Dependências:** contratos estáveis das Fases 1 e 2. Concluída.
 
 ### Fase 4 — Cobertura dos fluxos críticos e isolamento completo
 
@@ -42,7 +42,7 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 
 **Entregável:** cobertura útil de API/integração para Event e Attendance multi-tenant, autorização por endpoint e fluxos frontend críticos.
 
-**Dependências:** Fases 1 a 3.
+**Dependências:** Fases 1 a 3. Concluída.
 
 ### Fase 5 — Mensageria confiável e observável
 
@@ -50,7 +50,7 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 
 **Entregável:** contrato de evento com contexto de Guild, política proporcional de retry/DLQ/idempotência, testes com RabbitMQ e diagnóstico operacional.
 
-**Dependências:** Fases 1 e 2; contrato de domínio estabilizado.
+**Dependências:** Fases 1 e 2; contrato de domínio estabilizado. Fase atual.
 
 ### Fase 6 — Operação, CI e apresentação de portfólio
 
@@ -68,10 +68,11 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 | P0 | `enforce-rbac-and-user-tenant-boundaries` — concluída em 2026-08-24 | Segurança | LARGE | Matriz de permissões aplicada e testada |
 | P0 | `remove-production-demo-bootstrap-and-fix-cors` — concluída em 2026-08-24 | Segurança / infraestrutura | MEDIUM | Bootstrap apenas em dev e CORS configurável correto |
 | P0 | `protect-public-guild-registration-against-abuse` — concluída em 2026-08-26 | Segurança | MEDIUM | `POST /auth/register-guild` limitado no servidor, com resposta 429 previsível e sem criação parcial |
-| P1 | `baseline-flyway-and-production-database-schema` — concluída em 2026-08-24 | Infraestrutura / qualidade | STRUCTURAL | Baseline versionada e validada automaticamente em H2; validação PostgreSQL real pendente |
-| P1 | `complete-guild-onboarding-and-user-management-ui` | Funcionalidade | LARGE | Lifecycle SaaS acessível no Angular |
-| P1 | `route-domain-areas-and-add-http-ux-feedback` | Funcionalidade / qualidade | MEDIUM | Áreas do domínio roteadas com feedback consistente |
-| P1 | `extend-tenant-integration-coverage-to-events-and-attendance` | Qualidade / segurança | MEDIUM | IDOR cross-Guild bloqueado nos quatro domínios |
+| P1 | `baseline-flyway-and-production-database-schema` — concluída em 2026-08-24 | Infraestrutura / qualidade | STRUCTURAL | Baseline versionada, PostgreSQL real e CI validados |
+| P1 | `complete-guild-onboarding-and-user-management-ui` — concluída em 2026-08-30 | Funcionalidade | LARGE | Lifecycle SaaS acessível no Angular |
+| P1 | `route-domain-areas-and-add-http-ux-feedback` — concluída em 2026-08-30 | Funcionalidade / qualidade | MEDIUM | Áreas do domínio roteadas com feedback consistente |
+| P1 | `extend-tenant-integration-coverage-to-events-and-attendance` — concluída em 2026-09-01 | Qualidade / segurança | MEDIUM | IDOR cross-Guild bloqueado nos quatro domínios |
+| P1 | `validate-flyway-migrations-against-postgresql-in-ci` — concluída em 2026-09-01 | Qualidade / infraestrutura | MEDIUM | Migrations validadas continuamente em PostgreSQL 18 no CI |
 | P2 | `make-event-notifications-reliable-and-testable` | Infraestrutura / funcionalidade | LARGE | Retry/DLQ/idempotência e testes RabbitMQ |
 | P2 | `establish-fullstack-ci-and-compose-demo-environment` | Infraestrutura | LARGE | CI dos três componentes e demo local completa |
 | P2 | `add-proportional-observability-and-portfolio-documentation` | Qualidade / portfólio | MEDIUM | Health, logs, diagrama e roteiro de demonstração |
