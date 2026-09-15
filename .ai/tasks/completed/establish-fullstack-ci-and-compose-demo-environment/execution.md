@@ -23,3 +23,12 @@
 - Frontend respondeu HTTP 200; RabbitMQ Management respondeu HTTP 200.
 - O endpoint raiz do backend respondeu HTTP 403, conforme a política de segurança atual; o processo permaneceu ativo.
 - O primeiro build havia falhado porque o mount legado `/var/lib/postgresql/data` é incompatível com PostgreSQL 18; o volume descartável foi recriado sem manipulação de dados persistentes.
+
+## Smoke local
+
+- `POST /auth/register-guild`: 201 com dados descartáveis locais.
+- `POST /auth/login`: 200; o token não foi registrado em arquivos ou logs.
+- `GET /users/me`: 200 autenticado.
+- `POST /events`: 200 com o contrato real `EventRequestDTO` (`name`, `date`, `description`).
+- O notification-consumer registrou o recebimento do evento criado pelo RabbitMQ.
+- Uma primeira tentativa usou o campo incorreto `title` e retornou 400, sem mutação; a repetição com o DTO real foi aprovada.
