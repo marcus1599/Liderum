@@ -79,6 +79,8 @@ Serviços expostos localmente:
 
 O Compose usa PostgreSQL vazio com Flyway e `ddl-auto=validate`; o profile `prod` é usado dentro do ambiente local para reproduzir a configuração de produção. Registre uma Guild pela interface em `http://localhost:4200/register`. Para resetar somente o banco descartável local, pare os serviços e execute `docker compose down -v`.
 
+Verificações operacionais: `GET http://localhost:8080/actuator/health` (backend) e `GET http://localhost:8081/actuator/health` (notification-service) retornam somente o status de disponibilidade, sem detalhes internos. PostgreSQL e RabbitMQ possuem healthchecks nativos no Compose; use `docker compose ps` para confirmar os estados.
+
 ## Desenvolvimento local
 
 ### Backend
@@ -115,7 +117,7 @@ cd backend
 .\mvnw.cmd clean verify
 ```
 
-A última validação local executou 24 testes, sem failures ou errors.
+A última validação local executou 66 testes, sem failures, errors ou skipped.
 
 Frontend:
 
@@ -128,6 +130,16 @@ npm run build
 ## CI
 
 Os workflows do GitHub Actions validam o backend/Flyway em `.github/workflows/backend.yml` e, em `.github/workflows/fullstack.yml`, executam testes/build do frontend e testes/package do notification-service.
+
+## Roteiro de demonstração
+
+1. Suba o ambiente com `docker compose up --build`.
+2. Abra `http://localhost:4200/register` e crie uma Guild descartável.
+3. Faça login e confirme o perfil em `/users/me`.
+4. Crie um evento e observe o processamento pelo notification-service nos logs do Compose.
+5. Use duas contas/Guilds para demonstrar que cada consulta permanece isolada por tenant.
+
+O diagrama resumido da arquitetura está em `.ai/docs/architecture-demo.md`.
 
 ## Desenvolvimento assistido por IA
 

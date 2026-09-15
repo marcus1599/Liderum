@@ -8,16 +8,15 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Última task concluída
 
-- Nome: `make-event-notifications-reliable-and-testable`
-- Resultado: Task Verdict APROVADO. O GitHub Actions run #15 aprovou os jobs H2 e PostgreSQL 18.6, validando V1, `flyway_schema_history`, seis tabelas, FKs/índices e Hibernate `ddl-auto=validate` em banco descartável.
+- Nome: `add-proportional-observability-and-portfolio-documentation`
+- Resultado: Task Verdict APROVADO. Actuator health seguro, documentação operacional, diagrama Mermaid e roteiro de demonstração foram validados; Compose e healthchecks permaneceram saudáveis.
 - Release Verdict: APROVADO.
-- Data: 2026-09-01
-- Referência: [[tasks/completed/make-event-notifications-reliable-and-testable/audit.md]]
+- Data: 2026-09-11
+- Referência: [[tasks/completed/add-proportional-observability-and-portfolio-documentation/audit.md]]
 
 ## Task ativa
 
-- Nome: `establish-fullstack-ci-and-compose-demo-environment`
-- Estado: planejamento criado; implementação ainda não autorizada.
+- Nenhuma task ativa.
 
 ## Bloqueadores
 
@@ -25,7 +24,7 @@ Sistema Agents + Skills + MCP validado para uso controlado. As correções de JW
 
 ## Próximo passo recomendado
 
-- Revisar e autorizar a implementação de `establish-fullstack-ci-and-compose-demo-environment`.
+- Nenhuma task ativa. Revisar o roadmap para manutenção e evolução futura.
 
 ## Contexto relevante
 

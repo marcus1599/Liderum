@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-09-01
+> **Última inspeção:** 2026-09-15
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -23,6 +23,8 @@
 - O rate limiting do registro público foi corrigido em produção com `CF-Connecting-IP` confiado exclusivamente no profile `prod` do Render/Cloudflare; smoke final retornou `400,400,400,400,400,429`. `CORS_ALLOWED_ORIGINS` foi configurada para a origin Vercel e validada positiva e negativamente.
 - O Release Verdict está **APROVADO**. A validação PostgreSQL real de migrations no CI permanece recomendada como melhoria de qualidade não bloqueante.
 - A task `extend-tenant-integration-coverage-to-events-and-attendance` foi concluída com Task Verdict e Task Security Verdict APROVADOS. Oito cenários HTTP reais comprovam as fronteiras tenant de Event e Attendance, incluindo referências cross-Guild sem mutação parcial. `validate-flyway-migrations-against-postgresql-in-ci` foi concluída com Task Verdict, Security e SRE/DevOps aprovados; o GitHub Actions run #15 validou PostgreSQL 18.6, V1 e Hibernate `ddl-auto=validate` em banco descartável.
+- A task `make-event-notifications-reliable-and-testable` foi concluída: RabbitMQ usa retry/DLQ e idempotência proporcional, com testes unitários e integração. `establish-fullstack-ci-and-compose-demo-environment` também foi concluída: Compose local validado com PostgreSQL 18.6, RabbitMQ, backend, notification-consumer e frontend; CI cobre frontend e notification-service, e o smoke local confirmou registro, login, tenant, criação de evento e consumo assíncrono.
+- A task `add-proportional-observability-and-portfolio-documentation` foi concluída: Actuator health seguro para backend e notification-service, documentação operacional, diagrama Mermaid e roteiro reproduzível de demonstração foram adicionados e validados no Compose. A Fase 6 do roadmap está concluída.
 
 O roadmap SaaS canônico está registrado em `roadmap.md`. A recuperação Flyway foi concluída com banco Render PostgreSQL 18.6 vazio, V1 aplicada e Hibernate `validate` aprovado; o warning de compatibilidade Flyway/PostgreSQL 18 permanece uma dívida técnica não bloqueante. A task P0 de rate limiting e CORS também foi concluída: produção usa `CF-Connecting-IP` na borda aprovada Render/Cloudflare, o smoke confirmou `429` na sexta tentativa e CORS liberou apenas a origin Vercel configurada. A cobertura HTTP de isolamento tenant para Event e Attendance foi concluída: os oito cenários validam 404 cross-Guild, ausência de mutação parcial e 403 por RBAC; Event agora mapeia recurso fora do tenant a `EntityNotFoundException` para preservar a semântica 404. A validação PostgreSQL contínua de migrations foi adicionada ao GitHub Actions e aprovada no run #15 com PostgreSQL 18.6 descartável. Não há task ativa. As fundações de identidade/tenancy, Flyway e fluxos principais planejados da Fase 3 foram concluídos. O backend possui onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo, bootstrap demo exclusivo de `dev`, CORS configurável sem wildcard e schema Flyway com `ddl-auto=validate`. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
 
@@ -320,9 +322,11 @@ Existe `docker-compose.yml`.
 
 Serviços atualmente definidos:
 
+* PostgreSQL (`postgres:18.6`);
 * RabbitMQ (`rabbitmq:3.13-management`);
 * backend/producer (`liderum-producer`);
 * notification-service/consumer (`notification-consumer`).
+* frontend Angular servido por Nginx (`frontend`).
 
 Também existem Dockerfiles para componentes da aplicação.
 
@@ -336,17 +340,16 @@ Infraestrutura Docker existente.
 
 Existe GitHub Actions.
 
-Arquivo observado:
+Arquivos observados:
 
 ```text
 .github/workflows/backend.yml
+.github/workflows/fullstack.yml
 ```
 
 ## Estado
 
-CI do backend existente.
-
-O workflow possui histórico recente de ajustes relacionados ao processo de build/verificação (`./mvnw clean verify`).
+CI valida backend/Flyway em PostgreSQL 18.6, frontend e notification-service.
 
 ---
 

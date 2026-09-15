@@ -50,7 +50,7 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 
 **Entregável:** contrato de evento com contexto de Guild, política proporcional de retry/DLQ/idempotência, testes com RabbitMQ e diagnóstico operacional.
 
-**Dependências:** Fases 1 e 2; contrato de domínio estabilizado. Fase atual.
+**Dependências:** Fases 1 e 2; contrato de domínio estabilizado. Concluída.
 
 ### Fase 6 — Operação, CI e apresentação de portfólio
 
@@ -58,7 +58,7 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 
 **Entregável:** Compose completo, CI dos componentes, health checks e logs proporcionais, guia de execução, diagrama e roteiro de demonstração multi-tenant/mensageria.
 
-**Dependências:** Fases 3 a 5.
+**Dependências:** Fases 3 a 5. Concluída.
 
 ## Backlog priorizado
 
@@ -73,9 +73,9 @@ Não significa billing, escala corporativa ou infraestrutura complexa.
 | P1 | `route-domain-areas-and-add-http-ux-feedback` — concluída em 2026-08-30 | Funcionalidade / qualidade | MEDIUM | Áreas do domínio roteadas com feedback consistente |
 | P1 | `extend-tenant-integration-coverage-to-events-and-attendance` — concluída em 2026-09-01 | Qualidade / segurança | MEDIUM | IDOR cross-Guild bloqueado nos quatro domínios |
 | P1 | `validate-flyway-migrations-against-postgresql-in-ci` — concluída em 2026-09-01 | Qualidade / infraestrutura | MEDIUM | Migrations validadas continuamente em PostgreSQL 18 no CI |
-| P2 | `make-event-notifications-reliable-and-testable` | Infraestrutura / funcionalidade | LARGE | Retry/DLQ/idempotência e testes RabbitMQ |
-| P2 | `establish-fullstack-ci-and-compose-demo-environment` | Infraestrutura | LARGE | CI dos três componentes e demo local completa |
-| P2 | `add-proportional-observability-and-portfolio-documentation` | Qualidade / portfólio | MEDIUM | Health, logs, diagrama e roteiro de demonstração |
+| P2 | `make-event-notifications-reliable-and-testable` — concluída em 2026-09-11 | Infraestrutura / funcionalidade | LARGE | Retry/DLQ/idempotência e testes RabbitMQ |
+| P2 | `establish-fullstack-ci-and-compose-demo-environment` — concluída em 2026-09-11 | Infraestrutura | LARGE | CI dos três componentes e demo local completa |
+| P2 | `add-proportional-observability-and-portfolio-documentation` — concluída em 2026-09-11 | Qualidade / portfólio | MEDIUM | Health, logs, diagrama e roteiro de demonstração |
 
 ## Itens explicitamente adiados
 
