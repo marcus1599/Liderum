@@ -8,16 +8,21 @@ import { UsersComponent } from './users/users.component';
 import { GroupsComponent } from './groups/groups.component';
 import { EventsComponent } from './events/events.component';
 import { AttendenceComponent } from './attendence/attendence.component';
+import { AuthenticatedLayoutComponent } from './shared/authenticated-layout/authenticated-layout.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterGuildComponent },
-  { path: 'users', component: UsersComponent, canActivate: [authGuard] },
-  { path: 'members', component: MembersComponent, canActivate: [authGuard] },
-  { path: 'teams', component: GroupsComponent, canActivate: [authGuard] },
-  { path: 'events', component: EventsComponent, canActivate: [authGuard] },
-  { path: 'attendance', component: AttendenceComponent, canActivate: [authGuard] },
+  {
+    path: '', component: AuthenticatedLayoutComponent, canActivate: [authGuard], children: [
+      { path: 'users', component: UsersComponent },
+      { path: 'members', component: MembersComponent },
+      { path: 'teams', component: GroupsComponent },
+      { path: 'events', component: EventsComponent },
+      { path: 'attendance', component: AttendenceComponent }
+    ]
+  },
   { path: '**', redirectTo: 'login' },
 ];
