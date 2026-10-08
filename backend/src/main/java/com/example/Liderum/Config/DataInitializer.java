@@ -5,6 +5,7 @@ import com.example.Liderum.Entities.Member;
 import com.example.Liderum.Entities.Event;
 import com.example.Liderum.Entities.Guild;
 import com.example.Liderum.Enums.GuildRole;
+import com.example.Liderum.Enums.UserStatus;
 import com.example.Liderum.Enums.Classe;
 import com.example.Liderum.Repository.UserRepository;
 import com.example.Liderum.Repository.MemberRepository;
@@ -44,6 +45,7 @@ public class DataInitializer {
                         .email("admin@email.com")
                         .password(passwordEncoder.encode("admin123"))
                         .guildRole(GuildRole.MARECHAL)
+                        .status(UserStatus.ACTIVE)
                         .guild(guild)
                         .build();
                 userRepository.save(admin);

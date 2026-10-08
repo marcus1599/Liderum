@@ -5,14 +5,15 @@ export interface ManagedUser {
   username: string;
   email: string;
   guildRole: GuildRole;
+  status: 'PENDING' | 'ACTIVE' | 'DISABLED';
 }
 
 export interface CreateUserRequest {
   username: string;
   email: string;
-  password: string;
   role: GuildRole;
 }
+export interface UserActivationResponse { user: ManagedUser; activationToken: string; }
 
 export interface UpdateUserRoleRequest {
   role: GuildRole;

@@ -4,10 +4,15 @@ import com.example.Liderum.Entities.User;
 import com.example.Liderum.Enums.GuildRole;
 import com.example.Liderum.Repository.UserRepository;
 import com.example.Liderum.Services.UserService;
+import com.example.Liderum.Services.UserActivationService;
+import com.example.Liderum.Repository.UserActivationTokenRepository;
 import com.example.Liderum.Tenancy.TenantService;
 import com.example.Liderum.dto.UserCreateRequestDTO;
 import com.example.Liderum.dto.UserResponseDTO;
 import com.example.Liderum.dto.UserRoleUpdateRequestDTO;
+import com.example.Liderum.dto.UserActivationResponseDTO;
+import com.example.Liderum.dto.AdminUserCreateRequestDTO;
+import com.example.Liderum.Enums.UserStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,22 +29,49 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final TenantService tenantService;
     private final PasswordEncoder passwordEncoder;
+    private final UserActivationService activationService;
+    private final UserActivationTokenRepository activationTokenRepository;
 
     @Override
     public UserResponseDTO create(UserCreateRequestDTO dto) {
+        AdminUserCreateRequestDTO admin = new AdminUserCreateRequestDTO(); admin.setUsername(dto.getUsername()); admin.setEmail(dto.getEmail()); admin.setRole(dto.getRole());
+        return createWithActivation(admin).getUser();
+    }
+
+    @Override
+    public UserActivationResponseDTO createWithActivation(UserCreateRequestDTO dto) {
+        AdminUserCreateRequestDTO admin = new AdminUserCreateRequestDTO(); admin.setUsername(dto.getUsername()); admin.setEmail(dto.getEmail()); admin.setRole(dto.getRole());
+        return createWithActivation(admin);
+    }
+
+    @Override
+    public UserActivationResponseDTO createWithActivation(AdminUserCreateRequestDTO dto) {
         User actor = tenantService.getCurrentUser();
         assertCanCreate(actor.getGuildRole(), dto.getRole());
         User user = User.builder()
                 .username(dto.getUsername())
                 .email(dto.getEmail())
-                .password(passwordEncoder.encode(dto.getPassword()))
+                .password(null)
                 .guildRole(dto.getRole())
+                .status(UserStatus.PENDING)
                 .guild(actor.getGuild())
                 .build();
 
         user = userRepository.save(user);
 
-        return toDTO(user);
+        return activationService.createActivation(user);
+    }
+
+    @Override
+    @Transactional
+    public UserActivationResponseDTO regenerateActivation(Long id) {
+        User actor = tenantService.getCurrentUser();
+        User target = findUserInCurrentGuild(id, actor.getGuild().getId());
+        assertCanManageTarget(actor.getGuildRole(), target.getGuildRole(), null);
+        if (target.getStatus() != UserStatus.PENDING) {
+            throw new EntityNotFoundException("Activation unavailable");
+        }
+        return activationService.createActivation(target);
     }
 
     @Override
@@ -85,6 +117,7 @@ public class UserServiceImpl implements UserService {
 
         assertCanManageTarget(actor.getGuildRole(), user.getGuildRole(), null);
         assertLastMarechalIsPreserved(user, null, guildId);
+        activationTokenRepository.deleteAllByUserId(user.getId());
         userRepository.delete(user);
     }
 
@@ -133,6 +166,7 @@ public class UserServiceImpl implements UserService {
         dto.setUsername(user.getUsername());
         dto.setEmail(user.getEmail());
         dto.setGuildRole(user.getGuildRole());
+        dto.setStatus(user.getStatus());
         return dto;
     }
 }

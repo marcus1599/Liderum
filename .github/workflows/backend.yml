@@ -78,4 +78,4 @@ jobs:
           DB_USERNAME: liderum_ci
           DB_PASSWORD: liderum_ci_only
           JWT_SECRET: test_only_postgresql_ci_secret_32_bytes_minimum
-        run: ./mvnw -Dtest=PostgreSqlFlywaySchemaCiIT test
+        run: ./mvnw -Dtest=PostgreSqlFlywaySchemaCiIT,PostgreSqlFlywayUpgradeCiIT test

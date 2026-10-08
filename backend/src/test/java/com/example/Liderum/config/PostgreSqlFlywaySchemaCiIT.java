@@ -23,12 +23,12 @@ class PostgreSqlFlywaySchemaCiIT {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    void appliesV1AndHibernateValidatesThePostgresqlSchema() {
+    void appliesV1AndV2AndHibernateValidatesThePostgresqlSchema() {
         assertThat(jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM flyway_schema_history WHERE version = '1' AND success = true", Integer.class))
-                .isEqualTo(1);
+                "SELECT COUNT(*) FROM flyway_schema_history WHERE version IN ('1', '2') AND success = true", Integer.class))
+                .isEqualTo(2);
 
-        for (String table : new String[] {"guilds", "users", "member", "team", "event", "attendance"}) {
+        for (String table : new String[] {"guilds", "users", "member", "team", "event", "attendance", "user_activation_tokens"}) {
             Integer count = jdbcTemplate.queryForObject(
                     "SELECT COUNT(*) FROM information_schema.tables "
                             + "WHERE table_schema = 'public' AND table_name = ?", Integer.class, table);
@@ -43,7 +43,13 @@ class PostgreSqlFlywaySchemaCiIT {
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM pg_indexes WHERE schemaname = 'public' "
                         + "AND indexname IN ('idx_users_guild', 'idx_member_guild', 'idx_team_guild', "
-                        + "'idx_event_guild', 'idx_attendance_member', 'idx_attendance_event')", Integer.class))
-                .isEqualTo(6);
+                        + "'idx_event_guild', 'idx_attendance_member', 'idx_attendance_event', "
+                        + "'idx_activation_token_user')", Integer.class))
+                .isEqualTo(7);
+
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'public' "
+                        + "AND table_name = 'users' AND column_name = 'status' AND is_nullable = 'NO'", Integer.class))
+                .isEqualTo(1);
     }
 }

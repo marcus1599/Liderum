@@ -4,10 +4,13 @@ import com.example.Liderum.Entities.Guild;
 import com.example.Liderum.Entities.User;
 import com.example.Liderum.Enums.GuildRole;
 import com.example.Liderum.Repository.UserRepository;
+import com.example.Liderum.Repository.UserActivationTokenRepository;
 import com.example.Liderum.Tenancy.TenantService;
+import com.example.Liderum.Services.UserActivationService;
 import com.example.Liderum.dto.UserCreateRequestDTO;
 import com.example.Liderum.dto.UserRoleUpdateRequestDTO;
 import com.example.Liderum.dto.UserResponseDTO;
+import com.example.Liderum.dto.UserActivationResponseDTO;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,21 +28,24 @@ class UserServiceImplTest {
     @Mock UserRepository userRepository;
     @Mock TenantService tenantService;
     @Mock PasswordEncoder passwordEncoder;
+    @Mock UserActivationService activationService;
+    @Mock UserActivationTokenRepository activationTokenRepository;
     @InjectMocks UserServiceImpl userService;
 
     @Test
-    void shouldCreateUserWithEncodedPasswordAndCurrentGuild() {
+    void shouldCreatePendingUserWithCurrentGuild() {
         Guild guild = Guild.builder().id(7L).name("Guild").build();
         UserCreateRequestDTO request = request(GuildRole.SOLDADO);
         when(tenantService.getCurrentUser()).thenReturn(User.builder()
                 .id(9L).guild(guild).guildRole(GuildRole.MARECHAL).build());
-        when(passwordEncoder.encode("password123")).thenReturn("encoded");
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        when(activationService.createActivation(any(User.class))).thenAnswer(invocation -> new UserActivationResponseDTO(new UserResponseDTO(), "token"));
         UserResponseDTO response = userService.create(request);
-        assertThat(response.getUsername()).isEqualTo("marcus");
-        verify(passwordEncoder).encode("password123");
+        assertThat(response).isNotNull();
+        verify(passwordEncoder, never()).encode(anyString());
         verify(userRepository).save(argThat(user -> user.getGuild() == guild
-                && user.getGuildRole() == GuildRole.SOLDADO && user.getPassword().equals("encoded")));
+                && user.getGuildRole() == GuildRole.SOLDADO && user.getStatus() == com.example.Liderum.Enums.UserStatus.PENDING
+                && user.getPassword() == null));
     }
 
     @Test

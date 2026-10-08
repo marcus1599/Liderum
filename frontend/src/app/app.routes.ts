@@ -8,6 +8,7 @@ import { UsersComponent } from './users/users.component';
 import { GroupsComponent } from './groups/groups.component';
 import { EventsComponent } from './events/events.component';
 import { AttendenceComponent } from './attendence/attendence.component';
+import { ActivateComponent } from './auth/activate.component';
 import { AuthenticatedLayoutComponent } from './shared/authenticated-layout/authenticated-layout.component';
 
 export const routes: Routes = [
@@ -15,6 +16,7 @@ export const routes: Routes = [
   { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterGuildComponent },
+  { path: 'activate', component: ActivateComponent },
   {
     path: '', component: AuthenticatedLayoutComponent, canActivate: [authGuard], children: [
       { path: 'users', component: UsersComponent },

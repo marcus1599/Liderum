@@ -28,7 +28,7 @@ public class GuildOnboardingServiceImpl implements GuildOnboardingService {
         User admin = userRepository.save(User.builder()
                 .username(request.getUsername()).email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .guildRole(GuildRole.MARECHAL).guild(guild).build());
+                .guildRole(GuildRole.MARECHAL).status(com.example.Liderum.Enums.UserStatus.ACTIVE).guild(guild).build());
         UserResponseDTO response = new UserResponseDTO();
         response.setId(admin.getId());
         response.setUsername(admin.getUsername());

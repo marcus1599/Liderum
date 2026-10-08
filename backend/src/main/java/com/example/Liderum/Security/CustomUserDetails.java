@@ -47,7 +47,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return user.getStatus() == com.example.Liderum.Enums.UserStatus.ACTIVE;
     }
 
     public User getUser() {

@@ -210,12 +210,16 @@ class EventAttendanceTenantIsolationIntegrationTest {
     }
 
     private String createUserAndLogin(String token, String username, GuildRole role) throws Exception {
-        mockMvc.perform(post("/users").header("Authorization", bearer(token))
+        String response = mockMvc.perform(post("/users").header("Authorization", bearer(token))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"username\":\"" + username + "\",\"email\":\"" + username
                                 + "@example.test\",\"password\":\"password123\",\"role\":\""
                                 + role.name() + "\"}"))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String activationToken = objectMapper.readTree(response).get("activationToken").asText();
+        mockMvc.perform(post("/auth/activate").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"" + activationToken + "\",\"password\":\"password123\"}"))
+                .andExpect(status().isNoContent());
         return login(username);
     }
 

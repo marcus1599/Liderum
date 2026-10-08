@@ -1,0 +1,3 @@
+package com.example.Liderum.Controllers;
+import com.example.Liderum.Services.UserActivationService; import com.example.Liderum.dto.ActivationRequestDTO; import jakarta.validation.Valid; import lombok.RequiredArgsConstructor; import org.springframework.http.*; import org.springframework.web.bind.annotation.*;
+@RestController @RequestMapping("/auth") @RequiredArgsConstructor public class ActivationController { private final UserActivationService service; @PostMapping("/activate") public ResponseEntity<Void> activate(@RequestBody @Valid ActivationRequestDTO request){try { service.activate(request); return ResponseEntity.noContent().build(); } catch (IllegalArgumentException ex) { return ResponseEntity.status(HttpStatus.BAD_REQUEST).build(); }} }

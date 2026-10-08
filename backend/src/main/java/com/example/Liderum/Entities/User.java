@@ -3,6 +3,7 @@ package com.example.Liderum.Entities;
 import java.util.List;
 
 import com.example.Liderum.Enums.GuildRole;
+import com.example.Liderum.Enums.UserStatus;
 
 
 import jakarta.persistence.Column;
@@ -24,6 +25,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.Builder.Default;
 
 @Entity
 @Getter
@@ -44,11 +46,16 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String password;
 
     @Enumerated(EnumType.STRING)
     private GuildRole guildRole;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Default
+    private UserStatus status = UserStatus.ACTIVE;
 
     @ManyToOne
     @JoinColumn(name = "guild_id")

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Data
 public class UserCreateRequestDTO {
@@ -18,8 +19,7 @@ public class UserCreateRequestDTO {
     @Size(max = 160)
     private String email;
 
-    @NotBlank
-    @Size(min = 8, max = 128)
+    @JsonIgnore
     private String password;
 
     @NotNull

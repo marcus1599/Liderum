@@ -2,6 +2,7 @@ package com.example.Liderum.dto;
 
 import com.example.Liderum.Enums.GuildRole;
 import lombok.Data;
+import com.example.Liderum.Enums.UserStatus;
 
 @Data
 public class UserResponseDTO {
@@ -9,4 +10,5 @@ public class UserResponseDTO {
     private String username;
     private String email;
     private GuildRole guildRole;
+    private UserStatus status;
 }

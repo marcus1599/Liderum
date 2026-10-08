@@ -4,6 +4,8 @@ import com.example.Liderum.Services.UserService;
 import com.example.Liderum.dto.UserCreateRequestDTO;
 import com.example.Liderum.dto.UserRoleUpdateRequestDTO;
 import com.example.Liderum.dto.UserResponseDTO;
+import com.example.Liderum.dto.UserActivationResponseDTO;
+import com.example.Liderum.dto.AdminUserCreateRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +26,15 @@ public class UserController {
     @PostMapping
     @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL')")
     @Operation(summary = "Criar usuário")
-    public ResponseEntity<UserResponseDTO> create(@RequestBody @jakarta.validation.Valid UserCreateRequestDTO request) {
-        return ResponseEntity.ok(userService.create(request));
+    public ResponseEntity<UserActivationResponseDTO> create(@RequestBody @jakarta.validation.Valid AdminUserCreateRequestDTO request) {
+        return ResponseEntity.ok(userService.createWithActivation(request));
+    }
+
+    @PostMapping("/{id}/activation")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL')")
+    @Operation(summary = "Regenerar link de ativação")
+    public ResponseEntity<UserActivationResponseDTO> regenerateActivation(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.regenerateActivation(id));
     }
 
     @GetMapping

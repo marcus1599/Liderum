@@ -42,7 +42,6 @@ export class UsersComponent implements OnInit {
     this.form = this.fb.group({
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(80)]],
       email: ['', [Validators.required, Validators.email, Validators.maxLength(160)]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(128)]],
       role: ['SOLDADO' as GuildRole, Validators.required]
     });
   }
@@ -86,11 +85,13 @@ export class UsersComponent implements OnInit {
     this.isSaving = true;
     const request = this.form.getRawValue() as CreateUserRequest;
     this.usersService.create(request).subscribe({
-      next: user => {
-        this.users = [...this.users, user];
+      next: response => {
+        this.users = [...this.users, response.user];
         this.form.reset({ role: 'SOLDADO' });
         this.isSaving = false;
-        this.snackbar.open('Usuário criado com sucesso.', 'Fechar');
+        const link = `${window.location.origin}/activate?token=${encodeURIComponent(response.activationToken)}`;
+        navigator.clipboard?.writeText(link).catch(() => undefined);
+        this.snackbar.open('Usuário criado. Link de ativação copiado.', 'Fechar');
       },
       error: error => { this.isSaving = false; this.snackbar.open(this.safeError(error), 'Fechar'); }
     });
@@ -115,6 +116,18 @@ export class UsersComponent implements OnInit {
       next: () => {
         this.users = this.users.filter(item => item.id !== user.id);
         this.snackbar.open('Usuário removido com sucesso.', 'Fechar');
+      },
+      error: error => this.snackbar.open(this.safeError(error), 'Fechar')
+    });
+  }
+
+  regenerateActivation(user: ManagedUser): void {
+    if (!this.canActOn(user) || user.status !== 'PENDING') return;
+    this.usersService.regenerateActivation(user.id).subscribe({
+      next: response => {
+        const link = `${window.location.origin}/activate?token=${encodeURIComponent(response.activationToken)}`;
+        navigator.clipboard?.writeText(link).catch(() => undefined);
+        this.snackbar.open('Novo link de ativação copiado.', 'Fechar');
       },
       error: error => this.snackbar.open(this.safeError(error), 'Fechar')
     });

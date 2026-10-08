@@ -6,8 +6,10 @@ import com.example.Liderum.Entities.Team;
 import com.example.Liderum.Entities.User;
 import com.example.Liderum.Enums.Classe;
 import com.example.Liderum.Enums.GuildRole;
+import com.example.Liderum.Enums.UserStatus;
 import com.example.Liderum.Repository.MemberRepository;
 import com.example.Liderum.Repository.TeamRepository;
+import com.example.Liderum.Repository.UserActivationTokenRepository;
 import com.example.Liderum.Repository.UserRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -19,6 +21,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.time.Instant;
+import java.util.HexFormat;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -42,6 +48,7 @@ class RbacUserTenantBoundariesIntegrationTest {
     @Autowired UserRepository userRepository;
     @Autowired TeamRepository teamRepository;
     @Autowired MemberRepository memberRepository;
+    @Autowired UserActivationTokenRepository activationTokenRepository;
 
     @Test
     void generalCanListReadAndCreateOnlyRolesBelowGeneral() throws Exception {
@@ -140,6 +147,154 @@ class RbacUserTenantBoundariesIntegrationTest {
     }
 
     @Test
+    void regenerationRevokesPreviousTokenAndNewTokenActivatesPendingUser() throws Exception {
+        Actor owner = onboard("activation-regeneration-owner");
+        String pendingResponse = createPendingUser(owner.token(), "activation-pending", GuildRole.SOLDADO);
+        long pendingUserId = pendingId(pendingResponse);
+        String first = objectMapper.readTree(pendingResponse).get("activationToken").asText();
+
+        String firstResponse = mockMvc.perform(post("/users/" + pendingUserId + "/activation")
+                        .header("Authorization", bearer(owner.token())))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String second = objectMapper.readTree(firstResponse).get("activationToken").asText();
+
+        mockMvc.perform(post("/auth/activate").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"" + first + "\",\"password\":\"password123\"}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/auth/activate").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"" + second + "\",\"password\":\"password123\"}"))
+                .andExpect(status().isNoContent());
+        mockMvc.perform(post("/auth/activate").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"" + second + "\",\"password\":\"password123\"}"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void regenerationRespectsPendingStatusAndTenantBoundary() throws Exception {
+        Actor ownerA = onboard("activation-boundary-owner-a");
+        Actor ownerB = onboard("activation-boundary-owner-b");
+        String pending = createPendingUser(ownerB.token(), "activation-boundary-pending", GuildRole.SOLDADO);
+        long pendingId = pendingId(pending);
+
+        mockMvc.perform(post("/users/" + pendingId + "/activation")
+                        .header("Authorization", bearer(ownerA.token())))
+                .andExpect(status().isNotFound());
+
+        Actor active = createActor(ownerA.token(), "activation-active", GuildRole.SOLDADO);
+        mockMvc.perform(post("/users/" + active.id() + "/activation")
+                        .header("Authorization", bearer(ownerA.token())))
+                .andExpect(status().isNotFound());
+
+        String disabledResponse = createPendingUser(ownerA.token(), "activation-disabled", GuildRole.SOLDADO);
+        long disabledId = pendingId(disabledResponse);
+        userRepository.findById(disabledId).orElseThrow().setStatus(UserStatus.DISABLED);
+        userRepository.flush();
+        int tokensBefore = activationTokenRepository.findAllByUserIdAndUsedAtIsNullAndRevokedAtIsNull(disabledId).size();
+        mockMvc.perform(post("/users/" + disabledId + "/activation")
+                        .header("Authorization", bearer(ownerA.token())))
+                .andExpect(status().isNotFound());
+        assertThat(activationTokenRepository.findAllByUserIdAndUsedAtIsNullAndRevokedAtIsNull(disabledId))
+                .hasSize(tokensBefore);
+    }
+
+    @Test
+    void regenerationEnforcesGeneralHierarchyAndLowerRolesWithoutPartialMutation() throws Exception {
+        Actor owner = onboard("activation-rbac-owner");
+        Actor general = createActor(owner.token(), "activation-rbac-general", GuildRole.GENERAL);
+        Actor otherGeneral = createActor(owner.token(), "activation-rbac-other-general", GuildRole.GENERAL);
+        String pendingResponse = createPendingUser(owner.token(), "activation-rbac-pending", GuildRole.SOLDADO);
+        long pendingId = pendingId(pendingResponse);
+
+        String regenerated = mockMvc.perform(post("/users/" + pendingId + "/activation")
+                        .header("Authorization", bearer(general.token())))
+                .andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        String newToken = objectMapper.readTree(regenerated).get("activationToken").asText();
+        assertThat(newToken).isNotEqualTo(objectMapper.readTree(pendingResponse).get("activationToken").asText());
+        assertThat(activationTokenRepository.findAllByUserIdAndUsedAtIsNullAndRevokedAtIsNull(pendingId)).hasSize(1);
+
+        for (GuildRole role : new GuildRole[] { GuildRole.MAJOR, GuildRole.CAPITÃO, GuildRole.SOLDADO }) {
+            Actor actor = createActor(owner.token(), "activation-rbac-actor-" + role.name(), role);
+            int tokensBefore = activationTokenRepository.findAllByUserIdAndUsedAtIsNullAndRevokedAtIsNull(pendingId).size();
+            mockMvc.perform(post("/users/" + pendingId + "/activation")
+                            .header("Authorization", bearer(actor.token())))
+                    .andExpect(status().isForbidden());
+            assertThat(activationTokenRepository.findAllByUserIdAndUsedAtIsNullAndRevokedAtIsNull(pendingId))
+                    .hasSize(tokensBefore);
+        }
+
+        for (Actor protectedTarget : new Actor[] { owner, otherGeneral }) {
+            int tokensBefore = activationTokenRepository.findAllByUserIdAndUsedAtIsNullAndRevokedAtIsNull(protectedTarget.id()).size();
+            mockMvc.perform(post("/users/" + protectedTarget.id() + "/activation")
+                            .header("Authorization", bearer(general.token())))
+                    .andExpect(status().isForbidden());
+            assertThat(activationTokenRepository.findAllByUserIdAndUsedAtIsNullAndRevokedAtIsNull(protectedTarget.id()))
+                    .hasSize(tokensBefore);
+        }
+    }
+
+    @Test
+    void regenerationPersistsOnlyTokenHash() throws Exception {
+        Actor owner = onboard("activation-hash-owner");
+        String pendingResponse = createPendingUser(owner.token(), "activation-hash-pending", GuildRole.SOLDADO);
+        JsonNode creation = objectMapper.readTree(pendingResponse);
+        String rawToken = creation.get("activationToken").asText();
+        long userId = creation.get("id").asLong();
+
+        String regenerated = mockMvc.perform(post("/users/" + userId + "/activation")
+                        .header("Authorization", bearer(owner.token())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.activationToken").isNotEmpty())
+                .andExpect(jsonPath("$.password").doesNotExist())
+                .andExpect(jsonPath("$.user.password").doesNotExist())
+                .andReturn().getResponse().getContentAsString();
+        String regeneratedRaw = objectMapper.readTree(regenerated).get("activationToken").asText();
+
+        String expectedHash = HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
+                .digest(regeneratedRaw.getBytes(StandardCharsets.UTF_8)));
+        assertThat(activationTokenRepository.findAll()).extracting("tokenHash").contains(expectedHash)
+                .doesNotContain(regeneratedRaw, rawToken);
+    }
+
+    @Test
+    void invalidAndExpiredActivationTokensDoNotChangePendingAccount() throws Exception {
+        Actor owner = onboard("activation-invalid-expired-owner");
+        String pendingResponse = createPendingUser(owner.token(), "activation-invalid-expired", GuildRole.SOLDADO);
+        JsonNode pending = objectMapper.readTree(pendingResponse);
+        long userId = pending.get("id").asLong();
+        String validToken = pending.get("activationToken").asText();
+
+        mockMvc.perform(post("/auth/activate").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"unknown-activation-token\",\"password\":\"password123\"}"))
+                .andExpect(status().isBadRequest());
+        assertPendingWithoutPassword(userId);
+
+        var persistedToken = activationTokenRepository.findAllByUserIdAndUsedAtIsNullAndRevokedAtIsNull(userId)
+                .get(0);
+        persistedToken.setExpiresAt(Instant.now().minusSeconds(1));
+        activationTokenRepository.saveAndFlush(persistedToken);
+
+        mockMvc.perform(post("/auth/activate").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"token\":\"" + validToken + "\",\"password\":\"password123\"}"))
+                .andExpect(status().isBadRequest());
+        assertPendingWithoutPassword(userId);
+        assertThat(persistedToken.getUsedAt()).isNull();
+    }
+
+    private void assertPendingWithoutPassword(long userId) {
+        User pending = userRepository.findById(userId).orElseThrow();
+        assertThat(pending.getStatus()).isEqualTo(UserStatus.PENDING);
+        assertThat(pending.getPassword()).isNull();
+    }
+
+    private String createPendingUser(String token, String username, GuildRole role) throws Exception {
+        return createUserRequest(token, username, role).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+    }
+
+    private long pendingId(String response) throws Exception {
+        return objectMapper.readTree(response).get("id").asLong();
+    }
+
+    @Test
     void authenticatedUsersCanReadOnlyTheirOwnProfile() throws Exception {
         Actor owner = onboard("profile-owner");
         Actor general = createActor(owner.token(), "profile-general", GuildRole.GENERAL);
@@ -201,7 +356,11 @@ class RbacUserTenantBoundariesIntegrationTest {
     }
 
     private Actor createActor(String token, String prefix, GuildRole role) throws Exception {
-        long id = createUser(token, prefix, role);
+        String response = createUserRequest(token, prefix, role).andExpect(status().isOk()).andReturn().getResponse().getContentAsString();
+        JsonNode json = objectMapper.readTree(response);
+        mockMvc.perform(post("/auth/activate").contentType(MediaType.APPLICATION_JSON).content("{\"token\":\"" + json.get("activationToken").asText() + "\",\"password\":\"password123\"}"))
+                .andExpect(status().isNoContent());
+        long id = json.get("id").asLong();
         return new Actor(id, prefix, login(prefix));
     }
 

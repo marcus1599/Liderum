@@ -73,9 +73,9 @@ class GuildOnboardingIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON).content(userBody))
                 .andExpect(status().isOk());
 
-        String soldierToken = login("soldier-rbac", "password123");
-        mockMvc.perform(get("/users").header("Authorization", "Bearer " + soldierToken))
-                .andExpect(status().isForbidden());
+        mockMvc.perform(post("/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"username\":\"soldier-rbac\",\"password\":\"password123\"}"))
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
