@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-09-15
+> **Última inspeção:** 2026-10-07
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -15,6 +15,14 @@
 # 1. Snapshot
 
 ## Estado geral
+
+### Evolução pós-MVP (2026-09-15)
+
+- As seis fases do roadmap original estão concluídas e não serão reabertas.
+- `product-evolution-roadmap.md` inicia a evolução do MVP demonstrável para uso real por uma Guild, preservando ADR-001 e a separação Guild/User/Member.
+- Ciclo 1 (identidade individual e ativação segura) concluído; Ciclo 2 (integridade relacional do banco) ainda não iniciado. Não há task ativa.
+- A task estrutural `secure-staff-user-activation-flow` foi concluída com Task Verdict APROVADO após validar lifecycle PENDING/ACTIVE/DISABLED, ativação/regeneração, RBAC/tenant, migration V2 e testes de replay/concorrência.
+- Validação final em 2026-10-07: backend `clean verify` 72 testes, 0 failures/errors/skipped; PostgreSQL 18.6 descartável fresh/upgrade 2/2; frontend 35/35 em duas execuções e build SUCCESS. QA, Security, SRE/DevOps e Auditor aprovaram; Release Verdict APROVADO.
 
 ### Recuperação de produção Flyway (2026-08-26)
 
@@ -413,7 +421,7 @@ O README descreve o produto e suas principais funcionalidades.
 | Flyway               | Implementado; baseline V1 validada e `ddl-auto=validate` |
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
-| Testes Backend       | Validados localmente: 66 testes, 0 failures, 0 errors, 0 skipped |
+| Testes Backend       | Validados localmente em 2026-10-07: 72 testes, 0 failures, 0 errors, 0 skipped; PostgreSQL 18.6 fresh/upgrade: 2 testes aprovados |
 | Testes Frontend      | Gate validado: 35 testes, 0 failures, 0 errors, 0 skipped em duas execuções; sessão/auth, onboarding, Users e rotas de domínio alinhados |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |
