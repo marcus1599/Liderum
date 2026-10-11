@@ -14,7 +14,7 @@ import { AuthService } from '../../auth/auth.service';
   template: `
     <app-navbar [isHandset]="isHandset" (menuToggle)="sidenav.toggle()"></app-navbar>
     <mat-sidenav-container class="layout-container">
-      <mat-sidenav #sidenav [mode]="isHandset ? 'over' : 'side'" [opened]="!isHandset"
+      <mat-sidenav #sidenav class="layout-sidenav" [mode]="isHandset ? 'over' : 'side'" [opened]="!isHandset"
                    [fixedInViewport]="isHandset" fixedTopGap="64">
         <app-sidebar [isHandset]="isHandset" (logoutClick)="logout()" (closeSidenav)="sidenav.close()"></app-sidebar>
       </mat-sidenav>
@@ -23,7 +23,17 @@ import { AuthService } from '../../auth/auth.service';
   `,
   styles: [`
     .layout-container { height: calc(100vh - 64px); }
+    .layout-sidenav {
+      width: 260px;
+      background-color: #262930;
+      color: #fff;
+      border-right: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 0;
+    }
     .layout-content { min-height: 100%; background: #2e3139; }
+    @media (max-width: 768px) {
+      .layout-sidenav { width: 80vw !important; max-width: 300px; }
+    }
   `]
 })
 export class AuthenticatedLayoutComponent {
