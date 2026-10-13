@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-10-07
+> **Última inspeção:** 2026-10-11
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -20,7 +20,8 @@
 
 - As seis fases do roadmap original estão concluídas e não serão reabertas.
 - `product-evolution-roadmap.md` inicia a evolução do MVP demonstrável para uso real por uma Guild, preservando ADR-001 e a separação Guild/User/Member.
-- Ciclo 1 (identidade individual e ativação segura) concluído; Ciclo 2 (integridade relacional do banco) ainda não iniciado. Não há task ativa.
+- Ciclo 1 concluído. A task `enforce-relational-database-integrity` foi implementada e validada em H2 e PostgreSQL 18.6 (fresh e upgrade); `clean verify` passou com 74 testes. Render segue na V2, sem alteração. Aplicar V3 exige preflight read-only atualizado e rollout autorizado; o Release Verdict da migration permanece BLOQUEADO até isso.
+- Task ativa `rollout-flyway-v3-to-render-production` está bloqueada antes da operação: em 2026-10-13 V3 ainda estava apenas no working tree, sem revisão remota/CI correspondente. Dependências: versionamento/publicação seletivos em etapa separada, CI verde, backup/restore verificável, preflight atualizado e autorização explícita. Nenhuma chamada ou alteração Render foi feita.
 - A task estrutural `secure-staff-user-activation-flow` foi concluída com Task Verdict APROVADO após validar lifecycle PENDING/ACTIVE/DISABLED, ativação/regeneração, RBAC/tenant, migration V2 e testes de replay/concorrência.
 - Validação final em 2026-10-07: backend `clean verify` 72 testes, 0 failures/errors/skipped; PostgreSQL 18.6 descartável fresh/upgrade 2/2; frontend 35/35 em duas execuções e build SUCCESS. QA, Security, SRE/DevOps e Auditor aprovaram; Release Verdict APROVADO.
 
@@ -34,7 +35,7 @@
 - A task `make-event-notifications-reliable-and-testable` foi concluída: RabbitMQ usa retry/DLQ e idempotência proporcional, com testes unitários e integração. `establish-fullstack-ci-and-compose-demo-environment` também foi concluída: Compose local validado com PostgreSQL 18.6, RabbitMQ, backend, notification-consumer e frontend; CI cobre frontend e notification-service, e o smoke local confirmou registro, login, tenant, criação de evento e consumo assíncrono.
 - A task `add-proportional-observability-and-portfolio-documentation` foi concluída: Actuator health seguro para backend e notification-service, documentação operacional, diagrama Mermaid e roteiro reproduzível de demonstração foram adicionados e validados no Compose. A Fase 6 do roadmap está concluída.
 
-O roadmap SaaS canônico está registrado em `roadmap.md`. A recuperação Flyway foi concluída com banco Render PostgreSQL 18.6 vazio, V1 aplicada e Hibernate `validate` aprovado; o warning de compatibilidade Flyway/PostgreSQL 18 permanece uma dívida técnica não bloqueante. A task P0 de rate limiting e CORS também foi concluída: produção usa `CF-Connecting-IP` na borda aprovada Render/Cloudflare, o smoke confirmou `429` na sexta tentativa e CORS liberou apenas a origin Vercel configurada. A cobertura HTTP de isolamento tenant para Event e Attendance foi concluída: os oito cenários validam 404 cross-Guild, ausência de mutação parcial e 403 por RBAC; Event agora mapeia recurso fora do tenant a `EntityNotFoundException` para preservar a semântica 404. A validação PostgreSQL contínua de migrations foi adicionada ao GitHub Actions e aprovada no run #15 com PostgreSQL 18.6 descartável. Não há task ativa. As fundações de identidade/tenancy, Flyway e fluxos principais planejados da Fase 3 foram concluídos. O backend possui onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo, bootstrap demo exclusivo de `dev`, CORS configurável sem wildcard e schema Flyway com `ddl-auto=validate`. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
+O roadmap SaaS canônico está registrado em `roadmap.md`. A recuperação Flyway foi concluída com banco Render PostgreSQL 18.6 vazio, V1 aplicada e Hibernate `validate` aprovado; o warning de compatibilidade Flyway/PostgreSQL 18 permanece uma dívida técnica não bloqueante. A task P0 de rate limiting e CORS também foi concluída: produção usa `CF-Connecting-IP` na borda aprovada Render/Cloudflare, o smoke confirmou `429` na sexta tentativa e CORS liberou apenas a origin Vercel configurada. A cobertura HTTP de isolamento tenant para Event e Attendance foi concluída: os oito cenários validam 404 cross-Guild, ausência de mutação parcial e 403 por RBAC; Event agora mapeia recurso fora do tenant a `EntityNotFoundException` para preservar a semântica 404. A validação PostgreSQL contínua de migrations foi adicionada ao GitHub Actions e aprovada no run #15 com PostgreSQL 18.6 descartável. A task `enforce-relational-database-integrity` concluiu V3, H2, PostgreSQL 18.6 fresh/upgrade e suíte backend (74 testes verdes); Render permanece na V2 e o rollout da V3 aguarda preflight e autorização, portanto o Release Verdict da migration segue BLOQUEADO. As fundações de identidade/tenancy, Flyway e fluxos principais planejados da Fase 3 foram concluídos. O backend possui onboarding transacional, User tenant-scoped, BCrypt, perfil próprio, hierarquia MARECHAL/GENERAL, RBAC administrativo, bootstrap demo exclusivo de `dev`, CORS configurável sem wildcard e schema Flyway com `ddl-auto=validate`. ADR-001 formaliza User de Guild única e resolução server-side do tenant, sem `guildId` como autoridade no JWT.
 
 ### Consolidação de produto concluída (2026-08-18)
 
@@ -421,7 +422,7 @@ O README descreve o produto e suas principais funcionalidades.
 | Flyway               | Implementado; baseline V1 validada e `ddl-auto=validate` |
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
-| Testes Backend       | Validados localmente em 2026-10-07: 72 testes, 0 failures, 0 errors, 0 skipped; PostgreSQL 18.6 fresh/upgrade: 2 testes aprovados |
+| Testes Backend       | Task V3 (2026-10-11): clean verify 74 testes, 0 failures/errors/skipped; H2 fresh e PostgreSQL 18.6 fresh/upgrade aprovados (2/2); Flyway V3 e Hibernate `validate` confirmados |
 | Testes Frontend      | Gate validado: 35 testes, 0 failures, 0 errors, 0 skipped em duas execuções; sessão/auth, onboarding, Users e rotas de domínio alinhados |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |

@@ -34,11 +34,13 @@ Decisões de produto:
 - autenticação só é permitida para usuário `ACTIVE`;
 - o link/token nunca contém `guildId`, role ou autoridade do cliente.
 
-## Ciclo 2 — Integridade relacional do banco (NEXT — NÃO INICIADO)
+## Ciclo 2 — Integridade relacional do banco (IMPLEMENTAÇÃO E VALIDAÇÃO CONCLUÍDAS; ROLLOUT PENDENTE)
 
 **Objetivo:** mover invariantes já assumidas pela aplicação para constraints versionadas.
 
 **Entregável:** nova migration Flyway, validada em H2 e PostgreSQL 18, sem alteração da V1.
+
+Task `enforce-relational-database-integrity`: V3 implementada e validada em H2 e PostgreSQL 18.6 fresh/upgrade, com Hibernate `validate` e suíte backend verde. Render permanece na V2; aplicação de V3 requer preflight read-only atualizado e rollout autorizado. O Release Verdict da migration permanece BLOQUEADO até essa etapa operacional.
 
 Itens candidatos:
 
@@ -72,11 +74,11 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 ### NOW
 
-- nenhuma task ativa; Ciclo 1 concluído.
+- Nenhuma implementação do Ciclo 2 pendente. Rollout da V3 em produção aguarda preflight atualizado, revisão operacional e autorização; isso é gate de release, não pendência dos testes da task.
 
 ### NEXT
 
-- planejar e implementar constraints relacionais da base via migration incremental, depois do inventário do schema e dos dados;
+- aplicar V3 no Render por rollout controlado após preflight atualizado e autorização;
 - alteração autenticada de senha;
 - desativação segura de Staff, preservando ao menos um MARECHAL ativo;
 - consolidação de navegação e feedback HTTP.

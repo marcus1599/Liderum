@@ -4,35 +4,35 @@
 
 ## Estado atual
 
-As seis fases do roadmap original estão concluídas. O fluxo de ativação segura de Staff foi finalizado e auditado. Não iniciar o Ciclo 2 nesta retomada; aguardar orientação do usuário sobre a próxima prioridade.
+As seis fases do roadmap original estão concluídas. A task `enforce-relational-database-integrity` concluiu gates de task: V3 passou em H2 e PostgreSQL 18.6 fresh/upgrade, Hibernate `validate` e suíte backend completa (74 testes). Render não foi alterado e continua na V2; o Release Verdict para aplicar V3 permanece BLOQUEADO até preflight read-only atualizado, revisão operacional e autorização.
 
 ## Última task concluída
 
-- Nome: `secure-staff-user-activation-flow`
-- Resultado: Task Verdict APROVADO; QA, Security, SRE/DevOps e Auditor aprovados. Release Verdict APROVADO.
-- Data: 2026-10-07
-- Referência: [[tasks/completed/secure-staff-user-activation-flow/audit.md]]
+- Nome: `enforce-relational-database-integrity`
+- Resultado: Task Verdict APROVADO; QA, Security, SRE/DevOps e Auditor aprovados. Release Verdict BLOQUEADO apenas para rollout V3 em produção, que não foi autorizado/executado.
+- Data: 2026-10-11
+- Referência: [[tasks/completed/enforce-relational-database-integrity/audit.md]]
 
 ## Task ativa
 
-- Nenhuma task ativa.
+- `rollout-flyway-v3-to-render-production` — tentativa em 2026-10-13 parou antes do Render: V3 ainda está no working tree local e não há CI do commit exato. Backup/restore também não foi verificado. Requer versionamento/publicação seletivos separados, CI verde, readiness operacional e autorização final; nenhuma operação Render foi executada.
 
 ## Validações recentes
 
-- Backend: `clean verify`, 72 testes, 0 failures/errors/skipped, BUILD SUCCESS, exit code 0.
-- PostgreSQL: container descartável PostgreSQL 18.6, schema inicialmente vazio; fresh V1/V2 e upgrade V1 → User legado → V2 aprovados (2/2), Hibernate `validate`, contexto `prod` e autenticação do usuário legado aprovados. Container removido após o teste.
+- Backend V3: `clean verify`, 74 testes, 0 failures/errors/skipped, BUILD SUCCESS, exit code 0; H2 direcionado 3/3.
+- PostgreSQL 18.6 descartável: fresh V1→V2→V3 e upgrade V1→User legado→V2→V3 aprovados (2/2), Hibernate `validate` e contexto `prod` iniciados. Container removido após o teste; Flyway warning de suporte testado até PostgreSQL 15 permanece como dívida técnica não bloqueante.
 - Frontend: 35/35 testes em duas execuções consecutivas e build de produção SUCCESS.
 - Git: activation versionada no commit `2ab5d4a`; nenhum push foi realizado.
 
 ## Bloqueadores e pendências
 
-- Nenhum bloqueador de release foi identificado pelos gates desta task.
+- Bloqueador do release da V3: preflight atualizado e autorização/janela operacional antes de aplicar em Render, que permanece na V2.
 - Dívida técnica não bloqueante: Flyway 9.22.3 declara suporte testado até PostgreSQL 15; os cenários executados em PostgreSQL 18.6 passaram. Avaliar upgrade do Flyway em task separada.
-- O Ciclo 1 está concluído. O Ciclo 2 ainda não foi iniciado; não há task ativa.
+- O Ciclo 1 e a implementação/validação do Ciclo 2 estão concluídos. Render foi inspecionado read-only em 2026-10-11: 1 Guild, 1 User, tabelas de domínio vazias e zero violações candidatas naquele momento; V3 não foi aplicada em produção. Repetir preflight antes do rollout.
 
 ## Próximo passo recomendado
 
-Próxima recomendação: planejar a task de integridade relacional do banco do Ciclo 2, começando por inventário de constraints e estratégia de migration incremental. Aguardar autorização do usuário; não iniciar implementação nem criar task automaticamente.
+Preparar primeiro o versionamento/publicação autorizados da revisão V3 e confirmar os checks CI. Depois, verificar backup/restore e apresentar preflight read-only para autorização do deploy. Na execução, aplicar exclusivamente via Flyway; não executar DDL manual. A produção permanece na V2.
 
 ## Contexto relevante
 
@@ -47,3 +47,13 @@ Próxima recomendação: planejar a task de integridade relacional do banco do C
 - [[tasks/completed/secure-staff-user-activation-flow/sre.md]]
 - [[tasks/completed/secure-staff-user-activation-flow/audit.md]]
 - [[docs/adr/ADR-001-single-guild-user-and-server-side-tenant-resolution.md]]
+- [[tasks/completed/enforce-relational-database-integrity/inventory.md]]
+- [[tasks/completed/enforce-relational-database-integrity/prd.md]]
+- [[tasks/completed/enforce-relational-database-integrity/plan.md]]
+- [[tasks/completed/enforce-relational-database-integrity/execution.md]]
+- [[tasks/completed/enforce-relational-database-integrity/qa.md]]
+- [[tasks/completed/enforce-relational-database-integrity/security-review.md]]
+- [[tasks/completed/enforce-relational-database-integrity/sre-review.md]]
+- [[tasks/completed/enforce-relational-database-integrity/audit.md]]
+- [[tasks/active/rollout-flyway-v3-to-render-production/prd.md]]
+- [[tasks/active/rollout-flyway-v3-to-render-production/plan.md]]
