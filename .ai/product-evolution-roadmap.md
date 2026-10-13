@@ -59,7 +59,8 @@ Itens candidatos:
 
 **Adiado:** Settings persistente sem requisitos concretos; responsividade avançada e design system próprio.
 
-Primeira task concluída: `consolidate-authenticated-navigation-and-expose-users` (Task Verdict e Release Verdict APROVADOS). Dashboard e páginas de domínio compartilham o shell autenticado; o menu Users é exibido conforme perfil MARECHAL/GENERAL. A padronização dos estados HTTP por área permanece trabalho posterior do ciclo.
+Primeira task concluída: `consolidate-authenticated-navigation-and-expose-users` (Task Verdict e Release Verdict APROVADOS). Dashboard e páginas de domínio compartilham o shell autenticado; o menu Users é exibido conforme perfil MARECHAL/GENERAL.
+Segunda task concluída: `standardize-domain-http-feedback-states` (Task Verdict e Release Verdict APROVADOS, 2026-10-13). Members, Teams, Events e Attendance distinguem loading, vazio, erro, sucesso e falha de recarga após mutação. Feedback do drag-and-drop de Team foi incluído. Clareza da escolha/alteração de líder continua candidata separada; Ciclo 3 permanece em andamento.
 
 ## Ciclo 4 — Decisão de produto para notificações (LATER)
 
@@ -76,13 +77,12 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 ### NOW
 
-- Planejar `standardize-domain-http-feedback-states` para padronizar loading, vazio, erro e feedback seguro em Members, Teams, Events e Attendance, sem redesign nem infraestrutura nova.
+- `standardize-domain-http-feedback-states` concluída; avaliar a prioridade entre alteração autenticada de senha, desativação segura de Staff e clareza do fluxo de líder de Team antes de abrir nova task.
 
 ### NEXT
 
 - alteração autenticada de senha;
 - desativação segura de Staff, preservando ao menos um MARECHAL ativo;
-- padronização dos estados e feedback HTTP nas áreas principais após a navegação;
 
 ### LATER
 

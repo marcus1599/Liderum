@@ -8,10 +8,10 @@ As seis fases do roadmap original estão concluídas. A task `enforce-relational
 
 ## Última task concluída
 
-- Nome: `consolidate-authenticated-navigation-and-expose-users`
-- Resultado: Task Verdict, Task Security Verdict e Release Verdict APROVADOS. Dashboard e páginas autenticadas usam o shell compartilhado; link Users limitado visualmente ao perfil MARECHAL/GENERAL. Frontend: 40/40 testes e production build SUCCESS.
+- Nome: `standardize-domain-http-feedback-states`
+- Resultado: QA, Task Security Verdict, Task Verdict e Release Verdict APROVADOS. Members, Teams, Events e Attendance apresentam estados HTTP e feedback de mutações consistentes; frontend: 65/65 testes e build de produção SUCCESS. Sem sessão visual manual autenticada nesta task.
 - Data: 2026-10-13
-- Referência: [[tasks/completed/consolidate-authenticated-navigation-and-expose-users/audit.md]]
+- Referência: [[tasks/completed/standardize-domain-http-feedback-states/audit.md]]
 
 ## Task ativa
 
@@ -22,18 +22,19 @@ As seis fases do roadmap original estão concluídas. A task `enforce-relational
 
 - Backend V3: `clean verify`, 74 testes, 0 failures/errors/skipped, BUILD SUCCESS, exit code 0; H2 direcionado 3/3.
 - PostgreSQL 18.6 descartável: fresh V1→V2→V3 e upgrade V1→User legado→V2→V3 aprovados (2/2), Hibernate `validate` e contexto `prod` iniciados. Container removido após o teste; Flyway warning de suporte testado até PostgreSQL 15 permanece como dívida técnica não bloqueante.
-- Frontend da task de navegação: 40/40 testes em uma execução e production build SUCCESS; `git diff --check` sem erros. Build mantém warnings Sass/CSS e import já identificados.
-- Git: commits V3 `f860b2a` e `93caf70` já publicados pelo usuário. Esta finalização altera apenas documentação `.ai`; nenhum stage, commit ou push foi executado.
+- Frontend da task de feedback HTTP: 65/65 testes ChromeHeadless e production build SUCCESS, ambos exit 0; `git diff --check` sem erros. Warnings Sass/CSS e browser mapping continuam não bloqueantes. Validação visual manual desktop/handset não executada.
+- Git: as alterações desta task de feedback HTTP permanecem no working tree; nenhum stage, commit ou push foi executado nesta execução.
 
 ## Bloqueadores e pendências
 
+- Task de feedback HTTP sem bloqueador de gate. Encaminhamentos não bloqueantes: avaliar respostas de erro backend que podem incluir detalhes internos; RBAC visual das áreas de domínio; inspeção visual autenticada em desktop/handset não realizada nesta task.
 - Rollout V3: sem bloqueador conhecido após QA, Security, SRE/DevOps e Auditor aprovados. Limitação não bloqueante: status HTTP direto dos requests autenticados não foi capturado nos request logs Render; a conclusão baseia-se no fluxo de login/guard e na tela tenant-scoped funcional.
 - Dívida técnica não bloqueante: Flyway 9.22.3 declara suporte testado até PostgreSQL 15; os cenários executados em PostgreSQL 18.6 passaram. Avaliar upgrade do Flyway em task separada.
 - O Ciclo 1 e a implementação/validação do Ciclo 2 estão concluídos, incluindo aplicação da V3 em produção. O preflight imediatamente anterior ao deploy não encontrou violações candidatas; dados do ambiente de teste foram declarados descartáveis.
 
 ## Próximo passo recomendado
 
-Planejar `standardize-domain-http-feedback-states` para Members, Teams, Events e Attendance, começando pelo inventário de loading, estados vazios, falhas HTTP e feedback atual. Manter fora do escopo redesign, infraestrutura nova e mudanças de contrato. Alteração de senha e desativação de Staff permanecem no backlog.
+Reavaliar prioridade do próximo item NEXT: alteração autenticada de senha ou desativação segura de Staff, preservando ao menos um MARECHAL ativo. A clareza do fluxo de líder de Team é candidata UX separada. Avaliar em task própria a exposição potencial de detalhes internos pelos handlers backend e o RBAC visual das áreas de domínio. Não há task ativa.
 
 ## Contexto relevante
 
@@ -69,3 +70,10 @@ Planejar `standardize-domain-http-feedback-states` para Members, Teams, Events e
 - [[tasks/completed/consolidate-authenticated-navigation-and-expose-users/qa.md]]
 - [[tasks/completed/consolidate-authenticated-navigation-and-expose-users/security-review.md]]
 - [[tasks/completed/consolidate-authenticated-navigation-and-expose-users/audit.md]]
+- [[tasks/completed/standardize-domain-http-feedback-states/inventory.md]]
+- [[tasks/completed/standardize-domain-http-feedback-states/prd.md]]
+- [[tasks/completed/standardize-domain-http-feedback-states/plan.md]]
+- [[tasks/completed/standardize-domain-http-feedback-states/execution.md]]
+- [[tasks/completed/standardize-domain-http-feedback-states/qa.md]]
+- [[tasks/completed/standardize-domain-http-feedback-states/security-review.md]]
+- [[tasks/completed/standardize-domain-http-feedback-states/audit.md]]

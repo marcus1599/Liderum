@@ -18,6 +18,8 @@
 
 ### Evolução pós-MVP (2026-09-15)
 
+- Task `standardize-domain-http-feedback-states` concluída em 2026-10-13 com QA, Task Security e Task Verdict APROVADOS; Release Verdict APROVADO. Members, Teams, Events e Attendance distinguem loading, vazio real, erro e confirmação de mutações; 65/65 testes Angular e build de produção passaram (exit 0). Não houve sessão manual autenticada em desktop/handset. Possível exposição de detalhes nos handlers backend e RBAC visual de domínio incompleto permanecem achados preexistentes a avaliar separadamente. Nenhuma task ativa.
+
 - As seis fases do roadmap original estão concluídas e não serão reabertas.
 - `product-evolution-roadmap.md` inicia a evolução do MVP demonstrável para uso real por uma Guild, preservando ADR-001 e a separação Guild/User/Member.
 - O ambiente `.ai` inclui a skill `ux-review`, integrada ao Frontend Dev, QA, Planner e Router para revisão de UX Angular. A primeira task do Ciclo 3, `consolidate-authenticated-navigation-and-expose-users`, foi concluída com Task Verdict e Release Verdict APROVADOS. Dashboard e áreas autenticadas usam o shell compartilhado, e Users está acessível no menu somente para MARECHAL/GENERAL conforme perfil de `/users/me`.
@@ -424,7 +426,7 @@ O README descreve o produto e suas principais funcionalidades.
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
 | Testes Backend       | Task V3 (2026-10-11): clean verify 74 testes, 0 failures/errors/skipped; H2 fresh e PostgreSQL 18.6 fresh/upgrade aprovados (2/2); Flyway V3 e Hibernate `validate` confirmados |
-| Testes Frontend      | Última validação da task de navegação: 40 testes, 0 failures, 0 errors, 0 skipped; build de produção SUCCESS. Warnings Sass/CSS existentes permanecem não bloqueantes. |
+| Testes Frontend      | Última validação da task de feedback HTTP: 65 testes, 0 failures/errors, exit code 0; build de produção SUCCESS, exit code 0. Warnings Sass/CSS/baseline-browser-mapping permanecem não bloqueantes. |
 | Security Review      | Configuração JWT fail-fast validada e commitada localmente |
 | Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |
 
