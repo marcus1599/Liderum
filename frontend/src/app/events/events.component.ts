@@ -7,6 +7,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatInputModule } from '@angular/material/input';
 import { MatIcon } from '@angular/material/icon';
 import { HttpErrorResponse } from '@angular/common/http';
+import { httpFeedback } from '../shared/http-feedback';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-events',
@@ -21,6 +23,9 @@ export class EventsComponent implements OnInit {
   isEditing: boolean = false;
   editingEventId: number | null = null;
   loading = false;
+  loaded = false;
+  saving = false;
+  stale = false;
   errorMessage = '';
   statusMessage = '';
 
@@ -30,31 +35,52 @@ export class EventsComponent implements OnInit {
     this.loadEvents();
   }
 
-  loadEvents() {
+  loadEvents(afterMutation = false) {
+    if (this.loading) return;
+    if (!afterMutation) this.statusMessage = '';
     this.loading = true;
-    this.eventService.getEvents().subscribe({ next: events => { this.events = events; this.loading = false; }, error: (error: HttpErrorResponse) => { this.loading = false; this.errorMessage = error.status === 403 ? 'Você não tem permissão para consultar eventos.' : error.status === 404 ? 'Eventos não encontrados.' : 'Não foi possível carregar os eventos.'; } });
+    this.errorMessage = '';
+    this.eventService.getEvents().subscribe({
+      next: events => { this.events = events; this.loading = false; this.loaded = true; this.stale = false; },
+      error: (error: HttpErrorResponse) => {
+        this.loading = false;
+        this.loaded = false;
+        this.stale = afterMutation;
+        if (error.status === 401 || error.status === 403) this.events = [];
+        this.errorMessage = afterMutation
+          ? `Operação concluída, mas a lista não foi atualizada. ${httpFeedback(error, 'consultar eventos', true)}`
+          : httpFeedback(error, 'consultar eventos', true);
+      }
+    });
   }
 
   saveEvent() {
+    if (this.saving || this.loading || !this.loaded) return;
+    this.saving = true;
+    this.errorMessage = '';
+    this.statusMessage = '';
     // Converte o valor do input datetime-local para formato ISO LocalDateTime (yyyy-MM-ddTHH:mm:ss)
-    if (this.newEvent.date) {
-      const dateValue = this.newEvent.date;
+    const request = { ...this.newEvent };
+    if (request.date) {
+      const dateValue = request.date;
       // Se vier como string do input, pode estar no formato 'yyyy-MM-ddTHH:mm'
       if (typeof dateValue === 'string' && dateValue.length === 16) {
-        this.newEvent.date = dateValue + ':00'; // adiciona os segundos
+        request.date = dateValue + ':00'; // adiciona os segundos
       }
     }
-    if (this.isEditing && this.editingEventId !== null) {
-      this.eventService.updateEvent({ ...this.newEvent, id: this.editingEventId } as Event).subscribe(() => {
-        this.loadEvents(); this.statusMessage = 'Evento atualizado.';
+    const editing = this.isEditing && this.editingEventId !== null;
+    const operation: Observable<Event> = editing
+      ? this.eventService.updateEvent({ ...request, id: this.editingEventId } as Event)
+      : this.eventService.createEvent(request);
+    operation.subscribe({
+      next: () => {
+        this.saving = false;
+        this.statusMessage = editing ? 'Evento atualizado.' : 'Evento criado.';
         this.resetForm();
-      });
-    } else {
-      this.eventService.createEvent(this.newEvent).subscribe(() => {
-        this.loadEvents(); this.statusMessage = 'Evento criado.';
-        this.resetForm();
-      });
-    }
+        this.loadEvents(true);
+      },
+      error: (error: HttpErrorResponse) => { this.saving = false; this.errorMessage = httpFeedback(error, 'salvar evento'); }
+    });
   }
 
   editEvent(event: Event) {
@@ -64,9 +90,14 @@ export class EventsComponent implements OnInit {
   }
 
   deleteEvent(id: number) {
-    if (confirm('Tem certeza que deseja excluir este evento?')) {
-      this.eventService.deleteEvent(id).subscribe(() => this.loadEvents());
-    }
+    if (this.saving || this.loading || !this.loaded || !confirm('Tem certeza que deseja excluir este evento?')) return;
+    this.saving = true;
+    this.errorMessage = '';
+    this.statusMessage = '';
+    this.eventService.deleteEvent(id).subscribe({
+      next: () => { this.saving = false; this.statusMessage = 'Evento excluído.'; this.loadEvents(true); },
+      error: (error: HttpErrorResponse) => { this.saving = false; this.errorMessage = httpFeedback(error, 'excluir evento'); }
+    });
   }
 
   resetForm() {

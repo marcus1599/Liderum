@@ -1,6 +1,13 @@
 <p *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
-<p *ngIf="loading">Carregando presenças...</p>
-<p *ngIf="!loading && !errorMessage && attendances.length === 0">Nenhuma presença registrada.</p>
+<p *ngIf="statusMessage" role="status">{{ statusMessage }}</p>
+<button mat-button type="button" *ngIf="errorMessage && !loading" (click)="loadData()">Tentar carregar novamente</button>
+<p *ngIf="loading" role="status">Carregando dados de presença...</p>
+<p *ngIf="saving" role="status">Salvando presença...</p>
+<p *ngIf="stale">Dados anteriores podem estar desatualizados. Atualize antes de registrar outra presença.</p>
+<p *ngIf="loaded && !loading && events.length === 0">Nenhum evento cadastrado para registrar presença.</p>
+<p *ngIf="loaded && !loading && members.length === 0">Nenhum membro cadastrado para registrar presença.</p>
+<p *ngIf="loaded && !loading && events.length > 0 && members.length > 0 && selectedEventId === null">Selecione um evento para registrar presença.</p>
+<p *ngIf="loaded && !loading && selectedEventId !== null && attendancesLoaded && !hasAttendancesForSelectedEvent()">Ainda não há presenças neste evento. Você pode registrar a primeira.</p>
 <mat-card>
   <mat-card-title>Controle de Presença</mat-card-title>
   <mat-card-content>
@@ -8,13 +15,13 @@
       <div class="attendance-table">
         <mat-form-field appearance="outline" class="event-select">
           <mat-label>Evento</mat-label>
-          <select matNativeControl [ngModel]="selectedEventId" (ngModelChange)="onEventChange($event)" name="event">
+          <select matNativeControl [ngModel]="selectedEventId" (ngModelChange)="onEventChange($event)" name="event" [disabled]="saving || !loaded">
             <option [value]="null">Selecione um evento</option>
             <option *ngFor="let event of events" [value]="event.id">{{ event.name }} ({{ event.date | date:'short' }})</option>
           </select>
         </mat-form-field>
 
-        <mat-card class="attendance-table-card" *ngIf="selectedEventId && attendancesLoaded">
+        <mat-card class="attendance-table-card" *ngIf="loaded && selectedEventId && attendancesLoaded && !loading">
           <!-- Wrapper de scroll horizontal -->
           <div class="table-scroll-wrapper">
             <table class="mat-elevation-z2 styled-table">
@@ -31,8 +38,8 @@
                   <td><span class="member-nick"><mat-icon>person</mat-icon> {{ member.nickname }}</span></td>
                   <td>
                     <label class="status-radio present">
-                      <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
-                        (change)="markAttendance(member.id, 'PRESENTE')"
+                      <input #presentChoice type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
+                        (change)="markAttendance(member.id, 'PRESENTE', presentChoice)" [disabled]="saving" [attr.aria-label]="'Marcar ' + member.nickname + ' presente'"
                         [checked]="isChecked(member.id, 'PRESENTE')"
                         [value]="'PRESENTE'"
                       />
@@ -41,8 +48,8 @@
                   </td>
                   <td>
                     <label class="status-radio absent">
-                      <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
-                        (change)="markAttendance(member.id, 'FALTOU')"
+                      <input #absentChoice type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
+                        (change)="markAttendance(member.id, 'FALTOU', absentChoice)" [disabled]="saving" [attr.aria-label]="'Marcar ' + member.nickname + ' faltou'"
                         [checked]="isChecked(member.id, 'FALTOU')"
                         [value]="'FALTOU'"
                       />
@@ -51,8 +58,8 @@
                   </td>
                   <td>
                     <label class="status-radio justified">
-                      <input type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
-                        (change)="markAttendance(member.id, 'JUSTIFICOU')"
+                      <input #justifiedChoice type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
+                        (change)="markAttendance(member.id, 'JUSTIFICOU', justifiedChoice)" [disabled]="saving" [attr.aria-label]="'Marcar ' + member.nickname + ' justificou'"
                         [checked]="isChecked(member.id, 'JUSTIFICOU')"
                         [value]="'JUSTIFICOU'"
                       />
@@ -68,7 +75,10 @@
 
       <mat-card class="absence-alert-list">
         <h4><mat-icon color="warn">warning</mat-icon> Membros com Faltas Consecutivas</h4>
-        <ul>
+        <p *ngIf="alertLoading" role="status">Carregando alertas...</p>
+        <p *ngIf="alertError" role="alert">{{ alertError }}</p>
+        <button mat-button type="button" *ngIf="alertError && loaded" (click)="loadAlerts()">Tentar carregar alertas novamente</button>
+        <ul *ngIf="alertLoaded && loaded">
           <li *ngFor="let memberId of membersWithAlert">
             <mat-icon color="warn" style="vertical-align: middle;">warning</mat-icon>
             {{ getMemberNickname(memberId) }}

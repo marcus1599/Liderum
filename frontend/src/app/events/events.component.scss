@@ -1,3 +1,12 @@
+:host > p {
+  color: #e8e6f0;
+  margin: 8px 16px;
+  overflow-wrap: anywhere;
+}
+
+:host > p[role='alert'] { color: #ffb3b3; }
+:host > button { margin: 0 16px 12px; }
+
 @media (max-width: 900px) {
   .event-form {
     flex-direction: column;

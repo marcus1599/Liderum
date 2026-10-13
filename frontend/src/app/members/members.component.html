@@ -1,7 +1,11 @@
 <p *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
 <p *ngIf="statusMessage" role="status">{{ statusMessage }}</p>
-<p *ngIf="loading">Carregando membros...</p>
-<p *ngIf="!loading && !errorMessage && members.length === 0">Nenhum membro encontrado.</p>
+<button mat-button type="button" *ngIf="errorMessage && !loading" (click)="loadMembers()">Tentar carregar novamente</button>
+<p *ngIf="loading" role="status">Carregando membros...</p>
+<p *ngIf="saving" role="status">Salvando alteração...</p>
+<p *ngIf="stale && members.length > 0">Lista anterior: atualize antes de realizar outra ação.</p>
+<p *ngIf="loaded && !loading && members.length === 0">Nenhum membro cadastrado.</p>
+<p *ngIf="loaded && !loading && members.length > 0 && dataSource.filteredData.length === 0">Nenhum membro corresponde ao filtro.</p>
 <mat-card class="form-card">
   <mat-card-header>
     <div class="card-title-row">
@@ -49,11 +53,11 @@
       </div>
 
       <div class="form-actions">
-        <button mat-flat-button class="btn-primary" type="submit">
+        <button mat-flat-button class="btn-primary" type="submit" [disabled]="saving || loading || !loaded">
           <mat-icon>{{ isEditing ? 'save' : 'add' }}</mat-icon>
           {{ isEditing ? 'Atualizar' : 'Adicionar' }}
         </button>
-        <button mat-button class="btn-cancel" type="button" (click)="resetForm()">
+        <button mat-button class="btn-cancel" type="button" (click)="resetForm()" [disabled]="saving">
           Cancelar
         </button>
       </div>
@@ -81,7 +85,7 @@
 
   <mat-card-content>
     <div class="table-wrapper">
-      <table mat-table [dataSource]="dataSource" matSort class="members-table">
+      <table mat-table [dataSource]="dataSource" matSort class="members-table" *ngIf="loaded && !loading">
 
         <ng-container matColumnDef="nickname">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Nickname</th>
@@ -126,11 +130,11 @@
           <td mat-cell *matCellDef="let member" class="col-actions">
             <div class="action-btns">
               <button mat-icon-button class="action-edit"
-                (click)="editMember(member)" matTooltip="Editar membro">
+                (click)="editMember(member)" matTooltip="Editar membro" aria-label="Editar membro" [disabled]="saving || loading || stale">
                 <mat-icon>edit</mat-icon>
               </button>
               <button mat-icon-button class="action-delete"
-                (click)="deleteMember(member.id)" matTooltip="Excluir membro">
+                (click)="deleteMember(member.id)" matTooltip="Excluir membro" aria-label="Excluir membro" [disabled]="saving || loading || stale">
                 <mat-icon>delete_outline</mat-icon>
               </button>
             </div>

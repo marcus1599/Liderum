@@ -1,3 +1,9 @@
+<p *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+<p *ngIf="statusMessage" role="status">{{ statusMessage }}</p>
+<button mat-button type="button" *ngIf="errorMessage && !loading" (click)="loadGroups()">Tentar carregar novamente</button>
+<p *ngIf="loading" role="status">Carregando grupos e membros...</p>
+<p *ngIf="saving" role="status">Salvando alteração...</p>
+<p *ngIf="stale && groups.length > 0">Dados anteriores: atualize antes de realizar outra ação.</p>
 <mat-card class="groups-card">
   <mat-card-title>Gerenciar Grupos</mat-card-title>
   
@@ -23,7 +29,9 @@
           <mat-icon matSuffix>search</mat-icon>
         </mat-form-field>
         
-        <div cdkDropList id="membersDropList" [cdkDropListData]="dataSource.filteredData"
+        <p *ngIf="loaded && availableMembers.length === 0">Nenhum membro disponível.</p>
+        <p *ngIf="loaded && availableMembers.length > 0 && dataSource.filteredData.length === 0">Nenhum membro corresponde ao filtro.</p>
+        <div cdkDropList id="membersDropList" [hidden]="!loaded || loading" [cdkDropListData]="dataSource.filteredData" [cdkDropListDisabled]="saving || loading || !loaded"
           [cdkDropListConnectedTo]="groupDropListIds" class="members-list"
           (cdkDropListDropped)="dropToAvailable($event)">
           <div
@@ -41,14 +49,14 @@
             </ng-template>
           </div>
         </div>
-        <mat-paginator class="paginator" #paginator [pageSize]="10" [pageSizeOptions]="[10, 20, 40]" showFirstLastButtons></mat-paginator>
+        <mat-paginator class="paginator" #paginator [hidden]="!loaded || loading" [pageSize]="10" [pageSizeOptions]="[10, 20, 40]" showFirstLastButtons></mat-paginator>
       </div>
 
       <!-- Coluna Direita -->
       <div class="right-panel">
         <h3 class="groups-title">Grupos</h3>
         <div class="group-actions">
-          <button mat-raised-button color="primary" (click)="openGroupForm()" aria-label="Novo Grupo">
+          <button mat-raised-button color="primary" (click)="openGroupForm()" aria-label="Novo Grupo" [disabled]="saving || loading || !loaded">
             <mat-icon>add</mat-icon> Novo Grupo
           </button>
         </div>
@@ -60,30 +68,31 @@
                 <input matInput [(ngModel)]="groupForm.name" name="groupName" required />
               </mat-form-field>
               <div class="form-actions" fxLayout="row" fxLayoutGap="12px">
-                <button mat-raised-button color="primary" type="submit">
+                <button mat-raised-button color="primary" type="submit" [disabled]="saving || loading || !loaded || !groupForm.name?.trim()">
                   {{ groupForm.id ? "Atualizar" : "Criar" }}
                 </button>
-                <button mat-button type="button" (click)="cancelGroupForm()">
+                <button mat-button type="button" (click)="cancelGroupForm()" [disabled]="saving">
                   Cancelar
                 </button>
               </div>
             </form>
           </mat-card>
         </div>
-        <div class="groups-list">
+        <p *ngIf="loaded && groups.length === 0">Nenhum grupo cadastrado.</p>
+        <div class="groups-list" *ngIf="loaded">
           <mat-card class="group-card" *ngFor="let group of groups" style="margin-bottom: 16px;">
             <div class="group-header" fxLayout="row" fxLayoutAlign="space-between center">
               <span>{{ group.name }}</span>
               <span class="group-actions">
-                <button mat-icon-button class="button-edit" (click)="editGroup(group)" aria-label="Editar grupo">
+                <button mat-icon-button class="button-edit" (click)="editGroup(group)" aria-label="Editar grupo" [disabled]="saving || loading">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button class="button-remove" (click)="deleteGroup(group)" aria-label="Excluir grupo">
+                <button mat-icon-button class="button-remove" (click)="deleteGroup(group)" aria-label="Excluir grupo" [disabled]="saving || loading">
                   <mat-icon>delete</mat-icon>
                 </button>
               </span>
             </div>
-            <div cdkDropList [id]="'groupDropList-' + group.id" [cdkDropListData]="group.members"
+            <div cdkDropList [id]="'groupDropList-' + group.id" [cdkDropListData]="group.members" [cdkDropListDisabled]="saving || loading || !loaded"
               [cdkDropListConnectedTo]="['membersDropList']" class="group-members-list"
               (cdkDropListDropped)="dropToGroup($event, group)">
               <div *ngFor="let member of group.members" cdkDrag class="member-item">
@@ -98,7 +107,7 @@
                   </div>
                 </ng-template>
                 <button mat-icon-button class="button-remove" (click)="removeMemberFromGroup(member, group)"
-                  matTooltip="Remover do grupo" aria-label="Remover do grupo">
+                  matTooltip="Remover do grupo" aria-label="Remover do grupo" [disabled]="saving || loading">
                   <mat-icon>close</mat-icon>
                 </button>
               </div>

@@ -19,6 +19,8 @@ import { MatPaginator } from '@angular/material/paginator';
 import { MatSort } from '@angular/material/sort';
 import { MatTableDataSource } from '@angular/material/table';
 import { HttpErrorResponse } from '@angular/common/http';
+import { httpFeedback } from '../shared/http-feedback';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-members',
@@ -60,6 +62,9 @@ export class MembersComponent implements OnInit, AfterViewInit {
 
   isEditing: boolean = false;
   loading = false;
+  loaded = false;
+  saving = false;
+  stale = false;
   errorMessage = '';
   statusMessage = '';
 
@@ -76,7 +81,9 @@ export class MembersComponent implements OnInit, AfterViewInit {
     this.loadMembers();
   }
 
-  loadMembers(): void {
+  loadMembers(afterMutation = false): void {
+    if (this.loading) return;
+    if (!afterMutation) this.statusMessage = '';
     this.loading = true;
     this.errorMessage = '';
     this.memberService.getMembers().subscribe({ next: (data) => {
@@ -88,9 +95,19 @@ export class MembersComponent implements OnInit, AfterViewInit {
         this.dataSource.sort = this.sort;
       });
       this.loading = false;
+      this.loaded = true;
+      this.stale = false;
     }, error: (error: HttpErrorResponse) => {
       this.loading = false;
-      this.errorMessage = error.status === 403 ? 'Você não tem permissão para consultar membros.' : error.status === 404 ? 'Membros não encontrados.' : 'Não foi possível carregar os membros.';
+      this.loaded = false;
+      this.stale = afterMutation;
+      if (error.status === 401 || error.status === 403) {
+        this.members = [];
+        this.dataSource.data = [];
+      }
+      this.errorMessage = afterMutation
+        ? `Operação concluída, mas a lista não foi atualizada. ${httpFeedback(error, 'consultar membros', true)}`
+        : httpFeedback(error, 'consultar membros', true);
     }});
   }
 
@@ -105,19 +122,26 @@ export class MembersComponent implements OnInit, AfterViewInit {
   }
 
   saveMember(): void {
-    if (this.isEditing) {
-      this.memberService.updateMember(this.newMember).subscribe(() => {
-        this.loadMembers();
-        this.statusMessage = 'Membro atualizado.';
+    if (this.saving || this.loading || !this.loaded) return;
+    this.saving = true;
+    this.errorMessage = '';
+    this.statusMessage = '';
+    const editing = this.isEditing;
+    const operation: Observable<Member> = editing
+      ? this.memberService.updateMember({ ...this.newMember })
+      : this.memberService.addMember({ ...this.newMember });
+    operation.subscribe({
+      next: () => {
+        this.saving = false;
+        this.statusMessage = editing ? 'Membro atualizado.' : 'Membro criado.';
         this.resetForm();
-      });
-    } else {
-      this.memberService.addMember(this.newMember).subscribe(() => {
-        this.loadMembers();
-        this.statusMessage = 'Membro criado.';
-        this.resetForm();
-      });
-    }
+        this.loadMembers(true);
+      },
+      error: (error: HttpErrorResponse) => {
+        this.saving = false;
+        this.errorMessage = httpFeedback(error, 'salvar membro');
+      }
+    });
   }
 
   editMember(member: Member): void {
@@ -126,11 +150,14 @@ export class MembersComponent implements OnInit, AfterViewInit {
   }
 
   deleteMember(id: number): void {
-    if (confirm('Tem certeza que deseja excluir este membro?')) {
-      this.memberService.deleteMember(id).subscribe(() => {
-        this.loadMembers();
-      });
-    }
+    if (this.saving || this.loading || !this.loaded || !confirm('Tem certeza que deseja excluir este membro?')) return;
+    this.saving = true;
+    this.errorMessage = '';
+    this.statusMessage = '';
+    this.memberService.deleteMember(id).subscribe({
+      next: () => { this.saving = false; this.statusMessage = 'Membro excluído.'; this.loadMembers(true); },
+      error: (error: HttpErrorResponse) => { this.saving = false; this.errorMessage = httpFeedback(error, 'excluir membro'); }
+    });
   }
 
   resetForm(): void {

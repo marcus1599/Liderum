@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CdkDragDrop, CdkDropList, DragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
 import { GroupService, Group } from '../services/group.service';
 import { MatTable } from '@angular/material/table';
 import { MatButton } from '@angular/material/button';
@@ -17,6 +17,9 @@ import { MatDividerModule } from '@angular/material/divider';
 import { Member } from '../members/member.model';
 import { MatTableDataSource } from '@angular/material/table';
 import { ViewChild } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { httpFeedback } from '../shared/http-feedback';
 
 
 
@@ -55,20 +58,40 @@ export class GroupsComponent implements OnInit {
   groupForm: Partial<Group> = {};
   editingGroup: Group | null = null;
   filterText: string = '';
+  loading = false;
+  loaded = false;
+  saving = false;
+  stale = false;
+  errorMessage = '';
+  statusMessage = '';
 
   constructor(private groupService: GroupService) {}
 
   ngOnInit() {
     this.loadGroups();
-    this.loadClasses(); // Adicione esta linha
   }
 
-  loadMembers() {
-    this.groupService.getMembers().subscribe(members => {
+  loadMembers(afterMutation = false) {
+    this.groupService.getMembers().subscribe({ next: members => {
       const groupMemberIds = this.groups.flatMap(g => g.members.map(m => m.id));
       this.availableMembers = members.filter(m => !groupMemberIds.includes(m.id));
-      this.dataSource.data = this.availableMembers; // <-- Atualize aqui
-    });
+      this.filterMembers();
+      this.loaded = true;
+      this.loading = false;
+      this.stale = false;
+    }, error: (error: HttpErrorResponse) => {
+      this.loading = false;
+      this.loaded = false;
+      this.stale = afterMutation;
+      if (error.status === 401 || error.status === 403) {
+        this.groups = [];
+        this.availableMembers = [];
+        this.dataSource.data = [];
+      }
+      this.errorMessage = afterMutation
+        ? `Operação concluída, mas os dados não foram atualizados. ${httpFeedback(error, 'consultar membros', true)}`
+        : httpFeedback(error, 'consultar membros', true);
+    }});
   }
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -76,15 +99,31 @@ ngAfterViewInit() {
   this.dataSource.paginator = this.paginator;
 }
 
-  loadGroups() {
-    this.groupService.getGroups().subscribe(groups => {
+  loadGroups(afterMutation = false) {
+    if (this.loading) return;
+    if (!afterMutation) this.statusMessage = '';
+    this.loading = true;
+    this.loaded = false;
+    this.errorMessage = '';
+    this.groupService.getGroups().subscribe({ next: groups => {
       // Garante que todos os grupos tenham members como array
       this.groups = groups.map(g => ({
         ...g,
         members: Array.isArray(g.members) ? g.members : []
       }));
-      this.loadMembers();
-    });
+      this.loadMembers(afterMutation);
+    }, error: (error: HttpErrorResponse) => {
+      this.loading = false;
+      this.stale = afterMutation;
+      if (error.status === 401 || error.status === 403) {
+        this.groups = [];
+        this.availableMembers = [];
+        this.dataSource.data = [];
+      }
+      this.errorMessage = afterMutation
+        ? `Operação concluída, mas os dados não foram atualizados. ${httpFeedback(error, 'consultar grupos', true)}`
+        : httpFeedback(error, 'consultar grupos', true);
+    }});
   }
   filterMembers() {
   this.dataSource.data = this.availableMembers.filter(member =>
@@ -99,6 +138,7 @@ ngAfterViewInit() {
 
 
   openGroupForm(group?: Group) {
+    if (this.saving || this.loading || !this.loaded) return;
     this.showGroupForm = true;
     if (group) {
       this.groupForm = { ...group };
@@ -110,20 +150,27 @@ ngAfterViewInit() {
   }
 
   saveGroup() {
-    if (this.editingGroup) {
-      this.groupService.updateGroup(this.editingGroup.id, { name: this.groupForm.name! }).subscribe(() => {
-        this.loadGroups();
+    if (this.saving || this.loading || !this.loaded || !this.groupForm.name?.trim()) return;
+    this.saving = true;
+    this.errorMessage = '';
+    this.statusMessage = '';
+    const editing = !!this.editingGroup;
+    const operation: Observable<Group> = this.editingGroup
+      ? this.groupService.updateGroup(this.editingGroup.id, { name: this.groupForm.name })
+      : this.groupService.createGroup({ name: this.groupForm.name });
+    operation.subscribe({
+      next: () => {
+        this.saving = false;
+        this.statusMessage = editing ? 'Grupo atualizado.' : 'Grupo criado.';
         this.cancelGroupForm();
-      });
-    } else {
-      this.groupService.createGroup({ name: this.groupForm.name! }).subscribe(() => {
-        this.loadGroups();
-        this.cancelGroupForm();
-      });
-    }
+        this.loadGroups(true);
+      },
+      error: (error: HttpErrorResponse) => { this.saving = false; this.errorMessage = httpFeedback(error, 'salvar grupo'); }
+    });
   }
 
   cancelGroupForm() {
+    if (this.saving) return;
     this.showGroupForm = false;
     this.groupForm = {};
     this.editingGroup = null;
@@ -134,46 +181,46 @@ ngAfterViewInit() {
   }
 
   deleteGroup(group: Group) {
-    this.groupService.deleteGroup(group.id).subscribe(() => {
-      this.loadGroups();
-    });
+    if (this.saving || this.loading || !this.loaded) return;
+    this.mutate(this.groupService.deleteGroup(group.id), 'Grupo excluído.', 'excluir grupo');
   }
 
 dropToGroup(event: CdkDragDrop<Member[]>, group: Group) {
+  if (this.saving || this.loading || !this.loaded) return;
   if (event.previousContainer === event.container) {
-    moveItemInArray(group.members, event.previousIndex, event.currentIndex);
+    return; // A API não persiste ordenação.
   } else {
     const member = event.previousContainer.data[event.previousIndex];
     if (!group.members.some(m => m.id === member.id)) {
-      // Chame o serviço para adicionar o membro ao grupo no backend
-      this.groupService.addMemberToGroup(group.id, member.id).subscribe(() => {
-        // Após salvar no backend, recarregue os grupos para garantir consistência
-        this.loadGroups();
-      });
-      // Opcional: atualize a UI imediatamente (otimista)
-      group.members.push(member);
-      this.availableMembers = this.availableMembers.filter(m => m.id !== member.id);
-      this.filterMembers();
+      this.mutate(this.groupService.addMemberToGroup(group.id, member.id), 'Membro adicionado ao grupo.', 'adicionar membro ao grupo');
     }
   }
 }
 
   dropToAvailable(event: CdkDragDrop<Member[]>) {
+    if (this.saving || this.loading || !this.loaded) return;
     if (event.previousContainer !== event.container) {
       const member = event.previousContainer.data[event.previousIndex];
       // Descobre de qual grupo veio
       const group = this.groups.find(g => g.members.some(m => m.id === member.id));
       if (group) {
-        this.groupService.removeMemberFromGroup(group.id, member.id).subscribe(() => {
-          this.loadGroups();
-        });
+        this.removeMemberFromGroup(member, group);
       }
     }
   }
 
   removeMemberFromGroup(member: Member, group: Group) {
-    this.groupService.removeMemberFromGroup(group.id, member.id).subscribe(() => {
-      this.loadGroups();
+    if (this.saving || this.loading || !this.loaded) return;
+    this.mutate(this.groupService.removeMemberFromGroup(group.id, member.id), 'Membro removido do grupo.', 'remover membro do grupo');
+  }
+
+  private mutate(operation: Observable<unknown>, success: string, action: string): void {
+    this.saving = true;
+    this.errorMessage = '';
+    this.statusMessage = '';
+    operation.subscribe({
+      next: () => { this.saving = false; this.statusMessage = success; this.loadGroups(true); },
+      error: (error: HttpErrorResponse) => { this.saving = false; this.errorMessage = httpFeedback(error, action); }
     });
   }
 
