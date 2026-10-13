@@ -5,26 +5,34 @@
   </button>
 </div>
 
-<button class="menu-btn" (click)="setShowDashboard(true)">
+<a class="menu-btn" routerLink="/dashboard" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeIfHandset()">
   <mat-icon>dashboard</mat-icon>
   Dashboard
-</button>
-<button class="menu-btn" (click)="setShowMembers(true)">
+</a>
+<a class="menu-btn" routerLink="/members" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeIfHandset()">
   <mat-icon>group</mat-icon>
   Members
-</button>
-<button class="menu-btn" (click)="setShowGroups(true)">
+</a>
+<a class="menu-btn" routerLink="/teams" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeIfHandset()">
   <mat-icon>groups</mat-icon>
   Grupos
-</button>
-<button class="menu-btn" (click)="setShowEvents(true)">
+</a>
+<a class="menu-btn" routerLink="/events" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeIfHandset()">
   <mat-icon>event</mat-icon>
   Eventos
-</button>
-<button class="menu-btn" (click)="setShowAttendence(true)">
+</a>
+<a class="menu-btn" routerLink="/attendance" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeIfHandset()">
   <mat-icon>check_circle</mat-icon>
   Presença
-</button>
+</a>
+<ng-container *ngIf="profile$ | async as profile">
+  <a *ngIf="profile.guildRole === 'MARECHAL' || profile.guildRole === 'GENERAL'"
+     class="menu-btn" routerLink="/users" routerLinkActive="active"
+     ariaCurrentWhenActive="page" (click)="closeIfHandset()">
+    <mat-icon>manage_accounts</mat-icon>
+    Usuários
+  </a>
+</ng-container>
 <div class="sidebar-spacer"></div>
 
 <button class="menu-btn logout-btn" (click)="logout()">

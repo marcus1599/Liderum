@@ -1,6 +1,5 @@
 // ── Tokens ──────────────────────────────────────────────────────────────────
 $bg-page:    #2e3139;
-$bg-sidenav: #262930;
 $bg-card:    #31353e;
 $bg-surface: #3a3e48;
 
@@ -20,18 +19,6 @@ $radius-md: 10px;
 $radius-sm: 6px;
 
 // ── Layout base ─────────────────────────────────────────────────────────────
-mat-sidenav {
-  width: 260px;
-  background-color: $bg-sidenav;
-  color: white;
-  border-right: 1px solid $border;
-  border-radius: 0;
-}
-
-mat-sidenav-content {
-  background-color: $bg-page;
-}
-
 .content {
   padding: 20px;
   background-color: $bg-page;
@@ -468,8 +455,6 @@ mat-sidenav-content {
 }
 
 @media (max-width: 768px) {
-  mat-sidenav { width: 80vw !important; max-width: 300px; }
-
   .content { padding: 10px; }
 
   .kpi-strip {

@@ -1,29 +1,4 @@
-<app-navbar [isHandset]="isHandset" (menuToggle)="sidenav.toggle()"></app-navbar>
-
-<mat-sidenav-container style="height: calc(100vh - 64px);">
-  <mat-sidenav
-    #sidenav
-    [mode]="isHandset ? 'over' : 'side'"
-    [opened]="!isHandset"
-    [fixedInViewport]="isHandset"
-    fixedTopGap="64">
-    <app-sidebar
-      [isHandset]="isHandset"
-      (showDashboardChange)="activateView('dashboard')"
-      (showMembersChange)="activateView('members')"
-      (showEventsChange)="activateView('events')"
-      (showAttendenceChange)="activateView('attendence')"
-      (showSettingsChange)="activateView('settings')"
-      (showGroupsChange)="activateView('groups')"
-      (logoutClick)="logout()"
-      (closeSidenav)="sidenav.close()"
-    ></app-sidebar>
-  </mat-sidenav>
-
-  <mat-sidenav-content>
-    <div class="content">
-
-      <ng-container *ngIf="showDashboard">
+<div class="content">
 
         <!-- ── KPI strip ── -->
         <div class="kpi-strip">
@@ -252,24 +227,4 @@
           </mat-card>
 
         </div>
-      </ng-container>
-
-      <ng-container *ngIf="showMembers">
-        <app-members></app-members>
-      </ng-container>
-      <ng-container *ngIf="showGroups">
-        <app-groups></app-groups>
-      </ng-container>
-      <ng-container *ngIf="showEvents">
-        <app-events></app-events>
-      </ng-container>
-      <ng-container *ngIf="showAttendence">
-        <app-attendence></app-attendence>
-      </ng-container>
-      <ng-container *ngIf="showSettings">
-        <app-settings></app-settings>
-      </ng-container>
-
-    </div>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+</div>

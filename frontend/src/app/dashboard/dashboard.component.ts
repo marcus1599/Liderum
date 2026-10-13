@@ -1,12 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
-import { Subject } from 'rxjs';
-import { map, shareReplay, takeUntil } from 'rxjs/operators';
-import { MatSidenavModule } from '@angular/material/sidenav';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
+import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { NgChartsModule } from 'ng2-charts';
@@ -14,16 +7,8 @@ import { NgChartsModule } from 'ng2-charts';
 import { DashboardService, DashboardMetrics } from '../services/dashboard.service';
 
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../auth/auth.service';
-import { MembersComponent } from '../members/members.component';
-import { NavbarComponent } from '../shared/navbar/navbar.component';
-import { SidebarComponent } from '../shared/sidebar/sidebar.component';
-import { EventsComponent } from '../events/events.component';
-import { AttendenceComponent } from '../attendence/attendence.component';
-import { SettingsComponent } from '../settings/settings.component';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
-import { GroupsComponent } from '../groups/groups.component';
 import { SumPipe } from './sum.pipe';
 
 @Component({
@@ -31,40 +16,18 @@ import { SumPipe } from './sum.pipe';
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule,
-    MatSidenavModule,
-    MatToolbarModule,
-    MatButtonModule,
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MembersComponent,
-    NavbarComponent,
-    SidebarComponent,
-    EventsComponent,
-    AttendenceComponent,
-    SettingsComponent,
     MatCardModule,
     FormsModule,
     NgChartsModule,
-    GroupsComponent,
     SumPipe
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
-
-  // Valor síncrono — sem async pipe no template
-  isHandset = false;
-
-  showMembers = false;
-  showEvents = false;
-  showAttendence = false;
-  showSettings = false;
-  showDashboard = true;
-  showGroups = false;
+export class DashboardComponent implements OnInit {
   eventFilterCount = 10;
 
   presencePieChartData = {
@@ -101,29 +64,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   alerts: { member: any, faltasConsecutivas: number }[] = [];
 
   constructor(
-    private authService: AuthService,
-    private dashboardService: DashboardService,
-    private breakpointObserver: BreakpointObserver
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit() {
-    // Subscreve o breakpoint e atualiza a propriedade síncrona
-    this.breakpointObserver
-      .observe([Breakpoints.Handset, Breakpoints.Tablet])
-      .pipe(
-        map(result => result.matches),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(isHandset => {
-        this.isHandset = isHandset;
-      });
-
     this.loadDashboardData();
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   loadDashboardData() {
@@ -181,16 +126,4 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.loadDashboardData();
   }
 
-  activateView(view: string) {
-    this.showDashboard = view === 'dashboard';
-    this.showMembers = view === 'members';
-    this.showGroups = view === 'groups';
-    this.showEvents = view === 'events';
-    this.showAttendence = view === 'attendence';
-    this.showSettings = view === 'settings';
-  }
-
-  logout() {
-    this.authService.logout();
-  }
 }

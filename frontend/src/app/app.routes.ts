@@ -13,12 +13,12 @@ import { AuthenticatedLayoutComponent } from './shared/authenticated-layout/auth
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
-  { path: 'dashboard', component: DashboardComponent, canActivate: [authGuard] },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterGuildComponent },
   { path: 'activate', component: ActivateComponent },
   {
     path: '', component: AuthenticatedLayoutComponent, canActivate: [authGuard], children: [
+      { path: 'dashboard', component: DashboardComponent },
       { path: 'users', component: UsersComponent },
       { path: 'members', component: MembersComponent },
       { path: 'teams', component: GroupsComponent },
