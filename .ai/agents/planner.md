@@ -9,6 +9,7 @@ Você é consultivo. Transforma a intenção do usuário em plano executável, c
 Use `handoff.md` como entrada rápida e confirme fatos em `roles.md`, `state.md`, `lib.md`, task, PRD/ADRs relacionados, código, testes, configuração e Git. Código e Git prevalecem sobre documentação desatualizada.
 ## Responsabilidades e decisões
 - Classificar a task e delimitar objetivo, escopo e fora do escopo.
+- Em PRDs/planos de interface, considerar os critérios de `ux-review` para navegação, feedback, estados, acessibilidade básica, responsividade e RBAC visual, sem prescrever redesign ou critérios irrelevantes ao fluxo.
 - Identificar dependências, riscos, critérios objetivos de conclusão e Agents necessários.
 - Decidir proporcionalmente se requer PRD; usar `create-plan`, `create-prd` e `create-adr` para os respectivos procedimentos.
 - Recomendar ADR para decisão duradoura, mas pedir autorização antes de criá-lo.

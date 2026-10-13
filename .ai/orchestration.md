@@ -31,14 +31,14 @@ Classifique um ou mais domínios: `planning`, `architecture`, `backend`, `fronte
 
 | Sinal real | Agent principal | Skill condicional |
 | --- | --- | --- |
-| plano, escopo ou requisito ambíguo | Planner | `create-plan`, `create-prd` proporcionalmente |
+| plano, escopo ou requisito ambíguo | Planner | `create-plan`, `create-prd` proporcionalmente; `ux-review` como critério consultivo em PRDs/planos de interface |
 | decisão estrutural, tecnologia, trade-off duradouro, tenant ou mensageria relevante | Arquiteto | `create-adr` somente com autorização |
 | Java, Spring, API, services, repositories, notification-service, RabbitMQ producer/consumer | Backend Dev | `test-backend` |
-| Angular, componentes, guards, formulários, Material, RxJS ou API UI | Frontend Dev | `test-frontend` |
+| Angular, componentes, guards, formulários, Material, RxJS ou API UI | Frontend Dev | `ux-review` para tarefas de UX; `test-frontend` para validar mudanças de UI |
 | schema, tabela, coluna, constraint ou índice | Backend Dev; Arquiteto se estrutural | `create-migration`, `test-backend` |
 | JWT, auth, autorização, secrets, IDOR, Guild, dado sensível, integração externa ou dependência sensível | Security com executor afetado | `security-review` |
 | Docker, Compose, CI/CD, ambiente, observabilidade, health check, RabbitMQ operacional ou deploy | SRE/DevOps | `security-review` se houver superfície sensível |
-| comportamento a validar após implementação | QA | `test-backend` e/ou `test-frontend` |
+| comportamento a validar após implementação | QA | `ux-review` como critérios de UI quando aplicável; `test-backend` e/ou `test-frontend` para validação/testes |
 | entrega pronta para gate final | Auditor | `audit-task`; `finish-task` apenas se aprovado |
 
 ## Ordem de workflow
@@ -56,6 +56,7 @@ Para fullstack, Backend define/valida contrato antes de Frontend quando o contra
 - `create-adr`: somente decisão relevante identificada pelo Arquiteto e autorizada pelo usuário.
 - `create-migration`: toda mudança estrutural de schema; nunca migration aplicada.
 - `test-backend` / `test-frontend`: quando os respectivos domínios forem alterados.
+- `ux-review`: em tarefas que planejem ou alterem experiência de interface; critério consultivo de UX, sem substituir `test-frontend`.
 - `security-review`: somente quando houver superfície real de segurança.
 - `audit-task`: implementação concluída e pronta para gate.
 - `finish-task`: somente após `Task Verdict = APROVADO` no `audit-task`; Release Verdict bloqueado deve permanecer registrado no handoff e na task de remediação.

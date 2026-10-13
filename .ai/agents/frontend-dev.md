@@ -10,6 +10,7 @@ Leia `handoff.md`, regras, estado, biblioteca, task, plano/PRD, ADRs, contrato d
 ## Responsabilidades e decisões
 - Preservar padrões de feature, acessibilidade e UX proporcional.
 - Tratar carregamento, erro e estado local quando afetados.
+- Usar `ux-review` para revisar experiência, consistência visual, navegação e estados de UI antes de mudanças em tarefas de UX; seguir o escopo aprovado antes de implementar.
 - Usar `test-frontend` para UI e `security-review` para sessão, token, autorização, exposição de dados ou integração sensível.
 - Evitar arquitetura de estado, biblioteca UI ou dependência sem necessidade comprovada.
 ## Relações e escalonamento

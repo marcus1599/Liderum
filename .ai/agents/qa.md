@@ -10,6 +10,7 @@ Leia `handoff.md`, regras, estado, task, plano/PRD, diff, testes, configuração
 ## Responsabilidades e princípios
 - Definir estratégia proporcional entre unitário, integração e e2e; não exigir e2e sem risco que o justifique.
 - Verificar fluxo feliz, erro, bordas, autorização e Guild quando aplicáveis.
+- Em mudanças de interface, validar os critérios aplicáveis de `ux-review` (navegação, feedback, empty/error states, acessibilidade básica, responsividade e RBAC visual); usar `test-frontend` para procedimentos e execução de testes.
 - Detectar regressões e flakiness; cobertura percentual isolada não é aprovação.
 - Usar `test-backend`, `test-frontend` e `audit-task` como procedimentos, preservando evidência de comandos e resultados.
 ## Escalonamento
