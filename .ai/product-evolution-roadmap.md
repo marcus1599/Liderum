@@ -34,13 +34,13 @@ Decisões de produto:
 - autenticação só é permitida para usuário `ACTIVE`;
 - o link/token nunca contém `guildId`, role ou autoridade do cliente.
 
-## Ciclo 2 — Integridade relacional do banco (IMPLEMENTAÇÃO E VALIDAÇÃO CONCLUÍDAS; ROLLOUT PENDENTE)
+## Ciclo 2 — Integridade relacional do banco (CONCLUÍDO)
 
 **Objetivo:** mover invariantes já assumidas pela aplicação para constraints versionadas.
 
 **Entregável:** nova migration Flyway, validada em H2 e PostgreSQL 18, sem alteração da V1.
 
-Task `enforce-relational-database-integrity`: V3 implementada e validada em H2 e PostgreSQL 18.6 fresh/upgrade, com Hibernate `validate` e suíte backend verde. Render permanece na V2; aplicação de V3 requer preflight read-only atualizado e rollout autorizado. O Release Verdict da migration permanece BLOQUEADO até essa etapa operacional.
+Task `enforce-relational-database-integrity`: V3 implementada e validada em H2 e PostgreSQL 18.6 fresh/upgrade, com Hibernate `validate` e suíte backend verde. Em 2026-10-13 a V3 foi aplicada em Render via Flyway; history V1/V2/V3, constraints, serviço live, health (200), CORS permitido/negado e smoke autenticado tenant-scoped foram verificados. A task `rollout-flyway-v3-to-render-production` foi aprovada pelos gates QA, Security, SRE/DevOps e Auditor; Task Verdict e Release Verdict APROVADOS. O status HTTP autenticado direto não ficou disponível em request logs, mas o login/guard completou `/users/me` e a UI de `/members` exibiu o estado vazio normal.
 
 Itens candidatos:
 
@@ -49,7 +49,7 @@ Itens candidatos:
 - `events.name NOT NULL`, `events.date NOT NULL` e `attendance.status NOT NULL`;
 - revisão de índices tenant-scoped com evidência de consultas reais.
 
-## Ciclo 3 — Consolidação de UX operacional (NEXT)
+## Ciclo 3 — Consolidação de UX operacional (EM ANDAMENTO)
 
 **Objetivo:** remover atrito nos fluxos já existentes, sem redesign ou novo framework de estado.
 
@@ -58,6 +58,8 @@ Itens candidatos:
 **Útil:** feedback explícito do drag-and-drop de Team e tornar claro o fluxo de escolha/alteração de líder.
 
 **Adiado:** Settings persistente sem requisitos concretos; responsividade avançada e design system próprio.
+
+Primeira task concluída: `consolidate-authenticated-navigation-and-expose-users` (Task Verdict e Release Verdict APROVADOS). Dashboard e páginas de domínio compartilham o shell autenticado; o menu Users é exibido conforme perfil MARECHAL/GENERAL. A padronização dos estados HTTP por área permanece trabalho posterior do ciclo.
 
 ## Ciclo 4 — Decisão de produto para notificações (LATER)
 
@@ -74,14 +76,13 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 ### NOW
 
-- Nenhuma implementação do Ciclo 2 pendente. Rollout da V3 em produção aguarda preflight atualizado, revisão operacional e autorização; isso é gate de release, não pendência dos testes da task.
+- Planejar `standardize-domain-http-feedback-states` para padronizar loading, vazio, erro e feedback seguro em Members, Teams, Events e Attendance, sem redesign nem infraestrutura nova.
 
 ### NEXT
 
-- aplicar V3 no Render por rollout controlado após preflight atualizado e autorização;
 - alteração autenticada de senha;
 - desativação segura de Staff, preservando ao menos um MARECHAL ativo;
-- consolidação de navegação e feedback HTTP.
+- padronização dos estados e feedback HTTP nas áreas principais após a navegação;
 
 ### LATER
 
