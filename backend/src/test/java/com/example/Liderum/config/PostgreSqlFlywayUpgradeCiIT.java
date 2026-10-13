@@ -31,7 +31,7 @@ class PostgreSqlFlywayUpgradeCiIT {
     private static final String LEGACY_PASSWORD = "legacy-test-password-only";
 
     @Test
-    void upgradesV1WithExistingUserToV2AndStartsHibernateValidatedContext() throws Exception {
+    void upgradesV1WithExistingUserToV3AndStartsHibernateValidatedContext() throws Exception {
         String baseUrl = requiredEnv("DB_URL");
         String username = requiredEnv("DB_USERNAME");
         String password = requiredEnv("DB_PASSWORD");
@@ -73,7 +73,7 @@ class PostgreSqlFlywayUpgradeCiIT {
 
             assertThat(jdbc.queryForList(
                     "SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank", String.class))
-                    .containsExactly("1", "2");
+                    .containsExactly("1", "2", "3");
             assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM users WHERE id = ?", Integer.class, userId)).isEqualTo(1);
             assertThat(jdbc.queryForObject("SELECT guild_id FROM users WHERE id = ?", Long.class, userId)).isEqualTo(guildId);
             assertThat(jdbc.queryForObject("SELECT password FROM users WHERE id = ?", String.class, userId)).isEqualTo(legacyHash);

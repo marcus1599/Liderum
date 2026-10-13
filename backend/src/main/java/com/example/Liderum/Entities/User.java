@@ -50,6 +50,7 @@ public class User {
     private String password;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private GuildRole guildRole;
 
     @Enumerated(EnumType.STRING)
@@ -58,7 +59,7 @@ public class User {
     private UserStatus status = UserStatus.ACTIVE;
 
     @ManyToOne
-    @JoinColumn(name = "guild_id")
+    @JoinColumn(name = "guild_id", nullable = false)
     private Guild guild;
 
     @OneToMany(mappedBy = "leader")

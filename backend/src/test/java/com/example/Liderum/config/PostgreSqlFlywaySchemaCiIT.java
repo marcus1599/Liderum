@@ -23,10 +23,10 @@ class PostgreSqlFlywaySchemaCiIT {
     private JdbcTemplate jdbcTemplate;
 
     @Test
-    void appliesV1AndV2AndHibernateValidatesThePostgresqlSchema() {
+    void appliesV1V2AndV3AndHibernateValidatesThePostgresqlSchema() {
         assertThat(jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM flyway_schema_history WHERE version IN ('1', '2') AND success = true", Integer.class))
-                .isEqualTo(2);
+                "SELECT COUNT(*) FROM flyway_schema_history WHERE version IN ('1', '2', '3') AND success = true", Integer.class))
+                .isEqualTo(3);
 
         for (String table : new String[] {"guilds", "users", "member", "team", "event", "attendance", "user_activation_tokens"}) {
             Integer count = jdbcTemplate.queryForObject(
@@ -50,6 +50,24 @@ class PostgreSqlFlywaySchemaCiIT {
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'public' "
                         + "AND table_name = 'users' AND column_name = 'status' AND is_nullable = 'NO'", Integer.class))
+                .isEqualTo(1);
+
+        for (String[] column : new String[][] {
+                {"users", "guild_id"}, {"users", "guild_role"}, {"event", "name"},
+                {"event", "date"}, {"attendance", "status"}}) {
+            assertThat(jdbcTemplate.queryForObject(
+                    "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'public' "
+                            + "AND table_name = ? AND column_name = ? AND is_nullable = 'NO'",
+                    Integer.class, column[0], column[1]))
+                    .as("%s.%s is NOT NULL", column[0], column[1]).isEqualTo(1);
+        }
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.table_constraints WHERE table_schema = 'public' "
+                        + "AND table_name = 'attendance' AND constraint_name = 'uk_attendance_member_event' "
+                        + "AND constraint_type = 'UNIQUE'", Integer.class)).isEqualTo(1);
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'public' "
+                        + "AND table_name = 'users' AND column_name = 'password' AND is_nullable = 'YES'", Integer.class))
                 .isEqualTo(1);
     }
 }

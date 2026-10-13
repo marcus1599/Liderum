@@ -154,19 +154,12 @@ class MultiTenantIsolationIntegrationTest {
     }
 
     @Test
-    void shouldRejectUnauthenticatedOrGuildlessTenantAccess() {
+    void shouldRejectUnauthenticatedTenantAccess() {
         SecurityContextHolder.clearContext();
 
         assertThatThrownBy(tenantService::getCurrentGuild)
                 .isInstanceOf(IllegalStateException.class)
                 .hasMessage("Authenticated user is required.");
-
-        User guildlessUser = userRepository.save(user("guildless", "guildless@example.test", null));
-        authenticateAs(guildlessUser);
-
-        assertThatThrownBy(tenantService::getCurrentGuild)
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("Authenticated user is not linked to a guild.");
     }
 
     private User user(String username, String email, Guild guild) {
