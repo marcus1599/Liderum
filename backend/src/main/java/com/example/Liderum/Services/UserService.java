@@ -3,6 +3,7 @@ package com.example.Liderum.Services;
 import com.example.Liderum.dto.UserCreateRequestDTO;
 import com.example.Liderum.dto.UserRoleUpdateRequestDTO;
 import com.example.Liderum.dto.UserResponseDTO;
+import com.example.Liderum.dto.UserStatusUpdateRequestDTO;
 
 import java.util.List;
 
@@ -15,5 +16,6 @@ public interface UserService {
     UserResponseDTO findById(Long id);
     UserResponseDTO findCurrentUser();
     UserResponseDTO updateRole(Long id, UserRoleUpdateRequestDTO dto);
+    UserResponseDTO updateStatus(Long id, UserStatusUpdateRequestDTO dto);
     void delete(Long id);
 }

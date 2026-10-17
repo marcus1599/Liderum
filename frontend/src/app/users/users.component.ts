@@ -30,6 +30,7 @@ export class UsersComponent implements OnInit {
   errorMessage = '';
   readonly form: FormGroup;
   readonly roleChanges: Record<number, GuildRole> = {};
+  readonly statusChanges: Record<number, boolean> = {};
   private profileSubscription?: Subscription;
 
   constructor(
@@ -107,6 +108,25 @@ export class UsersComponent implements OnInit {
         this.snackbar.open('Role atualizada com sucesso.', 'Fechar');
       },
       error: error => this.snackbar.open(this.safeError(error), 'Fechar')
+    });
+  }
+
+  changeStatus(user: ManagedUser): void {
+    if (!this.canActOn(user) || !['ACTIVE', 'DISABLED'].includes(user.status)) return;
+    const nextStatus = user.status === 'ACTIVE' ? 'DISABLED' : 'ACTIVE';
+    const action = nextStatus === 'DISABLED' ? 'desativar' : 'reativar';
+    if (!window.confirm(`Deseja ${action} ${user.username}?`)) return;
+    this.statusChanges[user.id] = true;
+    this.usersService.updateStatus(user.id, nextStatus).subscribe({
+      next: updated => {
+        this.users = this.users.map(item => item.id === updated.id ? updated : item);
+        this.statusChanges[user.id] = false;
+        this.snackbar.open(nextStatus === 'DISABLED' ? 'Usuário desativado.' : 'Usuário reativado. Será necessário fazer login novamente.', 'Fechar');
+      },
+      error: error => {
+        this.statusChanges[user.id] = false;
+        this.snackbar.open(error.status === 409 ? 'Não foi possível alterar o status. Verifique se o usuário lidera uma equipe ou se a Guild mantém um MARECHAL ativo.' : this.safeError(error), 'Fechar');
+      }
     });
   }
 

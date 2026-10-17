@@ -21,10 +21,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.time.Instant;
 import java.util.HexFormat;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -119,6 +125,100 @@ class RbacUserTenantBoundariesIntegrationTest {
                 .andExpect(status().isForbidden());
         updateRole(owner.token(), owner.id(), GuildRole.GENERAL).andExpect(status().isForbidden());
         assertThat(userRepository.findById(owner.id()).orElseThrow().getGuildRole()).isEqualTo(GuildRole.MARECHAL);
+    }
+
+    @Test
+    void lastActiveMarechalCannotBeDisabledEvenWhenAnotherMarechalIsDisabled() throws Exception {
+        Actor owner = onboard("last-active-marechal-owner");
+        Actor second = createActor(owner.token(), "last-active-marechal-second", GuildRole.MARECHAL);
+        userRepository.findById(second.id()).orElseThrow().setStatus(UserStatus.DISABLED);
+        userRepository.flush();
+
+        updateStatus(owner.token(), owner.id(), UserStatus.DISABLED).andExpect(status().isForbidden());
+        assertThat(userRepository.findById(owner.id()).orElseThrow().getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    void statusLifecycleRevokesOldJwtAndAllowsFreshLogin() throws Exception {
+        Actor owner = onboard("staff-status-owner");
+        Actor general = createActor(owner.token(), "staff-status-general", GuildRole.GENERAL);
+        Actor staff = createActor(owner.token(), "staff-status-soldier", GuildRole.SOLDADO);
+        String originalHash = userRepository.findById(staff.id()).orElseThrow().getPassword();
+
+        updateStatus(general.token(), staff.id(), UserStatus.DISABLED).andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("DISABLED"))
+                .andExpect(jsonPath("$.password").doesNotExist());
+        assertThat(userRepository.findById(staff.id()).orElseThrow().getCredentialVersion()).isEqualTo(1L);
+        mockMvc.perform(get("/users/me").header("Authorization", bearer(staff.token())))
+                .andExpect(status().isUnauthorized());
+
+        updateStatus(general.token(), staff.id(), UserStatus.ACTIVE).andExpect(status().isOk());
+        assertThat(userRepository.findById(staff.id()).orElseThrow().getPassword()).isEqualTo(originalHash);
+        mockMvc.perform(get("/users/me").header("Authorization", bearer(staff.token())))
+                .andExpect(status().isUnauthorized());
+        String renewed = login(staff.username());
+        mockMvc.perform(get("/users/me").header("Authorization", bearer(renewed)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void statusChangesEnforceRoleTenantAndStateBoundaries() throws Exception {
+        Actor ownerA = onboard("status-boundary-owner-a");
+        Actor general = createActor(ownerA.token(), "status-boundary-general", GuildRole.GENERAL);
+        Actor anotherGeneral = createActor(ownerA.token(), "status-boundary-other-general", GuildRole.GENERAL);
+        Actor staff = createActor(ownerA.token(), "status-boundary-staff", GuildRole.SOLDADO);
+        Actor ownerB = onboard("status-boundary-owner-b");
+
+        updateStatus(general.token(), anotherGeneral.id(), UserStatus.DISABLED).andExpect(status().isForbidden());
+        updateStatus(general.token(), ownerA.id(), UserStatus.DISABLED).andExpect(status().isForbidden());
+        updateStatus(general.token(), general.id(), UserStatus.DISABLED).andExpect(status().isForbidden());
+        updateStatus(ownerA.token(), ownerB.id(), UserStatus.DISABLED).andExpect(status().isNotFound());
+        updateStatus(general.token(), staff.id(), UserStatus.PENDING).andExpect(status().isConflict());
+        updateStatus(general.token(), staff.id(), UserStatus.ACTIVE).andExpect(status().isConflict());
+        assertThat(userRepository.findById(staff.id()).orElseThrow().getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    void teamLeaderCannotBeDisabledUntilReassigned() throws Exception {
+        Actor owner = onboard("team-leader-status-owner");
+        Actor secondMarechal = createActor(owner.token(), "team-leader-status-second", GuildRole.MARECHAL);
+        User leader = userRepository.findById(owner.id()).orElseThrow();
+        Team team = teamRepository.save(Team.builder().name("Leader Team").guild(leader.getGuild()).leader(leader).build());
+
+        updateStatus(secondMarechal.token(), owner.id(), UserStatus.DISABLED).andExpect(status().isConflict());
+        assertThat(teamRepository.findById(team.getId()).orElseThrow().getLeader().getId()).isEqualTo(owner.id());
+        assertThat(userRepository.findById(owner.id()).orElseThrow().getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void concurrentStatusChangesCannotRemoveEveryActiveMarechal() throws Exception {
+        String runId = UUID.randomUUID().toString().replace("-", "");
+        Actor first = onboard("concurrent-marechal-first-" + runId);
+        Actor second = createActor(first.token(), "concurrent-marechal-second-" + runId, GuildRole.MARECHAL);
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<Integer> firstResult = executor.submit(() -> {
+                start.await();
+                return updateStatus(first.token(), second.id(), UserStatus.DISABLED).andReturn().getResponse().getStatus();
+            });
+            Future<Integer> secondResult = executor.submit(() -> {
+                start.await();
+                return updateStatus(second.token(), first.id(), UserStatus.DISABLED).andReturn().getResponse().getStatus();
+            });
+            start.countDown();
+            int firstStatus = firstResult.get();
+            int secondStatus = secondResult.get();
+
+            assertThat(java.util.List.of(firstStatus, secondStatus)).contains(200);
+            assertThat(java.util.List.of(firstStatus, secondStatus)).contains(403);
+            assertThat(userRepository.countByGuildIdAndGuildRoleAndStatus(
+                    userRepository.findById(first.id()).orElseThrow().getGuild().getId(), GuildRole.MARECHAL, UserStatus.ACTIVE))
+                    .isEqualTo(1);
+        } finally {
+            executor.shutdownNow();
+        }
     }
 
     @Test
@@ -387,6 +487,12 @@ class RbacUserTenantBoundariesIntegrationTest {
             throws Exception {
         return mockMvc.perform(put("/users/" + id + "/role").header("Authorization", bearer(token))
                 .contentType(MediaType.APPLICATION_JSON).content("{\"role\":\"" + role.name() + "\"}"));
+    }
+
+    private org.springframework.test.web.servlet.ResultActions updateStatus(String token, long id, UserStatus status)
+            throws Exception {
+        return mockMvc.perform(put("/users/" + id + "/status").header("Authorization", bearer(token))
+                .contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"" + status.name() + "\"}"));
     }
 
     private String login(String username) throws Exception {

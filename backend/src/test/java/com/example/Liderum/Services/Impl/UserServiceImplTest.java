@@ -4,7 +4,9 @@ import com.example.Liderum.Entities.Guild;
 import com.example.Liderum.Entities.User;
 import com.example.Liderum.Enums.GuildRole;
 import com.example.Liderum.Repository.UserRepository;
+import com.example.Liderum.Repository.TeamRepository;
 import com.example.Liderum.Repository.UserActivationTokenRepository;
+import jakarta.persistence.EntityManager;
 import com.example.Liderum.Tenancy.TenantService;
 import com.example.Liderum.Services.UserActivationService;
 import com.example.Liderum.dto.UserCreateRequestDTO;
@@ -26,10 +28,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class UserServiceImplTest {
     @Mock UserRepository userRepository;
+    @Mock TeamRepository teamRepository;
     @Mock TenantService tenantService;
     @Mock PasswordEncoder passwordEncoder;
     @Mock UserActivationService activationService;
     @Mock UserActivationTokenRepository activationTokenRepository;
+    @Mock EntityManager entityManager;
     @InjectMocks UserServiceImpl userService;
 
     @Test
@@ -64,9 +68,11 @@ class UserServiceImplTest {
         when(tenantService.getCurrentUser()).thenReturn(User.builder()
                 .id(2L).guild(Guild.builder().id(7L).build()).guildRole(GuildRole.MARECHAL).build());
         when(userRepository.findByIdAndGuildId(1L, 7L)).thenReturn(Optional.of(user));
+        when(userRepository.findByIdAndGuildIdForUpdate(1L, 7L)).thenReturn(Optional.of(user));
         assertThat(userService.findById(1L).getUsername()).isEqualTo("marcus");
         userService.delete(1L);
-        verify(userRepository, times(2)).findByIdAndGuildId(1L, 7L);
+        verify(userRepository).findByIdAndGuildId(1L, 7L);
+        verify(userRepository).findByIdAndGuildIdForUpdate(1L, 7L);
         verify(userRepository).delete(user);
         verify(userRepository, never()).deleteById(any());
     }
@@ -85,8 +91,7 @@ class UserServiceImplTest {
     void shouldPreserveLastMarechalWhenChangingRole() {
         User marechal = user(GuildRole.MARECHAL);
         when(tenantService.getCurrentUser()).thenReturn(marechal);
-        when(userRepository.findByIdAndGuildId(1L, 7L)).thenReturn(Optional.of(marechal));
-        when(userRepository.findAllByGuildIdAndGuildRole(7L, GuildRole.MARECHAL)).thenReturn(List.of(marechal));
+        when(userRepository.findByIdAndGuildIdForUpdate(1L, 7L)).thenReturn(Optional.of(marechal));
         UserRoleUpdateRequestDTO request = new UserRoleUpdateRequestDTO();
         request.setRole(GuildRole.GENERAL);
 

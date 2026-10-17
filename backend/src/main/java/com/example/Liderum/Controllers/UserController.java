@@ -8,6 +8,7 @@ import com.example.Liderum.dto.UserRoleUpdateRequestDTO;
 import com.example.Liderum.dto.UserResponseDTO;
 import com.example.Liderum.dto.UserActivationResponseDTO;
 import com.example.Liderum.dto.AdminUserCreateRequestDTO;
+import com.example.Liderum.dto.UserStatusUpdateRequestDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -74,6 +75,14 @@ public class UserController {
     public ResponseEntity<UserResponseDTO> updateRole(@PathVariable Long id,
             @RequestBody @jakarta.validation.Valid UserRoleUpdateRequestDTO request) {
         return ResponseEntity.ok(userService.updateRole(id, request));
+    }
+
+    @PutMapping("/{id}/status")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL')")
+    @Operation(summary = "Alterar status de usuário")
+    public ResponseEntity<UserResponseDTO> updateStatus(@PathVariable Long id,
+            @RequestBody @jakarta.validation.Valid UserStatusUpdateRequestDTO request) {
+        return ResponseEntity.ok(userService.updateStatus(id, request));
     }
 
     @DeleteMapping("/{id}")

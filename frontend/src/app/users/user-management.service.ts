@@ -17,5 +17,8 @@ export class UserManagementService {
   updateRole(id: number, request: UpdateUserRoleRequest): Observable<ManagedUser> {
     return this.http.put<ManagedUser>(`${this.endpoint}/${id}/role`, request);
   }
+  updateStatus(id: number, status: 'ACTIVE' | 'DISABLED'): Observable<ManagedUser> {
+    return this.http.put<ManagedUser>(`${this.endpoint}/${id}/status`, { status });
+  }
   remove(id: number): Observable<void> { return this.http.delete<void>(`${this.endpoint}/${id}`); }
 }

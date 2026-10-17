@@ -10,4 +10,6 @@ public interface TeamRepository extends JpaRepository<Team, Long> {
     List<Team> findAllByGuildId(Long guildId);
 
     Optional<Team> findByIdAndGuildId(Long id, Long guildId);
+
+    boolean existsByGuildIdAndLeaderId(Long guildId, Long leaderId);
 }

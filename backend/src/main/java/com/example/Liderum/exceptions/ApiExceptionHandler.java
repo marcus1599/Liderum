@@ -65,6 +65,11 @@ public class ApiExceptionHandler {
         return buildResponse(status, "Password Change Failed", ex.getCode().name(), request);
     }
 
+    @ExceptionHandler(UserStatusConflictException.class)
+    public ResponseEntity<ErrorResponse> handleUserStatusConflict(UserStatusConflictException ex, WebRequest request) {
+        return buildResponse(HttpStatus.CONFLICT, "User Status Conflict", "This user cannot change status in the current state.", request);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, WebRequest request) {
         if (isPasswordChangeRequest(request)) {
