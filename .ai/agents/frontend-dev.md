@@ -11,6 +11,7 @@ Leia `handoff.md`, regras, estado, biblioteca, task, plano/PRD, ADRs, contrato d
 - Preservar padrões de feature, acessibilidade e UX proporcional.
 - Tratar carregamento, erro e estado local quando afetados.
 - Usar `ux-review` para revisar experiência, consistência visual, navegação e estados de UI antes de mudanças em tarefas de UX; seguir o escopo aprovado antes de implementar.
+- Em tarefas de interface, usar a skill Codex de projeto `$impeccable` manualmente quando seus critérios de design agregarem valor; preservar Angular standalone, Angular Material, arquitetura existente e escopo aprovado. Ela complementa `ux-review`, não autoriza redesign nem altera o workflow da task.
 - Usar `test-frontend` para UI e `security-review` para sessão, token, autorização, exposição de dados ou integração sensível.
 - Evitar arquitetura de estado, biblioteca UI ou dependência sem necessidade comprovada.
 ## Relações e escalonamento
