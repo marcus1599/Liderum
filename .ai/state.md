@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-10-13
+> **Última inspeção:** 2026-10-15
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -18,7 +18,9 @@
 
 ### Evolução pós-MVP (2026-09-15)
 
-- Task `standardize-domain-http-feedback-states` concluída em 2026-10-13 com QA, Task Security e Task Verdict APROVADOS; Release Verdict APROVADO. Members, Teams, Events e Attendance distinguem loading, vazio real, erro e confirmação de mutações; 65/65 testes Angular e build de produção passaram (exit 0). Não houve sessão manual autenticada em desktop/handset. Possível exposição de detalhes nos handlers backend e RBAC visual de domínio incompleto permanecem achados preexistentes a avaliar separadamente. Nenhuma task ativa.
+- Task `add-authenticated-password-change` concluída em 2026-10-15 com QA, Security, SRE/DevOps e Task Verdict APROVADOS. Backend `clean verify`: 81 testes; PostgreSQL 18.6 fresh/upgrade: 3/3; frontend: 70/70 e build SUCCESS. V4 aditiva preserva Users e defaults de credential version; Hibernate `validate` e contextos `prod` passaram. Implementação e testes versionados localmente em `63fb032`. Release Verdict para esta alteração permanece BLOQUEADO até rollout coordenado confirmar que instâncias antigas foram drenadas/substituídas; nenhum deploy ou push foi feito. A inspeção visual autenticada desktop/handset não foi manual. ADR-002 recomendado, não criado sem autorização explícita; ADR-001 intacto. Referência: `tasks/completed/add-authenticated-password-change/audit.md`.
+
+- Task `standardize-domain-http-feedback-states` concluída em 2026-10-13 com QA, Task Security e Task Verdict APROVADOS; Release Verdict APROVADO. Members, Teams, Events e Attendance distinguem loading, vazio real, erro e confirmação de mutações; 65/65 testes Angular e build de produção passaram (exit 0). Não houve sessão manual autenticada em desktop/handset. Possível exposição de detalhes nos handlers backend e RBAC visual de domínio incompleto permanecem achados preexistentes a avaliar separadamente. Versionada em `2e60125` e `c74e528`, com push confirmado pelo usuário e Git sincronizado na abertura do planejamento seguinte.
 
 - As seis fases do roadmap original estão concluídas e não serão reabertas.
 - `product-evolution-roadmap.md` inicia a evolução do MVP demonstrável para uso real por uma Guild, preservando ADR-001 e a separação Guild/User/Member.

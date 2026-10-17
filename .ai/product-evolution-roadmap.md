@@ -77,12 +77,12 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 ### NOW
 
-- `standardize-domain-http-feedback-states` concluída; avaliar a prioridade entre alteração autenticada de senha, desativação segura de Staff e clareza do fluxo de líder de Team antes de abrir nova task.
+- `add-authenticated-password-change`: concluída em 2026-10-15 com Task Verdict APROVADO; backend (81 testes), PostgreSQL 18.6 fresh/upgrade (3/3), Angular (70/70 + build), QA, Security e SRE/DevOps aprovados. Não houve deploy; Release Verdict BLOQUEADO até rollout coordenado confirmar drenagem/substituição das instâncias antigas e validar reautenticação. Ver auditoria e execution em `tasks/completed/add-authenticated-password-change/`. Ciclo 3 permanece em andamento.
 
 ### NEXT
 
-- alteração autenticada de senha;
 - desativação segura de Staff, preservando ao menos um MARECHAL ativo;
+- clareza do fluxo de escolha/alteração de líder de Team, em escopo próprio;
 
 ### LATER
 

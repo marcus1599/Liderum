@@ -8,10 +8,10 @@ As seis fases do roadmap original estão concluídas. A task `enforce-relational
 
 ## Última task concluída
 
-- Nome: `standardize-domain-http-feedback-states`
-- Resultado: QA, Task Security Verdict, Task Verdict e Release Verdict APROVADOS. Members, Teams, Events e Attendance apresentam estados HTTP e feedback de mutações consistentes; frontend: 65/65 testes e build de produção SUCCESS. Sem sessão visual manual autenticada nesta task.
-- Data: 2026-10-13
-- Referência: [[tasks/completed/standardize-domain-http-feedback-states/audit.md]]
+- Nome: `add-authenticated-password-change`
+- Resultado: QA, Security, SRE/DevOps e Task Verdict APROVADOS. Backend `clean verify` 81 testes; PostgreSQL 18.6 fresh/upgrade 3/3; frontend 70/70 e build SUCCESS. Release Verdict BLOQUEADO até rollout coordenado drenar/substituir instâncias antigas e validar a transição de JWT. Implementação/testes versionados localmente em `63fb032`; nenhum deploy ou push foi feito.
+- Data: 2026-10-15
+- Referência: [[tasks/completed/add-authenticated-password-change/audit.md]]
 
 ## Task ativa
 
@@ -20,13 +20,15 @@ As seis fases do roadmap original estão concluídas. A task `enforce-relational
 
 ## Validações recentes
 
+- Task password change: `clean verify` backend 81 testes; PostgreSQL 18.6 descartável fresh V1–V4 e upgrades V1/V3→V4 3/3; frontend 70/70 e production build SUCCESS. `git diff --check` sem erros. Container de teste foi removido; nenhum recurso Render foi alterado.
 - Backend V3: `clean verify`, 74 testes, 0 failures/errors/skipped, BUILD SUCCESS, exit code 0; H2 direcionado 3/3.
 - PostgreSQL 18.6 descartável: fresh V1→V2→V3 e upgrade V1→User legado→V2→V3 aprovados (2/2), Hibernate `validate` e contexto `prod` iniciados. Container removido após o teste; Flyway warning de suporte testado até PostgreSQL 15 permanece como dívida técnica não bloqueante.
 - Frontend da task de feedback HTTP: 65/65 testes ChromeHeadless e production build SUCCESS, ambos exit 0; `git diff --check` sem erros. Warnings Sass/CSS e browser mapping continuam não bloqueantes. Validação visual manual desktop/handset não executada.
-- Git: as alterações desta task de feedback HTTP permanecem no working tree; nenhum stage, commit ou push foi executado nesta execução.
+- Git: password change versionado em commits locais separados para implementação/testes e artefatos `.ai`; nenhum push ou deploy desta task. O feedback HTTP foi versionado anteriormente em `2e60125` e `c74e528`.
 
 ## Bloqueadores e pendências
 
+- Release da task password change permanece bloqueado até executar rollout coordenado, confirmar drenagem/substituição de todas as instâncias antigas (que ainda podem aceitar JWT sem `uid`/`cv`) e validar reautenticação. Rollback para código antigo pode reabilitar aceitação de JWT legado; não houve deploy nesta execução.
 - Task de feedback HTTP sem bloqueador de gate. Encaminhamentos não bloqueantes: avaliar respostas de erro backend que podem incluir detalhes internos; RBAC visual das áreas de domínio; inspeção visual autenticada em desktop/handset não realizada nesta task.
 - Rollout V3: sem bloqueador conhecido após QA, Security, SRE/DevOps e Auditor aprovados. Limitação não bloqueante: status HTTP direto dos requests autenticados não foi capturado nos request logs Render; a conclusão baseia-se no fluxo de login/guard e na tela tenant-scoped funcional.
 - Dívida técnica não bloqueante: Flyway 9.22.3 declara suporte testado até PostgreSQL 15; os cenários executados em PostgreSQL 18.6 passaram. Avaliar upgrade do Flyway em task separada.
@@ -34,10 +36,13 @@ As seis fases do roadmap original estão concluídas. A task `enforce-relational
 
 ## Próximo passo recomendado
 
-Reavaliar prioridade do próximo item NEXT: alteração autenticada de senha ou desativação segura de Staff, preservando ao menos um MARECHAL ativo. A clareza do fluxo de líder de Team é candidata UX separada. Avaliar em task própria a exposição potencial de detalhes internos pelos handlers backend e o RBAC visual das áreas de domínio. Não há task ativa.
+Após revisão/publicação autorizada dos commits locais, planejar rollout coordenado e smoke operacional da mudança de JWT; manter o Release Verdict bloqueado até essa validação. Próxima candidata de produto no Ciclo 3: desativação segura de Staff preservando ao menos um MARECHAL ativo. Clareza do líder de Team, revisão dos handlers backend e RBAC visual continuam separadas. As seis fases originais e Ciclos 1/2 permanecem concluídos; Ciclo 3 continua em andamento.
 
 ## Contexto relevante
 
+- [[tasks/completed/add-authenticated-password-change/inventory.md]]
+- [[tasks/completed/add-authenticated-password-change/prd.md]]
+- [[tasks/completed/add-authenticated-password-change/plan.md]]
 - [[state.md]]
 - [[roadmap.md]]
 - [[product-evolution-roadmap.md]]
