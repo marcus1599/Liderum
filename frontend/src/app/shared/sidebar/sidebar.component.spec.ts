@@ -22,6 +22,7 @@ describe('SidebarComponent', () => {
           { path: 'teams', component: SidebarComponent },
           { path: 'events', component: SidebarComponent },
           { path: 'attendance', component: SidebarComponent },
+          { path: 'account/password', component: SidebarComponent },
           { path: 'users', component: SidebarComponent }
         ]),
         { provide: AuthService, useValue: { profile$: profile.asObservable() } }

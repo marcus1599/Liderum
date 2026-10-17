@@ -12,7 +12,7 @@ describe('Application routes', () => {
     const paths = authenticatedLayout?.children?.map(route => route.path);
 
     expect(authenticatedLayout?.canActivate).toBeDefined();
-    expect(paths).toEqual(jasmine.arrayContaining(['dashboard', 'users', 'members', 'teams', 'events', 'attendance']));
+    expect(paths).toEqual(jasmine.arrayContaining(['dashboard', 'users', 'members', 'teams', 'events', 'attendance', 'account/password']));
     expect(routes.some(route => route.path === 'dashboard')).toBeFalse();
   });
 });

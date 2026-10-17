@@ -3,6 +3,11 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface PasswordChangeRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
 export interface AuthResponse {
   token: string;
   role: string;

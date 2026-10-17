@@ -3,6 +3,7 @@ package com.example.Liderum.Controllers;
 import com.example.Liderum.dto.AuthRequestDTO;
 import com.example.Liderum.dto.AuthResponseDTO;
 import com.example.Liderum.Security.JwtUtil;
+import com.example.Liderum.Security.CustomUserDetails;
 import com.example.Liderum.Services.GuildOnboardingService;
 import com.example.Liderum.dto.GuildRegistrationRequestDTO;
 import jakarta.validation.Valid;
@@ -50,7 +51,7 @@ public class AuthController {
             .collect(Collectors.toList());
 
         // Gerar token com todas as roles
-        String token = jwtUtil.generateToken(authentication.getName(), roles);
+        String token = jwtUtil.generateToken((CustomUserDetails) userDetails, roles);
 
         return ResponseEntity.ok(new AuthResponseDTO(token, String.join(",", roles))); // opcionalmente envia as roles no response
         } catch (AuthenticationException ex) {

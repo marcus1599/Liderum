@@ -55,4 +55,17 @@ describe('AuthService', () => {
     service.logout();
     expect(localStorage.getItem('token')).toBeNull();
   });
+
+  it('sends only the current and new passwords to the authenticated self endpoint', () => {
+    let completed = false;
+    service.changeOwnPassword({ currentPassword: 'current-secret', newPassword: 'replacement-secret' })
+      .subscribe(() => completed = true);
+    const request = http.expectOne(req => req.url.endsWith('/users/me/password'));
+    expect(request.request.method).toBe('PUT');
+    expect(request.request.body).toEqual({ currentPassword: 'current-secret', newPassword: 'replacement-secret' });
+    expect(request.request.body.userId).toBeUndefined();
+    expect(request.request.body.guildId).toBeUndefined();
+    request.flush(null);
+    expect(completed).toBeTrue();
+  });
 });

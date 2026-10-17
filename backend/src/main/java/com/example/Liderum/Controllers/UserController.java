@@ -1,6 +1,8 @@
 package com.example.Liderum.Controllers;
 
 import com.example.Liderum.Services.UserService;
+import com.example.Liderum.Services.PasswordChangeService;
+import com.example.Liderum.dto.PasswordChangeRequestDTO;
 import com.example.Liderum.dto.UserCreateRequestDTO;
 import com.example.Liderum.dto.UserRoleUpdateRequestDTO;
 import com.example.Liderum.dto.UserResponseDTO;
@@ -22,6 +24,15 @@ import java.util.List;
 public class UserController {
 
     private final UserService userService;
+    private final PasswordChangeService passwordChangeService;
+
+    @PutMapping("/me/password")
+    @Operation(summary = "Alterar a própria senha")
+    public ResponseEntity<Void> changeOwnPassword(
+            @RequestBody @jakarta.validation.Valid PasswordChangeRequestDTO request) {
+        passwordChangeService.changeCurrentUserPassword(request);
+        return ResponseEntity.noContent().build();
+    }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL')")

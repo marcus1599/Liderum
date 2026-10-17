@@ -49,6 +49,10 @@ public class User {
     @Column(nullable = true)
     private String password;
 
+    @Column(name = "credential_version", nullable = false)
+    @Default
+    private long credentialVersion = 0L;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private GuildRole guildRole;

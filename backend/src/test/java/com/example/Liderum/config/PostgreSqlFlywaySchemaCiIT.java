@@ -25,8 +25,8 @@ class PostgreSqlFlywaySchemaCiIT {
     @Test
     void appliesV1V2AndV3AndHibernateValidatesThePostgresqlSchema() {
         assertThat(jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM flyway_schema_history WHERE version IN ('1', '2', '3') AND success = true", Integer.class))
-                .isEqualTo(3);
+                "SELECT COUNT(*) FROM flyway_schema_history WHERE version IN ('1', '2', '3', '4') AND success = true", Integer.class))
+                .isEqualTo(4);
 
         for (String table : new String[] {"guilds", "users", "member", "team", "event", "attendance", "user_activation_tokens"}) {
             Integer count = jdbcTemplate.queryForObject(
@@ -53,7 +53,7 @@ class PostgreSqlFlywaySchemaCiIT {
                 .isEqualTo(1);
 
         for (String[] column : new String[][] {
-                {"users", "guild_id"}, {"users", "guild_role"}, {"event", "name"},
+                {"users", "guild_id"}, {"users", "guild_role"}, {"users", "credential_version"}, {"event", "name"},
                 {"event", "date"}, {"attendance", "status"}}) {
             assertThat(jdbcTemplate.queryForObject(
                     "SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = 'public' "

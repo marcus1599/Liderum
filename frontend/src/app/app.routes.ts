@@ -9,6 +9,7 @@ import { GroupsComponent } from './groups/groups.component';
 import { EventsComponent } from './events/events.component';
 import { AttendenceComponent } from './attendence/attendence.component';
 import { ActivateComponent } from './auth/activate.component';
+import { PasswordChangeComponent } from './auth/password-change.component';
 import { AuthenticatedLayoutComponent } from './shared/authenticated-layout/authenticated-layout.component';
 
 export const routes: Routes = [
@@ -23,7 +24,8 @@ export const routes: Routes = [
       { path: 'members', component: MembersComponent },
       { path: 'teams', component: GroupsComponent },
       { path: 'events', component: EventsComponent },
-      { path: 'attendance', component: AttendenceComponent }
+      { path: 'attendance', component: AttendenceComponent },
+      { path: 'account/password', component: PasswordChangeComponent }
     ]
   },
   { path: '**', redirectTo: 'login' },

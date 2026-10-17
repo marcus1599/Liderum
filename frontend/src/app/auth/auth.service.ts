@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { BehaviorSubject, Observable, of, switchMap, tap, catchError, map } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { AuthResponse, LoginRequest, UserProfile } from './auth.models';
+import { AuthResponse, LoginRequest, PasswordChangeRequest, UserProfile } from './auth.models';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +36,10 @@ export class AuthService {
         this.restored = true;
       })
     );
+  }
+
+  changeOwnPassword(request: PasswordChangeRequest): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}/users/me/password`, request);
   }
 
   restoreSession(): Observable<boolean> {

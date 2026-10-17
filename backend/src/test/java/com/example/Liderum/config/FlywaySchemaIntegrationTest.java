@@ -31,8 +31,8 @@ class FlywaySchemaIntegrationTest {
     @Test
     void appliesAllMigrationsAndCreatesExpectedSchemaWithoutHibernateUpdate() {
         assertThat(jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM \"flyway_schema_history\" WHERE \"version\" IN ('1', '2', '3') AND \"success\" = TRUE", Integer.class))
-                .isEqualTo(3);
+                "SELECT COUNT(*) FROM \"flyway_schema_history\" WHERE \"version\" IN ('1', '2', '3', '4') AND \"success\" = TRUE", Integer.class))
+                .isEqualTo(4);
 
         for (String table : new String[] {"GUILDS", "USERS", "MEMBER", "TEAM", "EVENT", "ATTENDANCE", "USER_ACTIVATION_TOKENS"}) {
             Integer count = jdbcTemplate.queryForObject(
@@ -55,6 +55,10 @@ class FlywaySchemaIntegrationTest {
                         + "AND CONSTRAINT_TYPE = 'UNIQUE'", Integer.class)).isEqualTo(1);
         assertNotNullable("USERS", "STATUS");
         assertNullable("USERS", "PASSWORD");
+        assertNotNullable("USERS", "CREDENTIAL_VERSION");
+        assertThat(jdbcTemplate.queryForObject(
+                "SELECT COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='PUBLIC' AND TABLE_NAME='USERS' AND COLUMN_NAME='CREDENTIAL_VERSION'", String.class))
+                .contains("0");
     }
 
     @Test

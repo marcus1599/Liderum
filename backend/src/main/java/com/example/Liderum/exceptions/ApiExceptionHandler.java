@@ -1,5 +1,6 @@
 package com.example.Liderum.exceptions;
 
+import com.example.Liderum.exceptions.PasswordChangeException;
 
 
 import org.springframework.http.HttpStatus;
@@ -51,12 +52,29 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleBadRequest(HttpMessageNotReadableException ex, WebRequest request) {
+        if (isPasswordChangeRequest(request)) {
+            return buildResponse(HttpStatus.BAD_REQUEST, "Invalid Password Change Request", "INVALID_PASSWORD_REQUEST", request);
+        }
         return buildResponse(HttpStatus.BAD_REQUEST, "Malformed JSON", ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(PasswordChangeException.class)
+    public ResponseEntity<ErrorResponse> handlePasswordChange(PasswordChangeException ex, WebRequest request) {
+        HttpStatus status = ex.getCode() == PasswordChangeException.Code.SESSION_EXPIRED
+                ? HttpStatus.UNAUTHORIZED : HttpStatus.BAD_REQUEST;
+        return buildResponse(status, "Password Change Failed", ex.getCode().name(), request);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneric(Exception ex, WebRequest request) {
+        if (isPasswordChangeRequest(request)) {
+            return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", "Password change failed.", request);
+        }
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal Server Error", ex.getMessage(), request);
+    }
+
+    private boolean isPasswordChangeRequest(WebRequest request) {
+        return request.getDescription(false).contains("/users/me/password");
     }
 
     private ResponseEntity<ErrorResponse> buildResponse(HttpStatus status, String error, String message, WebRequest request) {

@@ -35,7 +35,10 @@ class JwtFilterTest {
         List<String> roles = List.of("MARECHAL");
         JwtUtil jwtUtil = mock(JwtUtil.class);
         var userDetailsService = mock(org.springframework.security.core.userdetails.UserDetailsService.class);
-        UserDetails userDetails = mock(UserDetails.class);
+        UserDetails userDetails = new CustomUserDetails(com.example.Liderum.Entities.User.builder()
+                .id(12L).username(username).email("jwt-filter@example.test")
+                .guildRole(com.example.Liderum.Enums.GuildRole.MARECHAL)
+                .status(com.example.Liderum.Enums.UserStatus.ACTIVE).build());
         var filterChain = mock(jakarta.servlet.FilterChain.class);
         JwtFilter jwtFilter = new JwtFilter(jwtUtil, userDetailsService);
         MockHttpServletRequest request = new MockHttpServletRequest();
@@ -45,7 +48,7 @@ class JwtFilterTest {
         when(jwtUtil.validateToken(token)).thenReturn(true);
         when(jwtUtil.extractUsername(token)).thenReturn(username);
         when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
-        doReturn(List.of(new SimpleGrantedAuthority("ROLE_MARECHAL"))).when(userDetails).getAuthorities();
+        when(jwtUtil.identifiesCurrentUser(token, (CustomUserDetails) userDetails)).thenReturn(true);
 
         jwtFilter.doFilter(request, response, filterChain);
 

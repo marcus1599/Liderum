@@ -31,7 +31,7 @@ class PostgreSqlFlywayUpgradeCiIT {
     private static final String LEGACY_PASSWORD = "legacy-test-password-only";
 
     @Test
-    void upgradesV1WithExistingUserToV3AndStartsHibernateValidatedContext() throws Exception {
+    void upgradesV1WithExistingUserToV4AndStartsHibernateValidatedContext() throws Exception {
         String baseUrl = requiredEnv("DB_URL");
         String username = requiredEnv("DB_USERNAME");
         String password = requiredEnv("DB_PASSWORD");
@@ -73,7 +73,7 @@ class PostgreSqlFlywayUpgradeCiIT {
 
             assertThat(jdbc.queryForList(
                     "SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank", String.class))
-                    .containsExactly("1", "2", "3");
+                    .containsExactly("1", "2", "3", "4");
             assertThat(jdbc.queryForObject("SELECT COUNT(*) FROM users WHERE id = ?", Integer.class, userId)).isEqualTo(1);
             assertThat(jdbc.queryForObject("SELECT guild_id FROM users WHERE id = ?", Long.class, userId)).isEqualTo(guildId);
             assertThat(jdbc.queryForObject("SELECT password FROM users WHERE id = ?", String.class, userId)).isEqualTo(legacyHash);
@@ -108,6 +108,66 @@ class PostgreSqlFlywayUpgradeCiIT {
                 assertThat(context.getBean("entityManagerFactory")).isNotNull();
                 Authentication authentication = context.getBean(AuthenticationManager.class)
                         .authenticate(new UsernamePasswordAuthenticationToken(LEGACY_USERNAME, LEGACY_PASSWORD));
+                assertThat(authentication.isAuthenticated()).isTrue();
+            }
+        } finally {
+            dropSchema(baseUrl, username, password, schema);
+        }
+    }
+
+    @Test
+    void upgradesV3WithExistingActiveAndPendingUsersToV4WithoutChangingTheirData() throws Exception {
+        String baseUrl = requiredEnv("DB_URL");
+        String username = requiredEnv("DB_USERNAME");
+        String password = requiredEnv("DB_PASSWORD");
+        String schema = "password_upgrade_" + UUID.randomUUID().toString().replace("-", "");
+        String schemaUrl = withCurrentSchema(baseUrl, schema);
+        String activeUsername = "password_upgrade_active_" + UUID.randomUUID().toString().substring(0, 8);
+        String pendingUsername = "password_upgrade_pending_" + UUID.randomUUID().toString().substring(0, 8);
+        String activePassword = "password-upgrade-active";
+        String activeHash = new BCryptPasswordEncoder().encode(activePassword);
+
+        try {
+            createSchema(baseUrl, username, password, schema);
+            Flyway.configure().dataSource(schemaUrl, username, password).schemas(schema).defaultSchema(schema)
+                    .locations("classpath:db/migration").target("3").load().migrate();
+
+            JdbcTemplate jdbc = new JdbcTemplate(dataSource(schemaUrl, username, password));
+            Long guildId = jdbc.queryForObject("INSERT INTO guilds (name, server_name) VALUES (?, ?) RETURNING id",
+                    Long.class, "Password upgrade guild", "Upgrade server");
+            Long activeId = jdbc.queryForObject(
+                    "INSERT INTO users (username, email, password, guild_role, guild_id, status) VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
+                    Long.class, activeUsername, activeUsername + "@example.test", activeHash, "MARECHAL", guildId, "ACTIVE");
+            Long pendingId = jdbc.queryForObject(
+                    "INSERT INTO users (username, email, password, guild_role, guild_id, status) VALUES (?, ?, ?, ?, ?, ?) RETURNING id",
+                    Long.class, pendingUsername, pendingUsername + "@example.test", null, "SOLDADO", guildId, "PENDING");
+
+            Flyway.configure().dataSource(schemaUrl, username, password).schemas(schema).defaultSchema(schema)
+                    .locations("classpath:db/migration").load().migrate();
+
+            assertThat(jdbc.queryForList(
+                    "SELECT version FROM flyway_schema_history WHERE success ORDER BY installed_rank", String.class))
+                    .containsExactly("1", "2", "3", "4");
+            assertThat(jdbc.queryForObject("SELECT credential_version FROM users WHERE id = ?", Long.class, activeId)).isZero();
+            assertThat(jdbc.queryForObject("SELECT credential_version FROM users WHERE id = ?", Long.class, pendingId)).isZero();
+            assertThat(jdbc.queryForObject("SELECT password FROM users WHERE id = ?", String.class, activeId)).isEqualTo(activeHash);
+            assertThat(jdbc.queryForObject("SELECT password FROM users WHERE id = ?", String.class, pendingId)).isNull();
+            assertThat(jdbc.queryForObject("SELECT status FROM users WHERE id = ?", String.class, activeId)).isEqualTo("ACTIVE");
+            assertThat(jdbc.queryForObject("SELECT status FROM users WHERE id = ?", String.class, pendingId)).isEqualTo("PENDING");
+            assertThat(jdbc.queryForObject("SELECT guild_id FROM users WHERE id = ?", Long.class, activeId)).isEqualTo(guildId);
+            assertThat(new BCryptPasswordEncoder().matches(activePassword,
+                    jdbc.queryForObject("SELECT password FROM users WHERE id = ?", String.class, activeId))).isTrue();
+
+            try (ConfigurableApplicationContext context = new SpringApplicationBuilder(LiderumApplication.class)
+                    .web(WebApplicationType.SERVLET).properties(Map.of("spring.main.banner-mode", "off"))
+                    .run("--spring.profiles.active=prod", "--server.port=0", "--spring.datasource.url=" + schemaUrl,
+                            "--spring.datasource.username=" + username, "--spring.datasource.password=" + password,
+                            "--spring.flyway.schemas=" + schema, "--spring.flyway.default-schema=" + schema,
+                            "--spring.jpa.hibernate.ddl-auto=validate", "--spring.rabbitmq.listener.simple.auto-startup=false",
+                            "--jwt.secret=test_only_postgresql_upgrade_secret_32_bytes_minimum")) {
+                assertThat(context.getBean("entityManagerFactory")).isNotNull();
+                Authentication authentication = context.getBean(AuthenticationManager.class)
+                        .authenticate(new UsernamePasswordAuthenticationToken(activeUsername, activePassword));
                 assertThat(authentication.isAuthenticated()).isTrue();
             }
         } finally {

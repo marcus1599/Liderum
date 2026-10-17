@@ -25,6 +25,10 @@
   <mat-icon>check_circle</mat-icon>
   Presença
 </a>
+<a class="menu-btn" routerLink="/account/password" routerLinkActive="active" ariaCurrentWhenActive="page" (click)="closeIfHandset()">
+  <mat-icon>lock_reset</mat-icon>
+  Alterar senha
+</a>
 <ng-container *ngIf="profile$ | async as profile">
   <a *ngIf="profile.guildRole === 'MARECHAL' || profile.guildRole === 'GENERAL'"
      class="menu-btn" routerLink="/users" routerLinkActive="active"
