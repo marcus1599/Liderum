@@ -61,6 +61,7 @@ Itens candidatos:
 
 Primeira task concluída: `consolidate-authenticated-navigation-and-expose-users` (Task Verdict e Release Verdict APROVADOS). Dashboard e páginas de domínio compartilham o shell autenticado; o menu Users é exibido conforme perfil MARECHAL/GENERAL.
 Segunda task concluída: `standardize-domain-http-feedback-states` (Task Verdict e Release Verdict APROVADOS, 2026-10-13). Members, Teams, Events e Attendance distinguem loading, vazio, erro, sucesso e falha de recarga após mutação. Feedback do drag-and-drop de Team foi incluído. Clareza da escolha/alteração de líder continua candidata separada; Ciclo 3 permanece em andamento.
+Task concluída: `safely-deactivate-and-reactivate-staff-users` (2026-10-17). Desativação/reativação segura de Staff, revogação de sessão, proteção do último MARECHAL ACTIVE e bloqueio de 409 para líder de Team foram aprovados por QA, Security e Auditor. Release global permanece bloqueado por achado RabbitMQ preexistente, cuja investigação está adiada pelo usuário.
 
 ## Ciclo 4 — Decisão de produto para notificações (LATER)
 
@@ -77,11 +78,10 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 ### NOW
 
-- `add-authenticated-password-change`: concluída em 2026-10-15 com Task Verdict APROVADO; backend (81 testes), PostgreSQL 18.6 fresh/upgrade (3/3), Angular (70/70 + build), QA, Security e SRE/DevOps aprovados. Não houve deploy; Release Verdict BLOQUEADO até rollout coordenado confirmar drenagem/substituição das instâncias antigas e validar reautenticação. Ver auditoria e execution em `tasks/completed/add-authenticated-password-change/`. Ciclo 3 permanece em andamento.
+- Sem task ativa. A próxima candidata de produto é planejar `reassign-team-leader-before-staff-deactivation`, escopo próprio para reassociação explícita de liderança; dependências de UX, RBAC e tenant devem ser verificadas no planejamento antes de implementar.
 
 ### NEXT
 
-- desativação segura de Staff, preservando ao menos um MARECHAL ativo;
 - clareza do fluxo de escolha/alteração de líder de Team, em escopo próprio;
 
 ### LATER
