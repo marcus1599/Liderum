@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-10-15
+> **Última inspeção:** 2026-10-17
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -18,13 +18,17 @@
 
 ### Evolução pós-MVP (2026-09-15)
 
-- Task `add-authenticated-password-change` concluída em 2026-10-15 com QA, Security, SRE/DevOps e Task Verdict APROVADOS. Backend `clean verify`: 81 testes; PostgreSQL 18.6 fresh/upgrade: 3/3; frontend: 70/70 e build SUCCESS. V4 aditiva preserva Users e defaults de credential version; Hibernate `validate` e contextos `prod` passaram. Implementação e testes versionados localmente em `63fb032`. Release Verdict para esta alteração permanece BLOQUEADO até rollout coordenado confirmar que instâncias antigas foram drenadas/substituídas; nenhum deploy ou push foi feito. A inspeção visual autenticada desktop/handset não foi manual. ADR-002 recomendado, não criado sem autorização explícita; ADR-001 intacto. Referência: `tasks/completed/add-authenticated-password-change/audit.md`.
+- Task operacional `rollout-authenticated-password-change-and-jwt-transition` concluída em 2026-10-17 com QA, Security, SRE/DevOps e Task Verdict APROVADOS. GitHub/CI da revisão `fb0b9a4` confirmados; Render já a havia autoimplantado e marcou a revisão anterior `deactivated`. PostgreSQL 18.6 registrou V4 com sucesso, Hibernate/JPA e Tomcat iniciaram, e health retornou 200/UP. Smoke de conta descartável aprovou registro, login, perfil, rota tenant-scoped, troca de senha, revogação do JWT anterior e novo login. O request direto com JWT legado assinado não foi executado por ausência de artefato de smoke pré-deploy; o usuário aceitou explicitamente a evidência equivalente de teste de integração assinado na revisão implantada, CI, deploy antigo desativado e revogação em produção. Release Verdict permanece BLOQUEADO por erro AMQP 406 da fila de notificações observado também em 2026-10-13, achado preexistente não relacionado a este rollout; requer diagnóstico separado. Evidências: `tasks/completed/rollout-authenticated-password-change-and-jwt-transition/audit.md`.
+
+- Task `safely-deactivate-and-reactivate-staff-users` concluída em 2026-10-17 com QA, Task Security e Auditor APROVADOS. `PUT /users/{id}/status` permite somente ACTIVE↔DISABLED, preserva senha hash, incrementa credentialVersion ao desativar e requer novo login ao reativar. Tenant/RBAC, JWT revogado, proteção concorrente do último MARECHAL ACTIVE e bloqueio 409 seguro para líder de Team foram validados. Backend `clean verify`: 86 testes; frontend: 73/73 e build SUCCESS. Task Verdict APROVADO; Release Verdict continua BLOQUEADO somente pelo erro RabbitMQ AMQP 406 preexistente e adiado. Evidências: `tasks/completed/safely-deactivate-and-reactivate-staff-users/audit.md`.
+
+- Task `add-authenticated-password-change` concluída em 2026-10-15 com QA, Security, SRE/DevOps e Task Verdict APROVADOS. Backend `clean verify`: 81 testes; PostgreSQL 18.6 fresh/upgrade: 3/3; frontend: 70/70 e build SUCCESS. V4 aditiva preserva Users e defaults de credential version; Hibernate `validate` e contextos `prod` passaram. Implementação e testes versionados em `63fb032`. O Release Verdict daquela auditoria ficou BLOQUEADO até rollout coordenado, realizado posteriormente na task operacional acima; durante a execução da task de implementação não houve deploy ou push. A inspeção visual autenticada desktop/handset não foi manual. ADR-002 recomendado, não criado sem autorização explícita; ADR-001 intacto. Referência: `tasks/completed/add-authenticated-password-change/audit.md`.
 
 - Task `standardize-domain-http-feedback-states` concluída em 2026-10-13 com QA, Task Security e Task Verdict APROVADOS; Release Verdict APROVADO. Members, Teams, Events e Attendance distinguem loading, vazio real, erro e confirmação de mutações; 65/65 testes Angular e build de produção passaram (exit 0). Não houve sessão manual autenticada em desktop/handset. Possível exposição de detalhes nos handlers backend e RBAC visual de domínio incompleto permanecem achados preexistentes a avaliar separadamente. Versionada em `2e60125` e `c74e528`, com push confirmado pelo usuário e Git sincronizado na abertura do planejamento seguinte.
 
 - As seis fases do roadmap original estão concluídas e não serão reabertas.
 - `product-evolution-roadmap.md` inicia a evolução do MVP demonstrável para uso real por uma Guild, preservando ADR-001 e a separação Guild/User/Member.
-- O ambiente `.ai` inclui a skill `ux-review`, integrada ao Frontend Dev, QA, Planner e Router para revisão de UX Angular. A primeira task do Ciclo 3, `consolidate-authenticated-navigation-and-expose-users`, foi concluída com Task Verdict e Release Verdict APROVADOS. Dashboard e áreas autenticadas usam o shell compartilhado, e Users está acessível no menu somente para MARECHAL/GENERAL conforme perfil de `/users/me`.
+- O ambiente `.ai` inclui a skill `ux-review`, integrada ao Frontend Dev, QA, Planner e Router para revisão de UX Angular. A skill de projeto Impeccable está instalada em `.agents/skills/impeccable/` para uso manual no Codex, sem hooks automáticos. A primeira task do Ciclo 3, `consolidate-authenticated-navigation-and-expose-users`, foi concluída com Task Verdict e Release Verdict APROVADOS. Dashboard e áreas autenticadas usam o shell compartilhado, e Users está acessível no menu somente para MARECHAL/GENERAL conforme perfil de `/users/me`.
 - Ciclo 1 concluído. A task `enforce-relational-database-integrity` foi implementada e validada em H2 e PostgreSQL 18.6 (fresh e upgrade); `clean verify` passou com 74 testes. Em 2026-10-13 Render aplicou V3 após o deploy `dep-db76ikcs728c73dk48og`; Flyway history, constraints, Hibernate/JPA e startup live foram confirmados. Health respondeu 200 e CORS passou nos casos permitido/negado. O rollout V3 foi concluído com Task Verdict e Release Verdict APROVADOS após smoke autenticado na rota tenant-scoped `/members`.
 - Task `rollout-flyway-v3-to-render-production` concluída em 2026-10-13: commits `f860b2a` e `93caf70` publicados; primeira tentativa de build encontrou HTTP 429 do Maven Central, retry do mesmo commit ficou live. Preflight read-only não encontrou violações candidatas; dados de teste foram declarados descartáveis, dispensando backup recuperável neste ambiente de teste. O usuário autenticou-se no frontend; login/guard só completam após `/users/me` responder com sucesso, e `/members` carregou o estado vazio normal. O status HTTP autenticado direto não foi capturado; nenhuma credencial/token foi lida ou exposta.
 - A task estrutural `secure-staff-user-activation-flow` foi concluída com Task Verdict APROVADO após validar lifecycle PENDING/ACTIVE/DISABLED, ativação/regeneração, RBAC/tenant, migration V2 e testes de replay/concorrência.
@@ -35,7 +39,7 @@
 - O banco legado do Render foi substituído por PostgreSQL 18.6 vazio em Oregon; V1 aplicou com sucesso em produção, Hibernate `validate` e Spring/Tomcat iniciaram. A causa raiz permanece o schema legado sem `flyway_schema_history` (SQLState `42P07`), não a V1 nem o warning Flyway/PostgreSQL 18.
 - `fix-production-flyway-baseline-postgresql` foi concluída com Task Verdict APROVADO. A remediação posterior de rate limit/CORS também foi concluída, sem alterar a conclusão da recuperação do banco.
 - O rate limiting do registro público foi corrigido em produção com `CF-Connecting-IP` confiado exclusivamente no profile `prod` do Render/Cloudflare; smoke final retornou `400,400,400,400,400,429`. `CORS_ALLOWED_ORIGINS` foi configurada para a origin Vercel e validada positiva e negativamente.
-- O Release Verdict está **APROVADO**. A validação PostgreSQL real de migrations no CI permanece recomendada como melhoria de qualidade não bloqueante.
+- Na conclusão da recuperação Flyway de 2026-08-26, o Release Verdict estava **APROVADO**. O veredito global atual está BLOQUEADO pelo achado RabbitMQ posterior. A validação PostgreSQL real de migrations no CI foi implementada depois, na task `validate-flyway-migrations-against-postgresql-in-ci`.
 - A task `extend-tenant-integration-coverage-to-events-and-attendance` foi concluída com Task Verdict e Task Security Verdict APROVADOS. Oito cenários HTTP reais comprovam as fronteiras tenant de Event e Attendance, incluindo referências cross-Guild sem mutação parcial. `validate-flyway-migrations-against-postgresql-in-ci` foi concluída com Task Verdict, Security e SRE/DevOps aprovados; o GitHub Actions run #15 validou PostgreSQL 18.6, V1 e Hibernate `ddl-auto=validate` em banco descartável.
 - A task `make-event-notifications-reliable-and-testable` foi concluída: RabbitMQ usa retry/DLQ e idempotência proporcional, com testes unitários e integração. `establish-fullstack-ci-and-compose-demo-environment` também foi concluída: Compose local validado com PostgreSQL 18.6, RabbitMQ, backend, notification-consumer e frontend; CI cobre frontend e notification-service, e o smoke local confirmou registro, login, tenant, criação de evento e consumo assíncrono.
 - A task `add-proportional-observability-and-portfolio-documentation` foi concluída: Actuator health seguro para backend e notification-service, documentação operacional, diagrama Mermaid e roteiro reproduzível de demonstração foram adicionados e validados no Compose. A Fase 6 do roadmap está concluída.
@@ -427,14 +431,14 @@ O README descreve o produto e suas principais funcionalidades.
 | Flyway               | Implementado; baseline V1 validada e `ddl-auto=validate` |
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
-| Testes Backend       | Task V3 (2026-10-11): clean verify 74 testes, 0 failures/errors/skipped; H2 fresh e PostgreSQL 18.6 fresh/upgrade aprovados (2/2); Flyway V3 e Hibernate `validate` confirmados |
-| Testes Frontend      | Última validação da task de feedback HTTP: 65 testes, 0 failures/errors, exit code 0; build de produção SUCCESS, exit code 0. Warnings Sass/CSS/baseline-browser-mapping permanecem não bloqueantes. |
-| Security Review      | Configuração JWT fail-fast validada e commitada localmente |
-| Documentação         | Estrutura `.ai/docs/` criada; conteúdo ainda sob demanda |
+| Testes Backend       | Último `clean verify` da task de status de Staff: 86 testes, 0 failures/errors/skipped, BUILD SUCCESS; validações PostgreSQL anteriores permanecem documentadas nas respectivas tasks |
+| Testes Frontend      | Última suíte completa da task de status de Staff: 73/73, exit code 0; build Angular SUCCESS. Warnings Sass/CSS/baseline-browser-mapping permanecem não bloqueantes. |
+| Security Review      | Task Security Verdict da desativação de Staff APROVADO; Release Verdict global BLOQUEADO pelo achado RabbitMQ preexistente |
+| Documentação         | ADR-001, roadmap, handoff e artefatos de tasks versionados em `.ai/`; Impeccable documentada em `.ai/docs/impeccable-codex.md` |
 
 ## Pendências técnicas não bloqueantes
 
-* Flyway 9.22.3 emite warning de suporte testado apenas até PostgreSQL 15, enquanto produção usa PostgreSQL 18.6. A V1 foi validada empiricamente em PostgreSQL 18.6 local e no Render; a validação contínua em PostgreSQL real no CI permanece recomendada.
+* Flyway 9.22.3 emite warning de suporte testado apenas até PostgreSQL 15, enquanto produção usa PostgreSQL 18.6. A V1 foi validada empiricamente em PostgreSQL 18.6 local e no Render; o job PostgreSQL 18.6 no CI foi executado com sucesso. Avaliar upgrade de Flyway separadamente.
 
 * rotas protegidas de Dashboard, Members, Teams, Events, Attendance e Users estão disponíveis; Settings permanece não persistente;
 * contratos frontend de Member/Team/Event/Attendance foram alinhados; update de Team agora aceita TeamRequestDTO e retorna TeamResponseDTO, preservando TenantService/RBAC;
@@ -443,3 +447,9 @@ O README descreve o produto e suas principais funcionalidades.
 
 * O rate limit de registro depende de memória local e da instância única atual. Escala horizontal exige store distribuído em task separada.
 * CORS de produção está configurado para `https://theliderum.vercel.app`, sem wildcard, e foi validado positiva e negativamente.
+
+## Estado corrente de execução
+
+- Não há task ativa após a conclusão de `safely-deactivate-and-reactivate-staff-users`.
+- Próxima candidata de produto no Ciclo 3: definir e implementar separadamente o fluxo explícito de escolha/reassociação de líder de Team, necessário para permitir o offboarding futuro de um líder sem conflito.
+- O erro RabbitMQ AMQP 406 permanece um bloqueador global conhecido de Release, mas sua investigação foi explicitamente adiada pelo usuário; não reabrir ou iniciar sem nova orientação.
