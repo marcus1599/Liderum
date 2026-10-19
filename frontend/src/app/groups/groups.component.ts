@@ -83,11 +83,15 @@ export class GroupsComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void { this.profileSubscription?.unsubscribe(); }
 
   canReassignLeader(): boolean {
+    return this.canManageDomain();
+  }
+
+  canManageDomain(): boolean {
     return ['MARECHAL', 'GENERAL', 'MAJOR'].includes(this.profile?.guildRole ?? '');
   }
 
   beginLeaderReassignment(group: Group): void {
-    if (!this.canReassignLeader() || this.saving || this.loading || !this.loaded) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
     this.reassigningTeam = group;
     this.selectedLeaderId = group.leaderId ?? null;
     this.leaderCandidates = [];
@@ -118,7 +122,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
   confirmLeaderReassignment(): void {
     const team = this.reassigningTeam;
     const leaderId = this.selectedLeaderId;
-    if (!team || !this.canReassignLeader() || leaderId == null || leaderId === team.leaderId || this.saving || this.leaderCandidatesLoading) return;
+    if (!team || !this.canManageDomain() || leaderId == null || leaderId === team.leaderId || this.saving || this.leaderCandidatesLoading) return;
     this.saving = true;
     this.errorMessage = '';
     this.statusMessage = '';
@@ -207,7 +211,7 @@ ngAfterViewInit() {
 
 
   openGroupForm(group?: Group) {
-    if (this.saving || this.loading || !this.loaded) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
     this.showGroupForm = true;
     if (group) {
       this.groupForm = { ...group };
@@ -219,7 +223,7 @@ ngAfterViewInit() {
   }
 
   saveGroup() {
-    if (this.saving || this.loading || !this.loaded || !this.groupForm.name?.trim()) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded || !this.groupForm.name?.trim()) return;
     this.saving = true;
     this.errorMessage = '';
     this.statusMessage = '';
@@ -250,12 +254,12 @@ ngAfterViewInit() {
   }
 
   deleteGroup(group: Group) {
-    if (this.saving || this.loading || !this.loaded) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
     this.mutate(this.groupService.deleteGroup(group.id), 'Grupo excluído.', 'excluir grupo');
   }
 
 dropToGroup(event: CdkDragDrop<Member[]>, group: Group) {
-  if (this.saving || this.loading || !this.loaded) return;
+  if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
   if (event.previousContainer === event.container) {
     return; // A API não persiste ordenação.
   } else {
@@ -267,7 +271,7 @@ dropToGroup(event: CdkDragDrop<Member[]>, group: Group) {
 }
 
   dropToAvailable(event: CdkDragDrop<Member[]>) {
-    if (this.saving || this.loading || !this.loaded) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
     if (event.previousContainer !== event.container) {
       const member = event.previousContainer.data[event.previousIndex];
       // Descobre de qual grupo veio
@@ -279,7 +283,7 @@ dropToGroup(event: CdkDragDrop<Member[]>, group: Group) {
   }
 
   removeMemberFromGroup(member: Member, group: Group) {
-    if (this.saving || this.loading || !this.loaded) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
     this.mutate(this.groupService.removeMemberFromGroup(group.id, member.id), 'Membro removido do grupo.', 'remover membro do grupo');
   }
 

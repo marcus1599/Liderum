@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MemberService } from '../services/member.service';
 import { EventService } from '../services/event.service';
@@ -15,6 +15,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin, Observable } from 'rxjs';
 import { httpFeedback } from '../shared/http-feedback';
+import { AuthService } from '../auth/auth.service';
+import { UserProfile } from '../auth/auth.models';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-attendence',
@@ -23,7 +26,7 @@ import { httpFeedback } from '../shared/http-feedback';
   templateUrl: './attendence.component.html',
   styleUrl: './attendence.component.scss'
 })
-export class AttendenceComponent implements OnInit {
+export class AttendenceComponent implements OnInit, OnDestroy {
   members: Member[] = [];
   events: Event[] = [];
   attendances: Attendance[] = [];
@@ -39,6 +42,8 @@ export class AttendenceComponent implements OnInit {
   statusMessage = '';
   stale = false;
   errorMessage = '';
+  profile: UserProfile | null = null;
+  private profileSubscription?: Subscription;
   private selectionRequest = 0;
   private alertRequest = 0;
 
@@ -46,11 +51,19 @@ export class AttendenceComponent implements OnInit {
     private memberService: MemberService,
     private eventService: EventService,
     private settingsService: SettingsService,
-    private attendanceService: AttendanceService
+    private attendanceService: AttendanceService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    this.profileSubscription = this.authService.profile$.subscribe(profile => this.profile = profile);
     this.loadData();
+  }
+
+  ngOnDestroy(): void { this.profileSubscription?.unsubscribe(); }
+
+  canManageDomain(): boolean {
+    return ['MARECHAL', 'GENERAL', 'MAJOR'].includes(this.profile?.guildRole ?? '');
   }
 
   loadData(afterMutation = false) {
@@ -126,7 +139,7 @@ export class AttendenceComponent implements OnInit {
   }
 
   markAttendance(memberId: number, status: AttendanceStatus, input?: HTMLInputElement) {
-    if (this.selectedEventId == null || !this.loaded || this.loading || this.saving) return;
+    if (!this.canManageDomain() || this.selectedEventId == null || !this.loaded || this.loading || this.saving) return;
     const eventId = this.selectedEventId;
     const existing = this.attendances.find(a => a.memberId === memberId && a.eventId === eventId);
     const confirmed = existing?.status ?? null;

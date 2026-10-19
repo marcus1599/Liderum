@@ -6,7 +6,7 @@
 <p *ngIf="stale && members.length > 0">Lista anterior: atualize antes de realizar outra ação.</p>
 <p *ngIf="loaded && !loading && members.length === 0">Nenhum membro cadastrado.</p>
 <p *ngIf="loaded && !loading && members.length > 0 && dataSource.filteredData.length === 0">Nenhum membro corresponde ao filtro.</p>
-<mat-card class="form-card">
+<mat-card class="form-card" *ngIf="canManageDomain()">
   <mat-card-header>
     <div class="card-title-row">
       <mat-icon class="card-icon">{{ isEditing ? 'edit' : 'person_add' }}</mat-icon>

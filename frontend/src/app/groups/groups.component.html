@@ -31,12 +31,12 @@
         
         <p *ngIf="loaded && availableMembers.length === 0">Nenhum membro disponível.</p>
         <p *ngIf="loaded && availableMembers.length > 0 && dataSource.filteredData.length === 0">Nenhum membro corresponde ao filtro.</p>
-        <div cdkDropList id="membersDropList" [hidden]="!loaded || loading" [cdkDropListData]="dataSource.filteredData" [cdkDropListDisabled]="saving || loading || !loaded"
+        <div cdkDropList id="membersDropList" [hidden]="!loaded || loading" [cdkDropListData]="dataSource.filteredData" [cdkDropListDisabled]="!canManageDomain() || saving || loading || !loaded"
           [cdkDropListConnectedTo]="groupDropListIds" class="members-list"
           (cdkDropListDropped)="dropToAvailable($event)">
           <div
             *ngFor="let member of dataSource.filteredData | slice:(paginator.pageIndex * paginator.pageSize):(paginator.pageIndex + 1) * paginator.pageSize"
-            cdkDrag class="member-item">
+            cdkDrag [cdkDragDisabled]="!canManageDomain()" class="member-item">
             <mat-icon>person</mat-icon> {{ member.nickname }}
             <img [src]="'assets/icons/classes/ClassIcon_' + member.classe + '.png'" [alt]="'Classe ' + member.classe"
               width="24" height="24" class="classe-icon">
@@ -56,11 +56,11 @@
       <div class="right-panel">
         <h3 class="groups-title">Grupos</h3>
         <div class="group-actions">
-          <button mat-raised-button color="primary" (click)="openGroupForm()" aria-label="Novo Grupo" [disabled]="saving || loading || !loaded">
+          <button *ngIf="canManageDomain()" mat-raised-button color="primary" (click)="openGroupForm()" aria-label="Novo Grupo" [disabled]="saving || loading || !loaded">
             <mat-icon>add</mat-icon> Novo Grupo
           </button>
         </div>
-        <div *ngIf="showGroupForm" class="group-form-panel">
+        <div *ngIf="showGroupForm && canManageDomain()" class="group-form-panel">
           <mat-card>
             <form (ngSubmit)="saveGroup()">
               <mat-form-field appearance="outline" class="full-width">
@@ -84,10 +84,10 @@
             <div class="group-header" fxLayout="row" fxLayoutAlign="space-between center">
               <span>{{ group.name }}</span>
               <span class="group-actions">
-                <button mat-icon-button class="button-edit" (click)="editGroup(group)" aria-label="Editar grupo" [disabled]="saving || loading">
+                <button *ngIf="canManageDomain()" mat-icon-button class="button-edit" (click)="editGroup(group)" aria-label="Editar grupo" [disabled]="saving || loading">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-icon-button class="button-remove" (click)="deleteGroup(group)" aria-label="Excluir grupo" [disabled]="saving || loading">
+                <button *ngIf="canManageDomain()" mat-icon-button class="button-remove" (click)="deleteGroup(group)" aria-label="Excluir grupo" [disabled]="saving || loading">
                   <mat-icon>delete</mat-icon>
                 </button>
               </span>
@@ -118,10 +118,10 @@
                 </ng-container>
               </div>
             </section>
-            <div cdkDropList [id]="'groupDropList-' + group.id" [cdkDropListData]="group.members" [cdkDropListDisabled]="saving || loading || !loaded"
+            <div cdkDropList [id]="'groupDropList-' + group.id" [cdkDropListData]="group.members" [cdkDropListDisabled]="!canManageDomain() || saving || loading || !loaded"
               [cdkDropListConnectedTo]="['membersDropList']" class="group-members-list"
               (cdkDropListDropped)="dropToGroup($event, group)">
-              <div *ngFor="let member of group.members" cdkDrag class="member-item">
+              <div *ngFor="let member of group.members" cdkDrag [cdkDragDisabled]="!canManageDomain()" class="member-item">
                 <mat-icon>person</mat-icon> {{ member.nickname }}
                 <img [src]="'assets/icons/classes/ClassIcon_' + member.classe + '.png'"
                   [alt]="'Classe ' + member.classe" width="24" height="24" class="classe-icon" />
@@ -132,7 +132,7 @@
                       [alt]="'Classe ' + member.classe" width="24" height="24" class="classe-icon" />
                   </div>
                 </ng-template>
-                <button mat-icon-button class="button-remove" (click)="removeMemberFromGroup(member, group)"
+                <button *ngIf="canManageDomain()" mat-icon-button class="button-remove" (click)="removeMemberFromGroup(member, group)"
                   matTooltip="Remover do grupo" aria-label="Remover do grupo" [disabled]="saving || loading">
                   <mat-icon>close</mat-icon>
                 </button>

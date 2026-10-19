@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, AfterViewInit } from '@angular/core';
 import { MemberService } from '../services/member.service';
 import { Member } from './member.model';
 
@@ -21,6 +21,9 @@ import { MatTableDataSource } from '@angular/material/table';
 import { HttpErrorResponse } from '@angular/common/http';
 import { httpFeedback } from '../shared/http-feedback';
 import { Observable } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
+import { UserProfile } from '../auth/auth.models';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-members',
@@ -43,7 +46,7 @@ import { Observable } from 'rxjs';
   ],
   styleUrls: ['./members.component.scss']
 })
-export class MembersComponent implements OnInit, AfterViewInit {
+export class MembersComponent implements OnInit, OnDestroy, AfterViewInit {
   members: Member[] = [];
   dataSource = new MatTableDataSource<Member>([]);
   displayedColumns: string[] = ['nickname', 'phone', 'guildRole', 'rank', 'classe', 'actions'];
@@ -67,6 +70,8 @@ export class MembersComponent implements OnInit, AfterViewInit {
   stale = false;
   errorMessage = '';
   statusMessage = '';
+  profile: UserProfile | null = null;
+  private profileSubscription?: Subscription;
 
   guildRoles: string[] = ['SOLDADO', 'CAPITÃO', 'MAJOR', 'GENERAL', 'MARECHAL'];
   ranks: string[] = ['C', 'B', 'A', 'S'];
@@ -75,10 +80,22 @@ export class MembersComponent implements OnInit, AfterViewInit {
     'BARBARO', 'FEITICEIRA', 'ANDARILHO', 'MERCENARIO', 'ESPIRITUALISTA', 'MISTICO', 'BARDO', 'ARCANO'
   ];
 
-  constructor(private memberService: MemberService) { }
+  constructor(private memberService: MemberService, private authService: AuthService) { }
 
   ngOnInit(): void {
+    this.profileSubscription = this.authService.profile$.subscribe(profile => {
+      this.profile = profile;
+      this.displayedColumns = this.canManageDomain()
+        ? ['nickname', 'phone', 'guildRole', 'rank', 'classe', 'actions']
+        : ['nickname', 'phone', 'guildRole', 'rank', 'classe'];
+    });
     this.loadMembers();
+  }
+
+  ngOnDestroy(): void { this.profileSubscription?.unsubscribe(); }
+
+  canManageDomain(): boolean {
+    return ['MARECHAL', 'GENERAL', 'MAJOR'].includes(this.profile?.guildRole ?? '');
   }
 
   loadMembers(afterMutation = false): void {
@@ -122,7 +139,7 @@ export class MembersComponent implements OnInit, AfterViewInit {
   }
 
   saveMember(): void {
-    if (this.saving || this.loading || !this.loaded) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
     this.saving = true;
     this.errorMessage = '';
     this.statusMessage = '';
@@ -145,12 +162,13 @@ export class MembersComponent implements OnInit, AfterViewInit {
   }
 
   editMember(member: Member): void {
+    if (!this.canManageDomain()) return;
     this.newMember = { ...member };
     this.isEditing = true;
   }
 
   deleteMember(id: number): void {
-    if (this.saving || this.loading || !this.loaded || !confirm('Tem certeza que deseja excluir este membro?')) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded || !confirm('Tem certeza que deseja excluir este membro?')) return;
     this.saving = true;
     this.errorMessage = '';
     this.statusMessage = '';

@@ -1,23 +1,57 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { HttpErrorResponse } from '@angular/common/http';
-import { of, Subject } from 'rxjs';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 import { EventsComponent } from './events.component';
 import { Event, EventService } from '../services/event.service';
+import { AuthService } from '../auth/auth.service';
+import { UserProfile } from '../auth/auth.models';
 
 describe('EventsComponent HTTP feedback', () => {
   let fixture: ComponentFixture<EventsComponent>;
   let component: EventsComponent;
   let service: jasmine.SpyObj<EventService>;
+  let profile$: BehaviorSubject<UserProfile | null>;
 
   beforeEach(async () => {
     service = jasmine.createSpyObj<EventService>('EventService', ['getEvents', 'createEvent', 'updateEvent', 'deleteEvent']);
     service.getEvents.and.returnValue(of([]));
+    profile$ = new BehaviorSubject<UserProfile | null>({ id: 1, username: 'admin', email: 'admin@example.test', guildRole: 'MARECHAL' });
     await TestBed.configureTestingModule({
-      imports: [EventsComponent], providers: [{ provide: EventService, useValue: service }]
+      imports: [EventsComponent], providers: [
+        { provide: EventService, useValue: service },
+        { provide: AuthService, useValue: { profile$: profile$.asObservable() } }
+      ]
     }).compileComponents();
     fixture = TestBed.createComponent(EventsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  it('keeps event reading and hides/blocks mutations for a read-only role', () => {
+    component.events = [{ id: 3, name: 'Raid', date: '2026-10-15T20:00:00' }];
+    component.loaded = true;
+    profile$.next({ id: 2, username: 'captain', email: 'captain@example.test', guildRole: 'CAPITÃO' });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Raid');
+    expect(fixture.nativeElement.textContent).not.toContain('Novo Evento');
+    expect(fixture.nativeElement.querySelector('[aria-label="Editar evento"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[aria-label="Excluir evento"]')).toBeNull();
+    component.saveEvent();
+    component.editEvent(component.events[0]);
+    component.deleteEvent(3);
+    expect(service.createEvent).not.toHaveBeenCalled();
+    expect(service.updateEvent).not.toHaveBeenCalled();
+    expect(service.deleteEvent).not.toHaveBeenCalled();
+  });
+
+  it('keeps domain administration for MARECHAL, GENERAL and MAJOR and hides it while profile is unresolved', () => {
+    profile$.next(null);
+    fixture.detectChanges();
+    expect(component.canManageDomain()).toBeFalse();
+    for (const guildRole of ['MARECHAL', 'GENERAL', 'MAJOR'] as const) {
+      profile$.next({ id: 1, username: 'admin', email: 'admin@example.test', guildRole });
+      expect(component.canManageDomain()).toBeTrue();
+    }
   });
 
   it('does not present an API failure as an empty list and retry clears it', () => {

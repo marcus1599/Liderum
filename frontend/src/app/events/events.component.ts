@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventService, Event } from '../services/event.service';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +9,9 @@ import { MatIcon } from '@angular/material/icon';
 import { HttpErrorResponse } from '@angular/common/http';
 import { httpFeedback } from '../shared/http-feedback';
 import { Observable } from 'rxjs';
+import { AuthService } from '../auth/auth.service';
+import { UserProfile } from '../auth/auth.models';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-events',
@@ -17,7 +20,7 @@ import { Observable } from 'rxjs';
   templateUrl: './events.component.html',
   styleUrls: ['./events.component.scss']
 })
-export class EventsComponent implements OnInit {
+export class EventsComponent implements OnInit, OnDestroy {
   events: Event[] = [];
   newEvent: Partial<Event> = { name: '', date: '', description: '' };
   isEditing: boolean = false;
@@ -28,11 +31,20 @@ export class EventsComponent implements OnInit {
   stale = false;
   errorMessage = '';
   statusMessage = '';
+  profile: UserProfile | null = null;
+  private profileSubscription?: Subscription;
 
-  constructor(private eventService: EventService) {}
+  constructor(private eventService: EventService, private authService: AuthService) {}
 
   ngOnInit() {
+    this.profileSubscription = this.authService.profile$.subscribe(profile => this.profile = profile);
     this.loadEvents();
+  }
+
+  ngOnDestroy(): void { this.profileSubscription?.unsubscribe(); }
+
+  canManageDomain(): boolean {
+    return ['MARECHAL', 'GENERAL', 'MAJOR'].includes(this.profile?.guildRole ?? '');
   }
 
   loadEvents(afterMutation = false) {
@@ -55,7 +67,7 @@ export class EventsComponent implements OnInit {
   }
 
   saveEvent() {
-    if (this.saving || this.loading || !this.loaded) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
     this.saving = true;
     this.errorMessage = '';
     this.statusMessage = '';
@@ -84,13 +96,14 @@ export class EventsComponent implements OnInit {
   }
 
   editEvent(event: Event) {
+    if (!this.canManageDomain()) return;
     this.newEvent = { ...event };
     this.isEditing = true;
     this.editingEventId = event.id;
   }
 
   deleteEvent(id: number) {
-    if (this.saving || this.loading || !this.loaded || !confirm('Tem certeza que deseja excluir este evento?')) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded || !confirm('Tem certeza que deseja excluir este evento?')) return;
     this.saving = true;
     this.errorMessage = '';
     this.statusMessage = '';

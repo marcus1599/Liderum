@@ -5,7 +5,7 @@
 <p *ngIf="saving" role="status">Salvando alteração...</p>
 <p *ngIf="stale && events.length > 0">Lista anterior: atualize antes de realizar outra ação.</p>
 <p *ngIf="loaded && !loading && events.length === 0">Nenhum evento cadastrado.</p>
-<mat-card>
+<mat-card *ngIf="canManageDomain()">
   <mat-card-title>{{ isEditing ? 'Editar Evento' : 'Novo Evento' }}</mat-card-title>
   <mat-card-content>
     <form (ngSubmit)="saveEvent()" class="event-form">
@@ -50,7 +50,7 @@
           <mat-icon>description</mat-icon>
           <span>{{ event.description }}</span>
         </div>
-        <div class="event-actions">
+        <div class="event-actions" *ngIf="canManageDomain()">
           <button mat-icon-button color="primary" (click)="editEvent(event)" matTooltip="Editar" aria-label="Editar evento" [disabled]="saving || stale">
             <mat-icon>edit</mat-icon>
           </button>

@@ -2,7 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { GroupsComponent } from './groups.component';
 import { GroupService } from '../services/group.service';
-import { of, Subject } from 'rxjs';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Group, TeamLeaderCandidate } from '../services/group.service';
 import { Member } from '../members/member.model';
@@ -13,6 +13,7 @@ describe('GroupsComponent', () => {
   let component: GroupsComponent;
   let fixture: ComponentFixture<GroupsComponent>;
   let service: jasmine.SpyObj<GroupService>;
+  let profile$: BehaviorSubject<any>;
 
   beforeEach(async () => {
     service = jasmine.createSpyObj<GroupService>('GroupService',
@@ -20,11 +21,12 @@ describe('GroupsComponent', () => {
     service.getGroups.and.returnValue(of([]));
     service.getMembers.and.returnValue(of([]));
     service.getLeaderCandidates.and.returnValue(of([]));
+    profile$ = new BehaviorSubject({ id: 1, username: 'admin', email: 'admin@example.test', guildRole: 'MARECHAL' });
     await TestBed.configureTestingModule({
       imports: [GroupsComponent],
       providers: [
         { provide: GroupService, useValue: service },
-        { provide: AuthService, useValue: { profile$: of({ id: 1, username: 'admin', email: 'admin@example.test', guildRole: 'MARECHAL' }) } }
+        { provide: AuthService, useValue: { profile$: profile$.asObservable() } }
       ]
     })
     .compileComponents();
@@ -148,11 +150,31 @@ describe('GroupsComponent', () => {
   });
 
   it('does not expose reassignment controls to non-admin roles', () => {
-    component.profile = { id: 3, username: 'soldier', email: 'soldier@example.test', guildRole: 'SOLDADO' };
+    const group: Group = { id: 8, name: 'Raid', members: [] };
+    component.groups = [group];
+    profile$.next({ id: 3, username: 'soldier', email: 'soldier@example.test', guildRole: 'SOLDADO' });
     fixture.detectChanges();
     expect(component.canReassignLeader()).toBeFalse();
+    expect(fixture.nativeElement.textContent).toContain('Raid');
+    expect(fixture.nativeElement.textContent).not.toContain('Novo Grupo');
+    expect(fixture.nativeElement.querySelector('[aria-label="Editar grupo"]')).toBeNull();
+    expect(fixture.nativeElement.querySelector('[aria-label="Excluir grupo"]')).toBeNull();
     component.beginLeaderReassignment({ id: 8, name: 'Raid', members: [] });
     expect(service.getLeaderCandidates).not.toHaveBeenCalled();
+    component.groupForm.name = 'Blocked';
+    component.saveGroup();
+    component.deleteGroup({ id: 8, name: 'Raid', members: [] });
+    expect(service.createGroup).not.toHaveBeenCalled();
+    expect(service.deleteGroup).not.toHaveBeenCalled();
+  });
+
+  it('keeps domain administration available to MARECHAL, GENERAL and MAJOR', () => {
+    profile$.next(null);
+    expect(component.canManageDomain()).toBeFalse();
+    for (const guildRole of ['MARECHAL', 'GENERAL', 'MAJOR'] as const) {
+      profile$.next({ id: 1, username: 'admin', email: 'admin@example.test', guildRole });
+      expect(component.canManageDomain()).toBeTrue();
+    }
   });
 
   it('does not present a failed candidate request as an empty list', () => {

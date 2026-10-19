@@ -4,11 +4,13 @@ import { AttendenceComponent } from './attendence.component';
 import { MemberService } from '../services/member.service';
 import { EventService } from '../services/event.service';
 import { AttendanceService } from '../services/attendance.service';
-import { of, Subject } from 'rxjs';
+import { BehaviorSubject, of, Subject } from 'rxjs';
 import { Member } from '../members/member.model';
 import { Event } from '../services/event.service';
 import { Attendance } from '../services/attendance.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { AuthService } from '../auth/auth.service';
+import { UserProfile } from '../auth/auth.models';
 
 describe('AttendenceComponent', () => {
   let component: AttendenceComponent;
@@ -16,6 +18,7 @@ describe('AttendenceComponent', () => {
   let members: jasmine.SpyObj<MemberService>;
   let events: jasmine.SpyObj<EventService>;
   let attendance: jasmine.SpyObj<AttendanceService>;
+  let profile$: BehaviorSubject<UserProfile | null>;
   const hero = { id: 1, nickname: 'Hero' } as Member;
   const eventOne: Event = { id: 1, name: 'Raid', date: '2026-10-15T20:00:00' };
   const eventTwo: Event = { id: 2, name: 'Quest', date: '2026-10-16T20:00:00' };
@@ -29,12 +32,14 @@ describe('AttendenceComponent', () => {
     events.getEvents.and.returnValue(of([eventOne, eventTwo]));
     attendance.getAttendances.and.returnValue(of([]));
     attendance.getMembersWithConsecutiveAbsences.and.returnValue(of([]));
+    profile$ = new BehaviorSubject<UserProfile | null>({ id: 1, username: 'admin', email: 'admin@example.test', guildRole: 'MARECHAL' });
     await TestBed.configureTestingModule({
       imports: [AttendenceComponent],
       providers: [
         { provide: MemberService, useValue: members },
         { provide: EventService, useValue: events },
-        { provide: AttendanceService, useValue: attendance }
+        { provide: AttendanceService, useValue: attendance },
+        { provide: AuthService, useValue: { profile$: profile$.asObservable() } }
       ]
     })
     .compileComponents();
@@ -42,6 +47,30 @@ describe('AttendenceComponent', () => {
     fixture = TestBed.createComponent(AttendenceComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
+  });
+
+  it('shows confirmed attendance read-only and blocks mutations for a low role', () => {
+    component.selectedEventId = 1;
+    component.loaded = true;
+    component.attendancesLoaded = true;
+    component.attendances = [{ id: 3, memberId: 1, eventId: 1, status: 'PRESENTE' }];
+    profile$.next({ id: 2, username: 'soldier', email: 'soldier@example.test', guildRole: 'SOLDADO' });
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelectorAll('input[type="radio"]').length).toBe(0);
+    expect(fixture.nativeElement.textContent).toContain('PRESENTE');
+    component.markAttendance(1, 'FALTOU');
+    expect(attendance.updateAttendance).not.toHaveBeenCalled();
+    expect(attendance.createAttendance).not.toHaveBeenCalled();
+  });
+
+  it('allows attendance administration only after resolving an authorized profile', () => {
+    profile$.next(null);
+    expect(component.canManageDomain()).toBeFalse();
+    for (const guildRole of ['MARECHAL', 'GENERAL', 'MAJOR'] as const) {
+      profile$.next({ id: 1, username: 'admin', email: 'admin@example.test', guildRole });
+      expect(component.canManageDomain()).toBeTrue();
+    }
   });
 
   it('should create', () => {
