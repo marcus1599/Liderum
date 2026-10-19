@@ -4,18 +4,18 @@
 
 ## Estado atual
 
-As seis fases do roadmap original estão concluídas. No Ciclo 3, `reassign-team-leader-before-staff-deactivation` foi concluída com Task Verdict APROVADO. Backend `clean verify`: 92 testes; Angular: 79/79 e build passaram. Release global permanece BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente na fila de notificações, cuja investigação foi adiada pelo usuário.
+As seis fases do roadmap original estão concluídas. No Ciclo 3, `align-domain-action-visibility-with-rbac` foi concluída com Task Verdict APROVADO; Angular 86/86 e build passaram. Mutação visual de domínio agora acompanha MARECHAL/GENERAL/MAJOR e mantém leitura para CAPITÃO/SOLDADO. Release global permanece BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente na fila de notificações, cuja investigação foi adiada pelo usuário.
 
 ## Última task concluída
 
-- Nome: `reassign-team-leader-before-staff-deactivation`
-- Resultado: QA, Security e Auditor aprovados; API e UI transferem explicitamente liderança para User ACTIVE da mesma Guild, com lista reduzida de candidatos, RBAC, locks e proteção contra corrida com desativação. Backend: 92 testes; frontend: 79/79 e build SUCCESS. Task Verdict APROVADO; Release Verdict BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente e adiado.
+- Nome: `align-domain-action-visibility-with-rbac`
+- Resultado: QA, Security e Auditor aprovados; Members, Teams, Events e Attendance refletem a matriz RBAC existente na UI e protegem handlers locais. Backend não alterado; Angular 86/86 e build SUCCESS. Task Verdict APROVADO; Release Verdict BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente e adiado.
 - Data: 2026-10-19
-- Referência: [[tasks/completed/reassign-team-leader-before-staff-deactivation/audit.md]]
+- Referência: [[tasks/completed/align-domain-action-visibility-with-rbac/audit.md]]
 
 ## Task ativa
 
-- Nenhuma task ativa no momento. A task `reassign-team-leader-before-staff-deactivation` foi implementada, testada, aprovada pelos gates e movida para concluídas.
+- Nenhuma task ativa no momento. `align-domain-action-visibility-with-rbac` foi encerrada após aprovação dos gates e movida para concluídas.
 - Skills `ux-review` e Impeccable disponíveis para tarefas de interface no Ciclo 3; Impeccable é de uso manual no Codex, sem hooks automáticos.
 
 ## Validações recentes
@@ -40,7 +40,7 @@ As seis fases do roadmap original estão concluídas. No Ciclo 3, `reassign-team
 
 ## Próximo passo recomendado
 
-Nenhuma task ativa. Próximo passo: reavaliar e priorizar o backlog do Ciclo 3 com base no roadmap após a entrega do fluxo de reassociação; não iniciar automaticamente uma task nova. O erro RabbitMQ AMQP 406 continua bloqueando Release e foi adiado pelo usuário. As seis fases originais e Ciclos 1/2 permanecem concluídos; Ciclo 3 continua em andamento.
+Reavaliar e priorizar as lacunas restantes do Ciclo 3 antes de criar outra task. O erro RabbitMQ AMQP 406 continua bloqueando Release e foi adiado pelo usuário; não iniciar investigação sem nova orientação. As seis fases originais e Ciclos 1/2 permanecem concluídos; Ciclo 3 continua em andamento.
 
 ## Contexto relevante
 

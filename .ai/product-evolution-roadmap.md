@@ -80,11 +80,11 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 ### NOW
 
-- `reassign-team-leader-before-staff-deactivation` concluída em 2026-10-19; fluxo de escolha/alteração do líder agora está implementado e testado. Não há task ativa; reavaliar as demais lacunas do Ciclo 3 para definir a próxima.
+- `align-domain-action-visibility-with-rbac` concluída em 2026-10-19: as ações visuais de Members, Teams, Events e Attendance acompanham as permissões existentes, preservando consulta para roles de leitura. QA, Security e Auditor aprovados; Angular 86/86 e build SUCCESS. Reavaliar as lacunas restantes do Ciclo 3 para escolher a próxima task.
 
 ### NEXT
 
-- reavaliar lacunas operacionais restantes e priorizar task do Ciclo 3;
+- reavaliar lacunas operacionais restantes e priorizar a próxima entrega do Ciclo 3;
 
 ### LATER
 
