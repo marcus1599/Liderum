@@ -60,6 +60,31 @@
             <mat-icon>add</mat-icon> Novo Grupo
           </button>
         </div>
+        <section *ngIf="canManageDomain()" class="team-assignment" aria-labelledby="team-assignment-title">
+          <h4 id="team-assignment-title">Adicionar membro a um grupo</h4>
+          <div class="team-assignment-controls">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Membro disponível</mat-label>
+              <mat-select [(value)]="selectedAssignmentMemberId" [disabled]="!loaded || loading || saving || stale">
+                <mat-option *ngFor="let member of availableMembers" [value]="member.id">
+                  {{ member.nickname }} · {{ member.classe }}
+                </mat-option>
+              </mat-select>
+              <mat-hint *ngIf="loaded && availableMembers.length === 0">Não há membros disponíveis.</mat-hint>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Grupo de destino</mat-label>
+              <mat-select [(value)]="selectedAssignmentGroupId" [disabled]="!loaded || loading || saving || stale">
+                <mat-option *ngFor="let group of groups" [value]="group.id">{{ group.name }}</mat-option>
+              </mat-select>
+              <mat-hint *ngIf="loaded && groups.length === 0">Cadastre um grupo antes de atribuir membros.</mat-hint>
+            </mat-form-field>
+            <button mat-raised-button color="primary" type="button" (click)="addSelectedMemberToGroup()"
+              [disabled]="!canAssignSelectedMember()">
+              Adicionar ao grupo
+            </button>
+          </div>
+        </section>
         <div *ngIf="showGroupForm && canManageDomain()" class="group-form-panel">
           <mat-card>
             <form (ngSubmit)="saveGroup()">

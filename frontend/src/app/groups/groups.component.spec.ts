@@ -177,6 +177,117 @@ describe('GroupsComponent', () => {
     }
   });
 
+  it('provides keyboard-operable member assignment controls to domain administrators', () => {
+    const member = { id: 3, nickname: 'Hero', classe: 'MAGO' } as Member;
+    component.availableMembers = [member];
+    component.groups = [{ id: 5, name: 'Raid', members: [] }];
+    component.loaded = true;
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.textContent).toContain('Adicionar membro a um grupo');
+    const memberLabel = Array.from(fixture.nativeElement.querySelectorAll('mat-label'))
+      .find((label: any) => label.textContent.includes('Membro disponível'));
+    expect(memberLabel).toBeTruthy();
+    const addButton = Array.from(fixture.nativeElement.querySelectorAll('button'))
+      .find((button: any) => button.textContent.includes('Adicionar ao grupo')) as HTMLButtonElement;
+    expect(addButton).toBeTruthy();
+    expect(addButton.disabled).toBeTrue();
+  });
+
+  it('does not expose member assignment controls to read-only roles or an unloaded profile', () => {
+    component.availableMembers = [{ id: 3, nickname: 'Hero', classe: 'MAGO' } as Member];
+    component.groups = [{ id: 5, name: 'Raid', members: [] }];
+    component.loaded = true;
+    profile$.next(null);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('Adicionar membro a um grupo');
+
+    profile$.next({ id: 4, username: 'soldier', email: 'soldier@example.test', guildRole: 'SOLDADO' });
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('Adicionar membro a um grupo');
+    component.selectedAssignmentMemberId = 3;
+    component.selectedAssignmentGroupId = 5;
+    component.addSelectedMemberToGroup();
+    expect(service.addMemberToGroup).not.toHaveBeenCalled();
+  });
+
+  it('blocks incomplete, stale, already-assigned and pending member assignment', () => {
+    const member = { id: 3, nickname: 'Hero', classe: 'MAGO' } as Member;
+    component.availableMembers = [member];
+    component.groups = [{ id: 5, name: 'Raid', members: [] }];
+    component.loaded = true;
+    component.selectedAssignmentMemberId = 3;
+    expect(component.canAssignSelectedMember()).toBeFalse();
+    component.selectedAssignmentGroupId = 5;
+    expect(component.canAssignSelectedMember()).toBeTrue();
+
+    component.stale = true;
+    expect(component.canAssignSelectedMember()).toBeFalse();
+    component.stale = false;
+    component.groups[0].members = [member];
+    expect(component.canAssignSelectedMember()).toBeFalse();
+    component.groups[0].members = [];
+    component.saving = true;
+    expect(component.canAssignSelectedMember()).toBeFalse();
+  });
+
+  it('adds a selected member once, clears selection after confirmation and reloads', () => {
+    const member = { id: 3, nickname: 'Hero', classe: 'MAGO' } as Member;
+    component.availableMembers = [member];
+    component.groups = [{ id: 5, name: 'Raid', members: [] }];
+    component.loaded = true;
+    component.selectedAssignmentMemberId = 3;
+    component.selectedAssignmentGroupId = 5;
+    service.addMemberToGroup.and.returnValue(new Subject<void>());
+
+    component.addSelectedMemberToGroup();
+    component.addSelectedMemberToGroup();
+    expect(service.addMemberToGroup).toHaveBeenCalledOnceWith(5, 3);
+    (service.addMemberToGroup.calls.mostRecent().returnValue as Subject<void>).next();
+
+    expect(component.statusMessage).toBe('Membro adicionado ao grupo.');
+    expect(component.selectedAssignmentMemberId).toBeNull();
+    expect(component.selectedAssignmentGroupId).toBeNull();
+    expect(service.getGroups).toHaveBeenCalledTimes(2);
+  });
+
+  it('preserves the assignment selection after a failed request', () => {
+    component.availableMembers = [{ id: 3, nickname: 'Hero', classe: 'MAGO' } as Member];
+    component.groups = [{ id: 5, name: 'Raid', members: [] }];
+    component.loaded = true;
+    component.selectedAssignmentMemberId = 3;
+    component.selectedAssignmentGroupId = 5;
+    service.addMemberToGroup.and.returnValue(new Subject<void>());
+
+    component.addSelectedMemberToGroup();
+    (service.addMemberToGroup.calls.mostRecent().returnValue as Subject<void>)
+      .error(new HttpErrorResponse({ status: 409 }));
+
+    expect(component.selectedAssignmentMemberId).toBe(3);
+    expect(component.selectedAssignmentGroupId).toBe(5);
+    expect(component.statusMessage).toBe('');
+    expect(component.errorMessage).toContain('conflito');
+  });
+
+  it('clears selection after confirmed assignment even if the follow-up reload fails', () => {
+    component.availableMembers = [{ id: 3, nickname: 'Hero', classe: 'MAGO' } as Member];
+    component.groups = [{ id: 5, name: 'Raid', members: [] }];
+    component.loaded = true;
+    component.selectedAssignmentMemberId = 3;
+    component.selectedAssignmentGroupId = 5;
+    service.addMemberToGroup.and.returnValue(of(void 0));
+    service.getGroups.and.returnValue(new Subject<Group[]>());
+
+    component.addSelectedMemberToGroup();
+    (service.getGroups.calls.mostRecent().returnValue as Subject<Group[]>)
+      .error(new HttpErrorResponse({ status: 500 }));
+
+    expect(component.selectedAssignmentMemberId).toBeNull();
+    expect(component.selectedAssignmentGroupId).toBeNull();
+    expect(component.statusMessage).toBe('Membro adicionado ao grupo.');
+    expect(component.errorMessage).toContain('Operação concluída');
+  });
+
   it('does not present a failed candidate request as an empty list', () => {
     const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Current', members: [] };
     component.groups = [group];

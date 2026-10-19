@@ -71,6 +71,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
   leaderCandidatesLoaded = false;
   selectedLeaderId: number | null = null;
   reassigningTeam: Group | null = null;
+  selectedAssignmentMemberId: number | null = null;
+  selectedAssignmentGroupId: number | null = null;
   private profileSubscription?: Subscription;
 
   constructor(private groupService: GroupService, private authService: AuthService) {}
@@ -149,6 +151,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
       const groupMemberIds = this.groups.flatMap(g => g.members.map(m => m.id));
       this.availableMembers = members.filter(m => !groupMemberIds.includes(m.id));
       this.filterMembers();
+      this.reconcileAssignmentSelection();
       this.loaded = true;
       this.loading = false;
       this.stale = false;
@@ -287,12 +290,47 @@ dropToGroup(event: CdkDragDrop<Member[]>, group: Group) {
     this.mutate(this.groupService.removeMemberFromGroup(group.id, member.id), 'Membro removido do grupo.', 'remover membro do grupo');
   }
 
-  private mutate(operation: Observable<unknown>, success: string, action: string): void {
+  canAssignSelectedMember(): boolean {
+    const memberId = this.selectedAssignmentMemberId;
+    const groupId = this.selectedAssignmentGroupId;
+    return this.canManageDomain() && this.loaded && !this.loading && !this.saving && !this.stale &&
+      memberId != null && groupId != null &&
+      this.availableMembers.some(member => member.id === memberId) &&
+      this.groups.some(group => group.id === groupId && !group.members.some(member => member.id === memberId));
+  }
+
+  private reconcileAssignmentSelection(): void {
+    if (this.selectedAssignmentMemberId != null &&
+        !this.availableMembers.some(member => member.id === this.selectedAssignmentMemberId)) {
+      this.selectedAssignmentMemberId = null;
+    }
+    if (this.selectedAssignmentGroupId != null &&
+        !this.groups.some(group => group.id === this.selectedAssignmentGroupId)) {
+      this.selectedAssignmentGroupId = null;
+    }
+  }
+
+  addSelectedMemberToGroup(): void {
+    if (!this.canAssignSelectedMember()) return;
+    const memberId = this.selectedAssignmentMemberId!;
+    const groupId = this.selectedAssignmentGroupId!;
+    this.mutate(
+      this.groupService.addMemberToGroup(groupId, memberId),
+      'Membro adicionado ao grupo.',
+      'adicionar membro ao grupo',
+      () => {
+        this.selectedAssignmentMemberId = null;
+        this.selectedAssignmentGroupId = null;
+      }
+    );
+  }
+
+  private mutate(operation: Observable<unknown>, success: string, action: string, onSuccess?: () => void): void {
     this.saving = true;
     this.errorMessage = '';
     this.statusMessage = '';
     operation.subscribe({
-      next: () => { this.saving = false; this.statusMessage = success; this.loadGroups(true); },
+      next: () => { this.saving = false; this.statusMessage = success; onSuccess?.(); this.loadGroups(true); },
       error: (error: HttpErrorResponse) => { this.saving = false; this.errorMessage = httpFeedback(error, action); }
     });
   }

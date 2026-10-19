@@ -134,6 +134,25 @@
   flex-wrap: wrap;
 }
 
+.team-assignment {
+  margin: 8px 0 20px;
+  padding: 12px;
+  border-radius: 8px;
+  background: #2a2b3162;
+
+  h4 { margin: 0 0 12px; color: #e8e6f0; }
+}
+
+.team-assignment-controls {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  mat-form-field { flex: 1 1 200px; min-width: 0; }
+  button { min-height: 48px; }
+}
+
 /* Grid de grupos: 3 colunas em desktop */
 .groups-list {
   display: grid;
