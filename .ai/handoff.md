@@ -4,18 +4,18 @@
 
 ## Estado atual
 
-As seis fases do roadmap original estão concluídas. No Ciclo 3, `align-domain-action-visibility-with-rbac` foi concluída com Task Verdict APROVADO; Angular 86/86 e build passaram. Mutação visual de domínio agora acompanha MARECHAL/GENERAL/MAJOR e mantém leitura para CAPITÃO/SOLDADO. Release global permanece BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente na fila de notificações, cuja investigação foi adiada pelo usuário.
+As seis fases do roadmap original estão concluídas. No Ciclo 3, `enable-accessible-team-member-assignment` foi concluída com Task Verdict APROVADO; Angular 92/92 em duas execuções e build passaram. `/teams` agora permite atribuir Members por controles operáveis sem drag-and-drop. A inspeção visual autenticada desktop/viewport estreito segue pendente. Release global permanece BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente, cuja investigação foi adiada pelo usuário.
 
 ## Última task concluída
 
-- Nome: `align-domain-action-visibility-with-rbac`
-- Resultado: QA, Security e Auditor aprovados; Members, Teams, Events e Attendance refletem a matriz RBAC existente na UI e protegem handlers locais. Backend não alterado; Angular 86/86 e build SUCCESS. Task Verdict APROVADO; Release Verdict BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente e adiado.
+- Nome: `enable-accessible-team-member-assignment`
+- Resultado: QA, Security e Auditor aprovados; atribuição por seleção e botão adicionada, preservando drag-and-drop e endpoint existente. Angular 92/92 em duas execuções e build SUCCESS. Task Verdict APROVADO; Release Verdict BLOQUEADO pelo RabbitMQ AMQP 406 preexistente e adiado. Inspeção visual autenticada desktop/viewport estreito não realizada.
 - Data: 2026-10-19
-- Referência: [[tasks/completed/align-domain-action-visibility-with-rbac/audit.md]]
+- Referência: [[tasks/completed/enable-accessible-team-member-assignment/audit.md]]
 
 ## Task ativa
 
-- Nenhuma task ativa no momento. `align-domain-action-visibility-with-rbac` foi encerrada após aprovação dos gates e movida para concluídas.
+- Nenhuma task ativa no momento. `enable-accessible-team-member-assignment` foi encerrada após aprovação dos gates e movida para concluídas.
 - Skills `ux-review` e Impeccable disponíveis para tarefas de interface no Ciclo 3; Impeccable é de uso manual no Codex, sem hooks automáticos.
 
 ## Validações recentes
@@ -40,7 +40,7 @@ As seis fases do roadmap original estão concluídas. No Ciclo 3, `align-domain-
 
 ## Próximo passo recomendado
 
-Reavaliar e priorizar as lacunas restantes do Ciclo 3 antes de criar outra task. O erro RabbitMQ AMQP 406 continua bloqueando Release e foi adiado pelo usuário; não iniciar investigação sem nova orientação. As seis fases originais e Ciclos 1/2 permanecem concluídos; Ciclo 3 continua em andamento.
+Reavaliar as lacunas restantes do Ciclo 3, incluindo a inspeção visual autenticada desktop/viewport estreito ainda pendente. O erro RabbitMQ AMQP 406 continua bloqueando Release e foi adiado pelo usuário; não iniciar investigação sem nova orientação. As seis fases originais e Ciclos 1/2 permanecem concluídos; Ciclo 3 continua em andamento.
 
 ## Contexto relevante
 

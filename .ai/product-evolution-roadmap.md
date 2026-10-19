@@ -65,6 +65,8 @@ Task concluída: `safely-deactivate-and-reactivate-staff-users` (2026-10-17). De
 
 Task concluída: `reassign-team-leader-before-staff-deactivation` (2026-10-19). A liderança de Team pode ser transferida explicitamente para User ACTIVE da mesma Guild por MARECHAL, GENERAL ou MAJOR, com candidatos mínimos, UX de confirmação e validação tenant-scoped. QA, Security e Auditor aprovaram; suíte backend (92), Angular (79/79) e build passaram. O Ciclo 3 permanece em andamento; a próxima prioridade deve ser reavaliada sem reabrir tarefas concluídas.
 
+Task concluída: `enable-accessible-team-member-assignment` (2026-10-19). A composição de Teams tem alternativa por teclado/toque para adicionar Members, além do drag-and-drop, sem mudança de API/RBAC/backend. QA, Security e Auditor aprovaram; Angular 92/92 em duas execuções e build SUCCESS. A inspeção visual autenticada desktop/viewport estreito segue sem evidência. Ciclo 3 permanece em andamento enquanto as lacunas restantes são reavaliadas.
+
 ## Ciclo 4 — Decisão de produto para notificações (LATER)
 
 O RabbitMQ e o notification-service continuam como demonstração técnica confiável (**opção A**) enquanto não houver requisito real de comunicação por Guild. O evento atual não carrega contexto tenant suficiente e o webhook é global.
@@ -80,11 +82,12 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 ### NOW
 
-- `align-domain-action-visibility-with-rbac` concluída em 2026-10-19: as ações visuais de Members, Teams, Events e Attendance acompanham as permissões existentes, preservando consulta para roles de leitura. QA, Security e Auditor aprovados; Angular 86/86 e build SUCCESS. Reavaliar as lacunas restantes do Ciclo 3 para escolher a próxima task.
+- `align-domain-action-visibility-with-rbac` concluída em 2026-10-19: as ações visuais de Members, Teams, Events e Attendance acompanham as permissões existentes, preservando consulta para roles de leitura. QA, Security e Auditor aprovados; Angular 86/86 e build SUCCESS.
+- `enable-accessible-team-member-assignment` concluída em 2026-10-19: Members disponíveis podem ser atribuídos a Teams também por seletores acessíveis e botão, preservando o drag-and-drop. QA/Security/Auditor aprovados; Angular 92/92 em duas execuções e build SUCCESS. Inspeção visual autenticada permanece como limitação registrada.
 
 ### NEXT
 
-- reavaliar lacunas operacionais restantes e priorizar a próxima entrega do Ciclo 3;
+- reavaliar lacunas operacionais restantes do Ciclo 3, incluindo a validação visual autenticada ainda pendente;
 
 ### LATER
 

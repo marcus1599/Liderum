@@ -26,6 +26,8 @@
 
 - Task `align-domain-action-visibility-with-rbac` concluída com QA, Security e Auditor aprovados. Members, Teams, Events e Attendance exibem mutações apenas a MARECHAL/GENERAL/MAJOR; perfis CAPITÃO/SOLDADO mantêm leitura permitida. Role vem de `/users/me`; backend/RBAC não foram alterados. Angular: 86/86 testes e production build SUCCESS. Task Verdict APROVADO; Release Verdict permanece BLOQUEADO pelo achado RabbitMQ AMQP 406 preexistente e adiado. Evidências: `tasks/completed/align-domain-action-visibility-with-rbac/audit.md`.
 
+- Task `enable-accessible-team-member-assignment` concluída com QA, Security e Auditor aprovados. `/teams` permite associar Member disponível a Team por teclado/toque além de drag-and-drop; sem mudança de API ou backend. Angular: 92/92 em duas execuções consecutivas e production build SUCCESS. Não houve inspeção visual autenticada desktop/viewport estreito. Release Verdict permanece BLOQUEADO pelo achado RabbitMQ AMQP 406 preexistente e adiado. Evidências: `tasks/completed/enable-accessible-team-member-assignment/audit.md`.
+
 - Task `add-authenticated-password-change` concluída em 2026-10-15 com QA, Security, SRE/DevOps e Task Verdict APROVADOS. Backend `clean verify`: 81 testes; PostgreSQL 18.6 fresh/upgrade: 3/3; frontend: 70/70 e build SUCCESS. V4 aditiva preserva Users e defaults de credential version; Hibernate `validate` e contextos `prod` passaram. Implementação e testes versionados em `63fb032`. O Release Verdict daquela auditoria ficou BLOQUEADO até rollout coordenado, realizado posteriormente na task operacional acima; durante a execução da task de implementação não houve deploy ou push. A inspeção visual autenticada desktop/handset não foi manual. ADR-002 recomendado, não criado sem autorização explícita; ADR-001 intacto. Referência: `tasks/completed/add-authenticated-password-change/audit.md`.
 
 - Task `standardize-domain-http-feedback-states` concluída em 2026-10-13 com QA, Task Security e Task Verdict APROVADOS; Release Verdict APROVADO. Members, Teams, Events e Attendance distinguem loading, vazio real, erro e confirmação de mutações; 65/65 testes Angular e build de produção passaram (exit 0). Não houve sessão manual autenticada em desktop/handset. Possível exposição de detalhes nos handlers backend e RBAC visual de domínio incompleto permanecem achados preexistentes a avaliar separadamente. Versionada em `2e60125` e `c74e528`, com push confirmado pelo usuário e Git sincronizado na abertura do planejamento seguinte.
@@ -436,7 +438,7 @@ O README descreve o produto e suas principais funcionalidades.
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
 | Testes Backend       | Último `clean verify` da task de reassociação de líder: 92 testes, 0 failures/errors/skipped, BUILD SUCCESS; validações PostgreSQL anteriores permanecem documentadas nas respectivas tasks |
-| Testes Frontend      | Última suíte completa: 79/79, exit code 0; build Angular SUCCESS. Warnings Sass/CSS/baseline-browser-mapping permanecem não bloqueantes. |
+| Testes Frontend      | Última suíte completa: 92/92, exit code 0 em duas execuções consecutivas; build Angular SUCCESS. Warnings Sass/CSS/baseline-browser-mapping permanecem não bloqueantes. |
 | Security Review      | Task Security Verdict da reassociação de líder APROVADO; Release Verdict global BLOQUEADO pelo achado RabbitMQ preexistente |
 | Documentação         | ADR-001, roadmap, handoff e artefatos de tasks versionados em `.ai/`; Impeccable documentada em `.ai/docs/impeccable-codex.md` |
 
@@ -454,5 +456,5 @@ O README descreve o produto e suas principais funcionalidades.
 
 ## Estado corrente de execução
 
-- Nenhuma task ativa. `align-domain-action-visibility-with-rbac` foi implementada, testada, aprovada pelos gates e movida para concluídas. A reassociação explícita de líder continua disponível para que, após transferir todas as Teams, o administrador use o fluxo existente de desativação de Staff.
+- Nenhuma task ativa. `enable-accessible-team-member-assignment` foi implementada, testada, aprovada pelos gates e movida para concluídas. A reassociação explícita de líder continua disponível para que, após transferir todas as Teams, o administrador use o fluxo existente de desativação de Staff.
 - O erro RabbitMQ AMQP 406 permanece um bloqueador global conhecido de Release, mas sua investigação foi explicitamente adiada pelo usuário; não reabrir ou iniciar sem nova orientação.
