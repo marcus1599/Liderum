@@ -1,7 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CdkDragDrop, CdkDropList, DragDropModule } from '@angular/cdk/drag-drop';
-import { GroupService, Group } from '../services/group.service';
-import { MatTable } from '@angular/material/table';
+import { GroupService, Group, TeamLeaderCandidate } from '../services/group.service';
 import { MatButton } from '@angular/material/button';
 import { MatCard, MatCardModule } from '@angular/material/card';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
@@ -20,6 +19,9 @@ import { ViewChild } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { httpFeedback } from '../shared/http-feedback';
+import { AuthService } from '../auth/auth.service';
+import { UserProfile } from '../auth/auth.models';
+import { Subscription } from 'rxjs';
 
 
 
@@ -28,7 +30,6 @@ import { httpFeedback } from '../shared/http-feedback';
   templateUrl: './groups.component.html',
   styleUrls: ['./groups.component.scss'],
   imports: [
-     MatTable,
      MatButton, 
      MatCard, 
      CdkDropList, 
@@ -51,7 +52,7 @@ import { httpFeedback } from '../shared/http-feedback';
 
     ]
 })
-export class GroupsComponent implements OnInit {
+export class GroupsComponent implements OnInit, OnDestroy {
   availableMembers: Member[] = [];
   groups: Group[] = [];
   showGroupForm = false;
@@ -64,11 +65,79 @@ export class GroupsComponent implements OnInit {
   stale = false;
   errorMessage = '';
   statusMessage = '';
+  profile: UserProfile | null = null;
+  leaderCandidates: TeamLeaderCandidate[] = [];
+  leaderCandidatesLoading = false;
+  leaderCandidatesLoaded = false;
+  selectedLeaderId: number | null = null;
+  reassigningTeam: Group | null = null;
+  private profileSubscription?: Subscription;
 
-  constructor(private groupService: GroupService) {}
+  constructor(private groupService: GroupService, private authService: AuthService) {}
 
   ngOnInit() {
+    this.profileSubscription = this.authService.profile$.subscribe(profile => this.profile = profile);
     this.loadGroups();
+  }
+
+  ngOnDestroy(): void { this.profileSubscription?.unsubscribe(); }
+
+  canReassignLeader(): boolean {
+    return ['MARECHAL', 'GENERAL', 'MAJOR'].includes(this.profile?.guildRole ?? '');
+  }
+
+  beginLeaderReassignment(group: Group): void {
+    if (!this.canReassignLeader() || this.saving || this.loading || !this.loaded) return;
+    this.reassigningTeam = group;
+    this.selectedLeaderId = group.leaderId ?? null;
+    this.leaderCandidates = [];
+    this.leaderCandidatesLoading = true;
+    this.leaderCandidatesLoaded = false;
+    this.errorMessage = '';
+    this.groupService.getLeaderCandidates().subscribe({
+      next: candidates => {
+        this.leaderCandidates = candidates.filter(candidate => candidate.id !== group.leaderId);
+        this.leaderCandidatesLoading = false;
+        this.leaderCandidatesLoaded = true;
+      },
+      error: (error: HttpErrorResponse) => {
+        this.leaderCandidatesLoading = false;
+        this.errorMessage = httpFeedback(error, 'consultar candidatos a líder', true);
+      }
+    });
+  }
+
+  cancelLeaderReassignment(): void {
+    if (this.saving) return;
+    this.reassigningTeam = null;
+    this.selectedLeaderId = null;
+    this.leaderCandidates = [];
+    this.leaderCandidatesLoaded = false;
+  }
+
+  confirmLeaderReassignment(): void {
+    const team = this.reassigningTeam;
+    const leaderId = this.selectedLeaderId;
+    if (!team || !this.canReassignLeader() || leaderId == null || leaderId === team.leaderId || this.saving || this.leaderCandidatesLoading) return;
+    this.saving = true;
+    this.errorMessage = '';
+    this.statusMessage = '';
+    this.groupService.reassignLeader(team.id, leaderId).subscribe({
+      next: updated => {
+        this.groups = this.groups.map(group => group.id === updated.id ? {
+          ...group,
+          leaderId: updated.leaderId ?? leaderId,
+          leaderName: updated.leaderName ?? this.leaderCandidates.find(candidate => candidate.id === leaderId)?.username ?? null
+        } : group);
+        this.saving = false;
+        this.statusMessage = `Liderança de ${team.name} transferida.`;
+        this.cancelLeaderReassignment();
+      },
+      error: (error: HttpErrorResponse) => {
+        this.saving = false;
+        this.errorMessage = httpFeedback(error, 'transferir liderança');
+      }
+    });
   }
 
   loadMembers(afterMutation = false) {

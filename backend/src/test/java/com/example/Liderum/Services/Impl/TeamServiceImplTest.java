@@ -7,9 +7,12 @@ import com.example.Liderum.Repository.MemberRepository;
 import com.example.Liderum.Repository.TeamRepository;
 import com.example.Liderum.Repository.UserRepository;
 import com.example.Liderum.Tenancy.TenantService;
+import com.example.Liderum.exceptions.UserStatusConflictException;
 import com.example.Liderum.dto.TeamRequestDTO;
 import com.example.Liderum.dto.TeamResponseDTO;
+import com.example.Liderum.Enums.UserStatus;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +41,9 @@ public class TeamServiceImplTest {
     @Mock
     private TenantService tenantService;
 
+    @Mock
+    private EntityManager entityManager;
+
     @InjectMocks
     private TeamServiceImpl teamService;
 
@@ -48,7 +54,7 @@ public class TeamServiceImplTest {
     @BeforeEach
     public void setUp() {
         guild = Guild.builder().id(1L).name("Guilda Teste").build();
-        leader = User.builder().id(1L).username("Marcus").guild(guild).build();
+        leader = User.builder().id(1L).username("Marcus").status(UserStatus.ACTIVE).guild(guild).build();
         team = Team.builder().id(1L).name("Guilda Top").leader(leader).guild(guild).build();
 
         lenient().when(tenantService.getCurrentGuild()).thenReturn(guild);
@@ -61,7 +67,8 @@ public class TeamServiceImplTest {
         request.setName("Guilda Top");
         request.setLeaderId(1L);
 
-        when(userRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(leader));
+        when(userRepository.findAllByGuildIdAndGuildRoleOrderById(1L, com.example.Liderum.Enums.GuildRole.MARECHAL)).thenReturn(List.of());
+        when(userRepository.findByIdAndGuildIdForUpdate(1L, 1L)).thenReturn(Optional.of(leader));
         when(teamRepository.save(any(Team.class))).thenReturn(team);
 
         TeamResponseDTO response = teamService.create(request);
@@ -69,6 +76,7 @@ public class TeamServiceImplTest {
         assertNotNull(response);
         assertEquals("Guilda Top", response.getName());
         assertEquals("Marcus", response.getLeaderName());
+        assertEquals(1L, response.getLeaderId());
     }
 
     @Test
@@ -77,9 +85,25 @@ public class TeamServiceImplTest {
         request.setName("Guilda Teste");
         request.setLeaderId(99L);
 
-        when(userRepository.findByIdAndGuildId(99L, 1L)).thenReturn(Optional.empty());
+        when(userRepository.findAllByGuildIdAndGuildRoleOrderById(1L, com.example.Liderum.Enums.GuildRole.MARECHAL)).thenReturn(List.of());
+        when(userRepository.findByIdAndGuildIdForUpdate(99L, 1L)).thenReturn(Optional.empty());
 
         assertThrows(EntityNotFoundException.class, () -> teamService.create(request));
+    }
+
+    @Test
+    public void shouldRevalidateDefaultLeaderStatusBeforeCreatingTeam() {
+        TeamRequestDTO request = new TeamRequestDTO();
+        request.setName("Guilda Top");
+        User authenticatedUser = User.builder().id(1L).username("Marcus").guild(guild).build();
+        User disabledLeader = User.builder().id(1L).username("Marcus").status(UserStatus.DISABLED).guild(guild).build();
+
+        when(tenantService.getCurrentUser()).thenReturn(authenticatedUser);
+        when(userRepository.findAllByGuildIdAndGuildRoleOrderById(1L, com.example.Liderum.Enums.GuildRole.MARECHAL)).thenReturn(List.of());
+        when(userRepository.findByIdAndGuildIdForUpdate(1L, 1L)).thenReturn(Optional.of(disabledLeader));
+
+        assertThrows(UserStatusConflictException.class, () -> teamService.create(request));
+        verify(teamRepository, never()).save(any(Team.class));
     }
 
     @Test
@@ -91,6 +115,7 @@ public class TeamServiceImplTest {
         assertEquals(1, teams.size());
         assertEquals("Guilda Top", teams.get(0).getName());
         assertEquals("Marcus", teams.get(0).getLeaderName());
+        assertEquals(1L, teams.get(0).getLeaderId());
     }
 
     @Test

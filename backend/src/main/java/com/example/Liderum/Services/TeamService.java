@@ -2,6 +2,7 @@ package com.example.Liderum.Services;
 
 import com.example.Liderum.dto.TeamRequestDTO;
 import com.example.Liderum.dto.TeamResponseDTO;
+import com.example.Liderum.dto.TeamLeaderCandidateDTO;
 
 import java.util.List;
 
@@ -13,5 +14,7 @@ public interface TeamService {
     void addMemberToTeam(Long teamId, Long memberId);
     void removeMemberFromTeam(Long teamId, Long memberId);
     TeamResponseDTO update(Long teamId, TeamRequestDTO request);
+    List<TeamLeaderCandidateDTO> findLeaderCandidates();
+    TeamResponseDTO reassignLeader(Long teamId, Long leaderId);
 
 }

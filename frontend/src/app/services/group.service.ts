@@ -7,11 +7,13 @@ import { environment } from '../../environments/environment';
 export interface Group {
   id: number;
   name: string;
+  leaderId?: number | null;
   leaderName?: string | null;
   members: Member[];
 }
 
 export interface TeamRequest { name: string; leaderId?: number | null; }
+export interface TeamLeaderCandidate { id: number; username: string; }
 
 @Injectable({ providedIn: 'root' })
 export class GroupService {
@@ -30,6 +32,14 @@ export class GroupService {
 
   updateGroup(groupId: number, request: TeamRequest): Observable<Group> {
     return this.http.put<Group>(`${this.apiUrl}/${groupId}`, request);
+  }
+
+  getLeaderCandidates(): Observable<TeamLeaderCandidate[]> {
+    return this.http.get<TeamLeaderCandidate[]>(`${this.apiUrl}/leader-candidates`);
+  }
+
+  reassignLeader(teamId: number, leaderId: number): Observable<Group> {
+    return this.http.put<Group>(`${this.apiUrl}/${teamId}/leader`, { leaderId });
   }
 
   deleteGroup(groupId: number): Observable<void> {

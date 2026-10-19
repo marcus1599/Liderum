@@ -5,11 +5,19 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
+import jakarta.persistence.LockModeType;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface TeamRepository extends JpaRepository<Team, Long> {
     List<Team> findAllByGuildId(Long guildId);
 
     Optional<Team> findByIdAndGuildId(Long id, Long guildId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("select t from Team t where t.id = :id and t.guild.id = :guildId")
+    Optional<Team> findByIdAndGuildIdForUpdate(@Param("id") Long id, @Param("guildId") Long guildId);
 
     boolean existsByGuildIdAndLeaderId(Long guildId, Long leaderId);
 }

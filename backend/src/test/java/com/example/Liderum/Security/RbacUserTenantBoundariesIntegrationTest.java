@@ -434,6 +434,155 @@ class RbacUserTenantBoundariesIntegrationTest {
     }
 
     @Test
+    void teamLeaderCandidatesAreTenantScopedMinimalAndRestrictedToTeamAdmins() throws Exception {
+        Actor ownerA = onboard("leader-candidates-owner-a");
+        Actor major = createActor(ownerA.token(), "leader-candidates-major", GuildRole.MAJOR);
+        Actor soldier = createActor(ownerA.token(), "leader-candidates-soldier", GuildRole.SOLDADO);
+        Actor disabled = createActor(ownerA.token(), "leader-candidates-disabled", GuildRole.SOLDADO);
+        long pending = createUser(ownerA.token(), "leader-candidates-pending", GuildRole.SOLDADO);
+        Actor ownerB = onboard("leader-candidates-owner-b");
+        userRepository.findById(disabled.id()).orElseThrow().setStatus(UserStatus.DISABLED);
+        userRepository.flush();
+
+        mockMvc.perform(get("/teams/leader-candidates").header("Authorization", bearer(major.token())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.id == " + ownerA.id() + ")].username").value(org.hamcrest.Matchers.hasItem(ownerA.username())))
+                .andExpect(jsonPath("$[?(@.id == " + ownerB.id() + ")]").doesNotExist())
+                .andExpect(jsonPath("$[?(@.id == " + disabled.id() + ")]").doesNotExist())
+                .andExpect(jsonPath("$[?(@.id == " + pending + ")]").doesNotExist())
+                .andExpect(jsonPath("$[0].email").doesNotExist())
+                .andExpect(jsonPath("$[0].guildRole").doesNotExist())
+                .andExpect(jsonPath("$[0].status").doesNotExist());
+        mockMvc.perform(get("/teams/leader-candidates").header("Authorization", bearer(soldier.token())))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/teams/leader-candidates")).andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void teamLeaderCanBeReassignedThenOldLeaderCanBeDisabled() throws Exception {
+        Actor owner = onboard("leader-reassign-owner");
+        Actor secondMarechal = createActor(owner.token(), "leader-reassign-second-marechal", GuildRole.MARECHAL);
+        Actor general = createActor(owner.token(), "leader-reassign-general", GuildRole.GENERAL);
+        User ownerUser = userRepository.findById(owner.id()).orElseThrow();
+        Team team = teamRepository.save(Team.builder().name("Transfer Team").guild(ownerUser.getGuild()).leader(ownerUser).build());
+
+        mockMvc.perform(put("/teams/" + team.getId() + "/leader")
+                        .header("Authorization", bearer(general.token())).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"leaderId\":" + general.id() + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.leaderId").value(general.id()))
+                .andExpect(jsonPath("$.leaderName").value(general.username()));
+
+        updateStatus(secondMarechal.token(), owner.id(), UserStatus.DISABLED).andExpect(status().isOk());
+        assertThat(teamRepository.findById(team.getId()).orElseThrow().getLeader().getId()).isEqualTo(general.id());
+    }
+
+    @Test
+    void teamLeaderReassignmentBlocksInactiveAndCrossGuildTargetsWithoutMutation() throws Exception {
+        Actor ownerA = onboard("leader-boundary-owner-a");
+        Actor generalA = createActor(ownerA.token(), "leader-boundary-general-a", GuildRole.GENERAL);
+        Actor ownerB = onboard("leader-boundary-owner-b");
+        long pendingId = createUser(ownerA.token(), "leader-boundary-pending", GuildRole.SOLDADO);
+        User userA = userRepository.findById(ownerA.id()).orElseThrow();
+        User userB = userRepository.findById(ownerB.id()).orElseThrow();
+        Team teamA = teamRepository.save(Team.builder().name("A Team").guild(userA.getGuild()).leader(userA).build());
+        Team teamB = teamRepository.save(Team.builder().name("B Team").guild(userB.getGuild()).leader(userB).build());
+        userRepository.findById(generalA.id()).orElseThrow().setStatus(UserStatus.DISABLED);
+        userRepository.flush();
+
+        mockMvc.perform(put("/teams/" + teamA.getId() + "/leader").header("Authorization", bearer(ownerA.token()))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"leaderId\":" + ownerB.id() + "}"))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(put("/teams/" + teamB.getId() + "/leader").header("Authorization", bearer(ownerA.token()))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"leaderId\":" + ownerA.id() + "}"))
+                .andExpect(status().isNotFound());
+        mockMvc.perform(put("/teams/" + teamA.getId() + "/leader").header("Authorization", bearer(ownerA.token()))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"leaderId\":" + generalA.id() + "}"))
+                .andExpect(status().isConflict());
+        mockMvc.perform(put("/teams/" + teamA.getId() + "/leader").header("Authorization", bearer(ownerA.token()))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"leaderId\":" + pendingId + "}"))
+                .andExpect(status().isConflict());
+        mockMvc.perform(put("/teams/" + teamA.getId() + "/leader").header("Authorization", bearer(ownerA.token()))
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isBadRequest());
+        mockMvc.perform(post("/teams").header("Authorization", bearer(ownerA.token())).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Invalid leader\",\"leaderId\":" + generalA.id() + "}"))
+                .andExpect(status().isConflict());
+        mockMvc.perform(post("/teams").header("Authorization", bearer(ownerA.token())).contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Cross Guild leader\",\"leaderId\":" + ownerB.id() + "}"))
+                .andExpect(status().isNotFound());
+        assertThat(teamRepository.findById(teamA.getId()).orElseThrow().getLeader().getId()).isEqualTo(ownerA.id());
+        assertThat(teamRepository.findById(teamB.getId()).orElseThrow().getLeader().getId()).isEqualTo(ownerB.id());
+    }
+
+    @Test
+    void onlyTeamAdminsCanReassignLeadersAndExtraFieldsCannotChangeUserOrGuild() throws Exception {
+        Actor owner = onboard("leader-role-owner");
+        Actor major = createActor(owner.token(), "leader-role-major", GuildRole.MAJOR);
+        Actor captain = createActor(owner.token(), "leader-role-captain", GuildRole.CAPITÃO);
+        Actor soldier = createActor(owner.token(), "leader-role-soldier", GuildRole.SOLDADO);
+        User ownerUser = userRepository.findById(owner.id()).orElseThrow();
+        Team team = teamRepository.save(Team.builder().name("Role Team").guild(ownerUser.getGuild()).leader(ownerUser).build());
+
+        mockMvc.perform(put("/teams/" + team.getId() + "/leader").header("Authorization", bearer(major.token()))
+                        .contentType(MediaType.APPLICATION_JSON).content("{\"leaderId\":" + major.id() + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.leaderId").value(major.id()));
+
+        for (Actor denied : new Actor[] { captain, soldier }) {
+            mockMvc.perform(put("/teams/" + team.getId() + "/leader").header("Authorization", bearer(denied.token()))
+                            .contentType(MediaType.APPLICATION_JSON).content("{\"leaderId\":" + denied.id() + "}"))
+                    .andExpect(status().isForbidden());
+        }
+        mockMvc.perform(put("/teams/" + team.getId() + "/leader").header("Authorization", bearer(owner.token()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"leaderId\":" + captain.id() + ",\"guildId\":999999,\"role\":\"MARECHAL\",\"status\":\"DISABLED\"}"))
+                .andExpect(status().isOk());
+        assertThat(teamRepository.findById(team.getId()).orElseThrow().getLeader().getId()).isEqualTo(captain.id());
+        assertThat(userRepository.findById(captain.id()).orElseThrow().getGuildRole()).isEqualTo(GuildRole.CAPITÃO);
+        assertThat(userRepository.findById(captain.id()).orElseThrow().getStatus()).isEqualTo(UserStatus.ACTIVE);
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    void concurrentLeaderReassignmentAndDeactivationNeverLeavesDisabledLeaderAssigned() throws Exception {
+        String runId = UUID.randomUUID().toString().replace("-", "");
+        Actor owner = onboard("leader-race-owner-" + runId);
+        Actor candidate = createActor(owner.token(), "leader-race-candidate-" + runId, GuildRole.GENERAL);
+        User ownerUser = userRepository.findById(owner.id()).orElseThrow();
+        Team team = teamRepository.save(Team.builder().name("Race Team").guild(ownerUser.getGuild()).leader(ownerUser).build());
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+        try {
+            Future<Integer> reassignment = executor.submit(() -> {
+                start.await();
+                return mockMvc.perform(put("/teams/" + team.getId() + "/leader")
+                                .header("Authorization", bearer(owner.token())).contentType(MediaType.APPLICATION_JSON)
+                                .content("{\"leaderId\":" + candidate.id() + "}"))
+                        .andReturn().getResponse().getStatus();
+            });
+            Future<Integer> deactivation = executor.submit(() -> {
+                start.await();
+                return updateStatus(owner.token(), candidate.id(), UserStatus.DISABLED)
+                        .andReturn().getResponse().getStatus();
+            });
+            start.countDown();
+            int reassignStatus = reassignment.get();
+            int deactivateStatus = deactivation.get();
+
+            assertThat(reassignStatus).isIn(200, 409);
+            assertThat(deactivateStatus).isIn(200, 409);
+            assertThat((reassignStatus == 200) ^ (deactivateStatus == 200)).isTrue();
+            User persistedCandidate = userRepository.findById(candidate.id()).orElseThrow();
+            Long persistedLeaderId = teamRepository.findById(team.getId()).orElseThrow().getLeader().getId();
+            assertThat(persistedCandidate.getStatus() == UserStatus.DISABLED)
+                    .isNotEqualTo(persistedLeaderId.equals(candidate.id()));
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
     void adminControllerAcceptsAdministrativeRolesOnly() throws Exception {
         Actor owner = onboard("admin-controller-owner");
         Actor major = createActor(owner.token(), "admin-controller-major", GuildRole.MAJOR);

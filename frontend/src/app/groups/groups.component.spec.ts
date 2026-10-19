@@ -4,9 +4,10 @@ import { GroupsComponent } from './groups.component';
 import { GroupService } from '../services/group.service';
 import { of, Subject } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Group } from '../services/group.service';
+import { Group, TeamLeaderCandidate } from '../services/group.service';
 import { Member } from '../members/member.model';
 import { CdkDragDrop } from '@angular/cdk/drag-drop';
+import { AuthService } from '../auth/auth.service';
 
 describe('GroupsComponent', () => {
   let component: GroupsComponent;
@@ -15,12 +16,16 @@ describe('GroupsComponent', () => {
 
   beforeEach(async () => {
     service = jasmine.createSpyObj<GroupService>('GroupService',
-      ['getGroups', 'getMembers', 'createGroup', 'updateGroup', 'deleteGroup', 'addMemberToGroup', 'removeMemberFromGroup']);
+      ['getGroups', 'getMembers', 'createGroup', 'updateGroup', 'deleteGroup', 'addMemberToGroup', 'removeMemberFromGroup', 'getLeaderCandidates', 'reassignLeader']);
     service.getGroups.and.returnValue(of([]));
     service.getMembers.and.returnValue(of([]));
+    service.getLeaderCandidates.and.returnValue(of([]));
     await TestBed.configureTestingModule({
       imports: [GroupsComponent],
-      providers: [{ provide: GroupService, useValue: service }]
+      providers: [
+        { provide: GroupService, useValue: service },
+        { provide: AuthService, useValue: { profile$: of({ id: 1, username: 'admin', email: 'admin@example.test', guildRole: 'MARECHAL' }) } }
+      ]
     })
     .compileComponents();
 
@@ -105,5 +110,63 @@ describe('GroupsComponent', () => {
       new HttpErrorResponse({ status: 0 }));
     expect(group.members).toEqual([member]);
     expect(component.errorMessage).toContain('Atualize a lista');
+  });
+
+  it('loads candidates and changes the displayed leader only after server confirmation', () => {
+    const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Old', members: [] };
+    component.groups = [group];
+    component.loaded = true;
+    service.getLeaderCandidates.and.returnValue(of([{ id: 2, username: 'New' }]));
+    service.reassignLeader.and.returnValue(of({ ...group, leaderId: 2, leaderName: 'New' }));
+
+    component.beginLeaderReassignment(group);
+    expect(component.leaderCandidates).toEqual([{ id: 2, username: 'New' }]);
+    component.selectedLeaderId = 2;
+    component.confirmLeaderReassignment();
+
+    expect(service.reassignLeader).toHaveBeenCalledWith(8, 2);
+    expect(component.groups[0].leaderName).toBe('New');
+    expect(component.statusMessage).toContain('transferida');
+  });
+
+  it('does not change displayed leader when reassignment fails', () => {
+    const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Old', members: [] };
+    component.groups = [group];
+    component.loaded = true;
+    component.leaderCandidates = [{ id: 2, username: 'New' }];
+    component.reassigningTeam = group;
+    component.selectedLeaderId = 2;
+    service.reassignLeader.and.returnValue(new Subject<Group>());
+
+    component.confirmLeaderReassignment();
+    (service.reassignLeader.calls.mostRecent().returnValue as Subject<Group>)
+      .error(new HttpErrorResponse({ status: 409 }));
+
+    expect(component.groups[0].leaderName).toBe('Old');
+    expect(component.saving).toBeFalse();
+    expect(component.errorMessage).toContain('conflito');
+  });
+
+  it('does not expose reassignment controls to non-admin roles', () => {
+    component.profile = { id: 3, username: 'soldier', email: 'soldier@example.test', guildRole: 'SOLDADO' };
+    fixture.detectChanges();
+    expect(component.canReassignLeader()).toBeFalse();
+    component.beginLeaderReassignment({ id: 8, name: 'Raid', members: [] });
+    expect(service.getLeaderCandidates).not.toHaveBeenCalled();
+  });
+
+  it('does not present a failed candidate request as an empty list', () => {
+    const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Current', members: [] };
+    component.groups = [group];
+    component.loaded = true;
+    service.getLeaderCandidates.and.returnValue(new Subject<TeamLeaderCandidate[]>());
+    component.beginLeaderReassignment(group);
+    (service.getLeaderCandidates.calls.mostRecent().returnValue as Subject<TeamLeaderCandidate[]>)
+      .error(new HttpErrorResponse({ status: 500 }));
+    fixture.detectChanges();
+
+    expect(component.leaderCandidatesLoaded).toBeFalse();
+    expect(fixture.nativeElement.textContent).not.toContain('Nenhum outro usuário ativo disponível');
+    expect(component.errorMessage).toContain('carregar os dados');
   });
 });

@@ -24,6 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("select u from User u where u.id = :id")
     Optional<User> findByIdForPasswordChange(@Param("id") Long id);
     List<User> findAllByGuildId(Long guildId);
+    List<User> findAllByGuildIdAndStatusOrderByUsername(Long guildId, UserStatus status);
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<User> findAllByGuildIdAndGuildRole(Long guildId, GuildRole guildRole);
     @Lock(LockModeType.PESSIMISTIC_WRITE)

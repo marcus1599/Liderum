@@ -92,6 +92,32 @@
                 </button>
               </span>
             </div>
+            <p class="team-leader">Líder: {{ group.leaderName || 'Sem líder definido' }}</p>
+            <section *ngIf="canReassignLeader()" class="leader-reassignment" aria-label="Transferir liderança da equipe">
+              <button mat-button type="button" (click)="beginLeaderReassignment(group)"
+                [disabled]="saving || loading || !loaded || leaderCandidatesLoading">
+                Trocar líder
+              </button>
+              <div *ngIf="reassigningTeam?.id === group.id" class="leader-form">
+                <p *ngIf="leaderCandidatesLoading" role="status">Carregando usuários ativos...</p>
+                <ng-container *ngIf="!leaderCandidatesLoading">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Novo líder de {{ group.name }}</mat-label>
+                    <mat-select [(ngModel)]="selectedLeaderId" [ngModelOptions]="{standalone: true}">
+                      <mat-option *ngFor="let candidate of leaderCandidates" [value]="candidate.id">{{ candidate.username }}</mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                  <p *ngIf="leaderCandidatesLoaded && leaderCandidates.length === 0">Nenhum outro usuário ativo disponível para assumir a liderança.</p>
+                  <div class="form-actions">
+                    <button mat-raised-button color="primary" type="button" (click)="confirmLeaderReassignment()"
+                      [disabled]="saving || selectedLeaderId == null || selectedLeaderId === group.leaderId">
+                      {{ saving ? 'Transferindo…' : 'Confirmar transferência' }}
+                    </button>
+                    <button mat-button type="button" (click)="cancelLeaderReassignment()" [disabled]="saving">Cancelar</button>
+                  </div>
+                </ng-container>
+              </div>
+            </section>
             <div cdkDropList [id]="'groupDropList-' + group.id" [cdkDropListData]="group.members" [cdkDropListDisabled]="saving || loading || !loaded"
               [cdkDropListConnectedTo]="['membersDropList']" class="group-members-list"
               (cdkDropListDropped)="dropToGroup($event, group)">

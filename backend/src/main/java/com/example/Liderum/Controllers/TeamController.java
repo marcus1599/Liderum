@@ -4,6 +4,8 @@ import com.example.Liderum.Services.TeamService;
 import com.example.Liderum.dto.MemberRequestDTO;
 import com.example.Liderum.dto.TeamRequestDTO;
 import com.example.Liderum.dto.TeamResponseDTO;
+import com.example.Liderum.dto.TeamLeaderUpdateRequestDTO;
+import com.example.Liderum.dto.TeamLeaderCandidateDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -33,6 +35,22 @@ public class TeamController {
     @Operation(summary = "Listar todas as equipes")
     public ResponseEntity<List<TeamResponseDTO>> findAll() {
         return ResponseEntity.ok(teamService.findAll());
+    }
+
+    @GetMapping("/leader-candidates")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
+    @Operation(summary = "Listar candidatos ativos a líder de equipe")
+    public ResponseEntity<List<TeamLeaderCandidateDTO>> findLeaderCandidates() {
+        return ResponseEntity.ok(teamService.findLeaderCandidates());
+    }
+
+    @PutMapping("/{teamId}/leader")
+    @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
+    @Operation(summary = "Reatribuir o líder de uma equipe")
+    public ResponseEntity<TeamResponseDTO> reassignLeader(
+            @PathVariable Long teamId,
+            @Valid @RequestBody TeamLeaderUpdateRequestDTO request) {
+        return ResponseEntity.ok(teamService.reassignLeader(teamId, request.leaderId()));
     }
 
     @GetMapping("/{id}")

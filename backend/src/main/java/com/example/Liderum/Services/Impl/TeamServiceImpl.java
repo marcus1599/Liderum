@@ -4,6 +4,8 @@ import com.example.Liderum.Entities.Guild;
 import com.example.Liderum.Entities.Member;
 import com.example.Liderum.Entities.Team;
 import com.example.Liderum.Entities.User;
+import com.example.Liderum.Enums.GuildRole;
+import com.example.Liderum.Enums.UserStatus;
 import com.example.Liderum.Repository.MemberRepository;
 import com.example.Liderum.Repository.TeamRepository;
 import com.example.Liderum.Repository.UserRepository;
@@ -12,9 +14,14 @@ import com.example.Liderum.Tenancy.TenantService;
 import com.example.Liderum.dto.MemberResponseDTO;
 import com.example.Liderum.dto.TeamRequestDTO;
 import com.example.Liderum.dto.TeamResponseDTO;
+import com.example.Liderum.dto.TeamLeaderCandidateDTO;
+import com.example.Liderum.exceptions.UserStatusConflictException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.LockModeType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,10 +34,13 @@ public class TeamServiceImpl implements TeamService {
     private final UserRepository userRepository;
     private final MemberRepository memberRepository;
     private final TenantService tenantService;
+    private final EntityManager entityManager;
 
     @Override
+    @Transactional
     public TeamResponseDTO create(TeamRequestDTO dto) {
         Guild guild = tenantService.getCurrentGuild();
+        lockMarechals(guild.getId());
         User leader = resolveLeader(dto.getLeaderId(), guild.getId());
 
         Team team = Team.builder()
@@ -92,13 +102,45 @@ public class TeamServiceImpl implements TeamService {
         return toResponseDTO(teamRepository.save(team));
     }
 
-    private User resolveLeader(Long leaderId, Long guildId) {
-        if (leaderId == null) {
-            return tenantService.getCurrentUser();
-        }
+    @Override
+    public List<TeamLeaderCandidateDTO> findLeaderCandidates() {
+        return userRepository.findAllByGuildIdAndStatusOrderByUsername(
+                        tenantService.getCurrentGuildId(), UserStatus.ACTIVE).stream()
+                .map(user -> new TeamLeaderCandidateDTO(user.getId(), user.getUsername()))
+                .toList();
+    }
 
-        return userRepository.findByIdAndGuildId(leaderId, guildId)
+    @Override
+    @Transactional
+    public TeamResponseDTO reassignLeader(Long teamId, Long leaderId) {
+        Long guildId = tenantService.getCurrentGuildId();
+        lockMarechals(guildId);
+        Team team = teamRepository.findByIdAndGuildIdForUpdate(teamId, guildId)
+                .orElseThrow(() -> new EntityNotFoundException("Equipe nao encontrada"));
+        User leader = userRepository.findByIdAndGuildIdForUpdate(leaderId, guildId)
                 .orElseThrow(() -> new EntityNotFoundException("Lider nao encontrado"));
+        entityManager.refresh(leader, LockModeType.PESSIMISTIC_WRITE);
+        if (leader.getStatus() != UserStatus.ACTIVE) {
+            throw new UserStatusConflictException();
+        }
+        team.setLeader(leader);
+        return toResponseDTO(teamRepository.save(team));
+    }
+
+    private User resolveLeader(Long leaderId, Long guildId) {
+        User requestedLeader = leaderId == null ? tenantService.getCurrentUser() : null;
+        Long effectiveLeaderId = leaderId == null ? requestedLeader.getId() : leaderId;
+        User leader = userRepository.findByIdAndGuildIdForUpdate(effectiveLeaderId, guildId)
+                .orElseThrow(() -> new EntityNotFoundException("Lider nao encontrado"));
+        entityManager.refresh(leader, LockModeType.PESSIMISTIC_WRITE);
+        if (leader.getStatus() != UserStatus.ACTIVE) {
+            throw new UserStatusConflictException();
+        }
+        return leader;
+    }
+
+    private void lockMarechals(Long guildId) {
+        userRepository.findAllByGuildIdAndGuildRoleOrderById(guildId, GuildRole.MARECHAL);
     }
 
     private Team findTeamInCurrentGuild(Long teamId) {
@@ -130,6 +172,7 @@ public class TeamServiceImpl implements TeamService {
         return TeamResponseDTO.builder()
                 .id(team.getId())
                 .name(team.getName())
+                .leaderId(team.getLeader() != null ? team.getLeader().getId() : null)
                 .leaderName(team.getLeader() != null ? team.getLeader().getUsername() : null)
                 .members(members)
                 .build();

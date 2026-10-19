@@ -10,6 +10,7 @@ import lombok.Data;
 public class TeamResponseDTO {
     private Long id;
     private String name;
+    private Long leaderId;
     private String leaderName;
     private List<MemberResponseDTO> members;
 }
