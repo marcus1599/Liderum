@@ -63,6 +63,8 @@ Primeira task concluída: `consolidate-authenticated-navigation-and-expose-users
 Segunda task concluída: `standardize-domain-http-feedback-states` (Task Verdict e Release Verdict APROVADOS, 2026-10-13). Members, Teams, Events e Attendance distinguem loading, vazio, erro, sucesso e falha de recarga após mutação. Feedback do drag-and-drop de Team foi incluído. Clareza da escolha/alteração de líder continua candidata separada; Ciclo 3 permanece em andamento.
 Task concluída: `safely-deactivate-and-reactivate-staff-users` (2026-10-17). Desativação/reativação segura de Staff, revogação de sessão, proteção do último MARECHAL ACTIVE e bloqueio de 409 para líder de Team foram aprovados por QA, Security e Auditor. Release global permanece bloqueado por achado RabbitMQ preexistente, cuja investigação está adiada pelo usuário.
 
+Task concluída: `reassign-team-leader-before-staff-deactivation` (2026-10-19). A liderança de Team pode ser transferida explicitamente para User ACTIVE da mesma Guild por MARECHAL, GENERAL ou MAJOR, com candidatos mínimos, UX de confirmação e validação tenant-scoped. QA, Security e Auditor aprovaram; suíte backend (92), Angular (79/79) e build passaram. O Ciclo 3 permanece em andamento; a próxima prioridade deve ser reavaliada sem reabrir tarefas concluídas.
+
 ## Ciclo 4 — Decisão de produto para notificações (LATER)
 
 O RabbitMQ e o notification-service continuam como demonstração técnica confiável (**opção A**) enquanto não houver requisito real de comunicação por Guild. O evento atual não carrega contexto tenant suficiente e o webhook é global.
@@ -78,11 +80,11 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 ### NOW
 
-- Sem task ativa. A próxima candidata de produto é planejar `reassign-team-leader-before-staff-deactivation`, escopo próprio para reassociação explícita de liderança; dependências de UX, RBAC e tenant devem ser verificadas no planejamento antes de implementar.
+- `reassign-team-leader-before-staff-deactivation` concluída em 2026-10-19; fluxo de escolha/alteração do líder agora está implementado e testado. Não há task ativa; reavaliar as demais lacunas do Ciclo 3 para definir a próxima.
 
 ### NEXT
 
-- clareza do fluxo de escolha/alteração de líder de Team, em escopo próprio;
+- reavaliar lacunas operacionais restantes e priorizar task do Ciclo 3;
 
 ### LATER
 

@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-10-17
+> **Última inspeção:** 2026-10-19
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -21,6 +21,8 @@
 - Task operacional `rollout-authenticated-password-change-and-jwt-transition` concluída em 2026-10-17 com QA, Security, SRE/DevOps e Task Verdict APROVADOS. GitHub/CI da revisão `fb0b9a4` confirmados; Render já a havia autoimplantado e marcou a revisão anterior `deactivated`. PostgreSQL 18.6 registrou V4 com sucesso, Hibernate/JPA e Tomcat iniciaram, e health retornou 200/UP. Smoke de conta descartável aprovou registro, login, perfil, rota tenant-scoped, troca de senha, revogação do JWT anterior e novo login. O request direto com JWT legado assinado não foi executado por ausência de artefato de smoke pré-deploy; o usuário aceitou explicitamente a evidência equivalente de teste de integração assinado na revisão implantada, CI, deploy antigo desativado e revogação em produção. Release Verdict permanece BLOQUEADO por erro AMQP 406 da fila de notificações observado também em 2026-10-13, achado preexistente não relacionado a este rollout; requer diagnóstico separado. Evidências: `tasks/completed/rollout-authenticated-password-change-and-jwt-transition/audit.md`.
 
 - Task `safely-deactivate-and-reactivate-staff-users` concluída em 2026-10-17 com QA, Task Security e Auditor APROVADOS. `PUT /users/{id}/status` permite somente ACTIVE↔DISABLED, preserva senha hash, incrementa credentialVersion ao desativar e requer novo login ao reativar. Tenant/RBAC, JWT revogado, proteção concorrente do último MARECHAL ACTIVE e bloqueio 409 seguro para líder de Team foram validados. Backend `clean verify`: 86 testes; frontend: 73/73 e build SUCCESS. Task Verdict APROVADO; Release Verdict continua BLOQUEADO somente pelo erro RabbitMQ AMQP 406 preexistente e adiado. Evidências: `tasks/completed/safely-deactivate-and-reactivate-staff-users/audit.md`.
+
+- Task `reassign-team-leader-before-staff-deactivation` concluída em 2026-10-19 com QA, Security e Auditor aprovados. Leaders de Team podem ser transferidos explicitamente para outro User ACTIVE da mesma Guild; candidatos retornam apenas ID/username, as operações permanecem tenant-scoped e `POST /teams` revalida o líder padrão sob lock. Backend `clean verify`: 92 testes; Angular: 79/79 e production build SUCCESS. Task Verdict APROVADO; Release Verdict permanece BLOQUEADO pelo achado RabbitMQ AMQP 406 preexistente e adiado. Evidências: `tasks/completed/reassign-team-leader-before-staff-deactivation/audit.md`.
 
 - Task `add-authenticated-password-change` concluída em 2026-10-15 com QA, Security, SRE/DevOps e Task Verdict APROVADOS. Backend `clean verify`: 81 testes; PostgreSQL 18.6 fresh/upgrade: 3/3; frontend: 70/70 e build SUCCESS. V4 aditiva preserva Users e defaults de credential version; Hibernate `validate` e contextos `prod` passaram. Implementação e testes versionados em `63fb032`. O Release Verdict daquela auditoria ficou BLOQUEADO até rollout coordenado, realizado posteriormente na task operacional acima; durante a execução da task de implementação não houve deploy ou push. A inspeção visual autenticada desktop/handset não foi manual. ADR-002 recomendado, não criado sem autorização explícita; ADR-001 intacto. Referência: `tasks/completed/add-authenticated-password-change/audit.md`.
 
@@ -431,9 +433,9 @@ O README descreve o produto e suas principais funcionalidades.
 | Flyway               | Implementado; baseline V1 validada e `ddl-auto=validate` |
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
-| Testes Backend       | Último `clean verify` da task de status de Staff: 86 testes, 0 failures/errors/skipped, BUILD SUCCESS; validações PostgreSQL anteriores permanecem documentadas nas respectivas tasks |
-| Testes Frontend      | Última suíte completa da task de status de Staff: 73/73, exit code 0; build Angular SUCCESS. Warnings Sass/CSS/baseline-browser-mapping permanecem não bloqueantes. |
-| Security Review      | Task Security Verdict da desativação de Staff APROVADO; Release Verdict global BLOQUEADO pelo achado RabbitMQ preexistente |
+| Testes Backend       | Último `clean verify` da task de reassociação de líder: 92 testes, 0 failures/errors/skipped, BUILD SUCCESS; validações PostgreSQL anteriores permanecem documentadas nas respectivas tasks |
+| Testes Frontend      | Última suíte completa: 79/79, exit code 0; build Angular SUCCESS. Warnings Sass/CSS/baseline-browser-mapping permanecem não bloqueantes. |
+| Security Review      | Task Security Verdict da reassociação de líder APROVADO; Release Verdict global BLOQUEADO pelo achado RabbitMQ preexistente |
 | Documentação         | ADR-001, roadmap, handoff e artefatos de tasks versionados em `.ai/`; Impeccable documentada em `.ai/docs/impeccable-codex.md` |
 
 ## Pendências técnicas não bloqueantes
@@ -450,6 +452,5 @@ O README descreve o produto e suas principais funcionalidades.
 
 ## Estado corrente de execução
 
-- Não há task ativa após a conclusão de `safely-deactivate-and-reactivate-staff-users`.
-- Próxima candidata de produto no Ciclo 3: definir e implementar separadamente o fluxo explícito de escolha/reassociação de líder de Team, necessário para permitir o offboarding futuro de um líder sem conflito.
+- Nenhuma task ativa após a conclusão de `reassign-team-leader-before-staff-deactivation`; a reassociação explícita agora permite que, após transferir todas as Teams, o administrador use o fluxo existente de desativação de Staff.
 - O erro RabbitMQ AMQP 406 permanece um bloqueador global conhecido de Release, mas sua investigação foi explicitamente adiada pelo usuário; não reabrir ou iniciar sem nova orientação.
