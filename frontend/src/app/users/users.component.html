@@ -7,19 +7,29 @@
   <ng-container *ngIf="canManageUsers() && !isLoading">
     <form class="create-form" [formGroup]="form" (ngSubmit)="createUser()">
       <h2>Criar usuário</h2>
-      <mat-form-field><mat-label>Usuário</mat-label><input matInput formControlName="username" /></mat-form-field>
-      <mat-form-field><mat-label>E-mail</mat-label><input matInput type="email" formControlName="email" /></mat-form-field>
+      <mat-form-field><mat-label>Usuário</mat-label><input matInput formControlName="username" /><mat-error>{{ fieldError('username') }}</mat-error></mat-form-field>
+      <mat-form-field><mat-label>E-mail</mat-label><input matInput type="email" formControlName="email" /><mat-error>{{ fieldError('email') }}</mat-error></mat-form-field>
       <p class="hint">O usuário definirá a própria senha pelo link de ativação.</p>
       <mat-form-field><mat-label>Role</mat-label><mat-select formControlName="role"><mat-option *ngFor="let role of allowedCreateRoles()" [value]="role">{{ role }}</mat-option></mat-select></mat-form-field>
       <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid || isSaving">Criar usuário</button>
     </form>
 
-    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
-    <p class="empty" *ngIf="!users.length">Nenhum usuário encontrado.</p>
+    <p class="error" *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+    <button mat-button type="button" *ngIf="errorMessage && !isLoading" (click)="loadUsers()">Tentar carregar novamente</button>
+    <section class="activation-link" *ngIf="activationLink" aria-label="Link de ativação">
+      <p role="status">{{ activationCopyFailed ? 'Link disponível para cópia manual.' : 'Link de ativação copiado.' }}</p>
+      <mat-form-field appearance="outline">
+        <mat-label>Link de ativação</mat-label>
+        <input #activationLinkInput matInput [value]="activationLink" readonly aria-describedby="activation-link-help" />
+      </mat-form-field>
+      <button mat-button type="button" (click)="selectActivationLink(activationLinkInput)">Selecionar link</button>
+      <small id="activation-link-help">Entregue este link ao usuário. Ele definirá a própria senha.</small>
+    </section>
+    <p class="empty" *ngIf="!isLoading && !errorMessage && !users.length">Nenhum usuário encontrado.</p>
     <div class="user-list" *ngIf="users.length">
       <article class="user-row" *ngFor="let user of users">
         <div><strong>{{ user.username }}</strong><span>{{ user.email }}</span><span class="status">{{ user.status }}</span></div>
-        <ng-container *ngIf="canActOn(user); else readOnlyRole"><mat-select [(ngModel)]="roleChanges[user.id]" [ngModelOptions]="{standalone: true}"><mat-option *ngFor="let role of allowedCreateRoles()" [value]="role">{{ role }}</mat-option></mat-select><button mat-button (click)="updateRole(user)">Salvar role</button><button mat-button *ngIf="user.status === 'PENDING'" (click)="regenerateActivation(user)">Regenerar link</button><button mat-button *ngIf="user.status === 'ACTIVE' || user.status === 'DISABLED'" [disabled]="statusChanges[user.id]" (click)="changeStatus(user)">{{ statusChanges[user.id] ? 'Salvando…' : user.status === 'ACTIVE' ? 'Desativar' : 'Reativar' }}</button><button mat-button color="warn" (click)="removeUser(user)">Remover</button></ng-container>
+        <ng-container *ngIf="canActOn(user); else readOnlyRole"><mat-select [(ngModel)]="roleChanges[user.id]" [ngModelOptions]="{standalone: true}" [disabled]="actionChanges[user.id]"><mat-option *ngFor="let role of allowedCreateRoles()" [value]="role">{{ role }}</mat-option></mat-select><button mat-button [disabled]="actionChanges[user.id]" (click)="updateRole(user)">Salvar role</button><button mat-button [disabled]="actionChanges[user.id]" *ngIf="user.status === 'PENDING'" (click)="regenerateActivation(user)">Regenerar link</button><button mat-button *ngIf="user.status === 'ACTIVE' || user.status === 'DISABLED'" [disabled]="statusChanges[user.id] || actionChanges[user.id]" (click)="changeStatus(user)">{{ statusChanges[user.id] ? 'Salvando…' : user.status === 'ACTIVE' ? 'Desativar' : 'Reativar' }}</button><button mat-button color="warn" [disabled]="actionChanges[user.id]" (click)="removeUser(user)">Remover</button></ng-container>
         <ng-template #readOnlyRole><span class="role">{{ user.guildRole }}</span></ng-template>
       </article>
     </div>

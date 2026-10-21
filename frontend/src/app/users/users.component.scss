@@ -7,4 +7,7 @@ header { margin-bottom: 1.5rem; }
 .user-row div { display: flex; flex-direction: column; }
 .user-row span { opacity: .75; }
 .error { color: #ffb3b3; }.denied { padding: 2rem; }.empty { opacity: .7; }
+.activation-link { display: grid; gap: .5rem; margin: 1rem 0; }
+.activation-link mat-form-field { width: 100%; }
+.activation-link small { opacity: .8; }
 @media (max-width: 700px) { .users-page { padding: 1rem; }.user-row { grid-template-columns: 1fr; } }

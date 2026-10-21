@@ -22,11 +22,50 @@ describe('UsersComponent', () => {
       { provide: MatSnackBar, useValue: snackbar }, { provide: Router, useValue: {} }, { provide: ActivatedRoute, useValue: {} }
     ] }).compileComponents();
     fixture = TestBed.createComponent(UsersComponent); component = fixture.componentInstance; fixture.detectChanges();
+    spyOn(component as any, 'getClipboard').and.returnValue(undefined);
   });
   it('denies management UI to non-administrative roles', () => { profile$.next({ ...marechal, guildRole: 'MAJOR' }); expect(component.canManageUsers()).toBeFalse(); expect(usersService.list).not.toHaveBeenCalled(); });
   it('limits GENERAL create roles and actions against privileged targets', () => { profile$.next(general); expect(component.allowedCreateRoles()).toEqual(['MAJOR', 'CAPITÃO', 'SOLDADO']); expect(component.canActOn({ id: 3, username: 'g', email: 'g', guildRole: 'GENERAL', status: 'ACTIVE' })).toBeFalse(); expect(usersService.list).toHaveBeenCalled(); });
   it('allows MARECHAL to create pending staff without a password', () => { profile$.next(marechal); component.form.setValue({ username: 'new', email: 'n@example.com', role: 'GENERAL' }); component.createUser(); expect(usersService.create).toHaveBeenCalledWith({ username: 'new', email: 'n@example.com', role: 'GENERAL' }); expect(localStorage.getItem('password')).toBeNull(); });
+  it('keeps the activation link available when clipboard is unavailable', () => {
+    (component as any).getClipboard.and.returnValue(undefined);
+    profile$.next(marechal);
+    component.form.setValue({ username: 'new', email: 'n@example.com', role: 'GENERAL' });
+    component.createUser();
+    expect(component.activationLink).toContain('/activate?token=token');
+    expect(component.activationCopyFailed).toBeTrue();
+  });
+  it('reports clipboard rejection without claiming the link was copied', () => {
+    const writeText = jasmine.createSpy('writeText').and.callFake(() => ({ then: () => ({ catch: (reject: (error: Error) => void) => { reject(new Error('denied')); } }) }));
+    (component as any).getClipboard.and.returnValue({ writeText });
+    profile$.next(marechal);
+    component.form.setValue({ username: 'new', email: 'n@example.com', role: 'GENERAL' });
+    component.createUser();
+    expect(writeText).toHaveBeenCalledWith(jasmine.stringMatching(/\/activate\?token=token/));
+    expect(component.activationCopyFailed).toBeTrue();
+  });
+  it('confirms automatic copy only after clipboard resolves', () => {
+    const writeText = jasmine.createSpy('writeText').and.callFake(() => ({ then: (resolve: () => void) => { resolve(); return { catch: () => undefined }; } }));
+    (component as any).getClipboard.and.returnValue({ writeText });
+    profile$.next(marechal);
+    component.form.setValue({ username: 'new', email: 'n@example.com', role: 'GENERAL' });
+    component.createUser();
+    expect(component.activationCopyFailed).toBeFalse();
+  });
   it('keeps safe error state for forbidden list operations', () => { profile$.next(general); usersService.list.and.returnValue(throwError(() => ({ status: 403 }))); component.loadUsers(); expect(component.errorMessage).toContain('permissão'); });
+  it('does not show an empty state while listing fails and can retry', () => {
+    profile$.next(general);
+    usersService.list.and.returnValue(throwError(() => ({ status: 500 })));
+    component.loadUsers();
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).not.toContain('Nenhum usuário encontrado.');
+    expect(fixture.nativeElement.textContent).toContain('Tentar carregar novamente');
+  });
+  it('exposes validation feedback for touched invalid fields', () => {
+    const username = component.form.get('username');
+    username?.markAsTouched();
+    expect(component.fieldError('username')).toBe('Campo obrigatório.');
+  });
   it('changes status after confirmation and updates the rendered user', () => {
     profile$.next(general);
     spyOn(window, 'confirm').and.returnValue(true);

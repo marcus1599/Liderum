@@ -28,9 +28,12 @@ export class UsersComponent implements OnInit {
   isLoading = true;
   isSaving = false;
   errorMessage = '';
+  activationLink = '';
+  activationCopyFailed = false;
   readonly form: FormGroup;
   readonly roleChanges: Record<number, GuildRole> = {};
   readonly statusChanges: Record<number, boolean> = {};
+  readonly actionChanges: Record<number, boolean> = {};
   private profileSubscription?: Subscription;
 
   constructor(
@@ -84,30 +87,34 @@ export class UsersComponent implements OnInit {
   createUser(): void {
     if (this.form.invalid || this.isSaving) return;
     this.isSaving = true;
+    this.clearActivationLink();
     const request = this.form.getRawValue() as CreateUserRequest;
     this.usersService.create(request).subscribe({
       next: response => {
         this.users = [...this.users, response.user];
         this.form.reset({ role: 'SOLDADO' });
         this.isSaving = false;
-        const link = `${window.location.origin}/activate?token=${encodeURIComponent(response.activationToken)}`;
-        navigator.clipboard?.writeText(link).catch(() => undefined);
-        this.snackbar.open('Usuário criado. Link de ativação copiado.', 'Fechar');
+        this.prepareActivationLink(response.activationToken, 'Usuário criado.');
       },
       error: error => { this.isSaving = false; this.snackbar.open(this.safeError(error), 'Fechar'); }
     });
   }
 
   updateRole(user: ManagedUser): void {
-    if (!this.canActOn(user)) return;
+    if (!this.canActOn(user) || this.actionChanges[user.id]) return;
     const role = this.roleChanges[user.id] || user.guildRole;
     if (role === user.guildRole) return;
+    this.actionChanges[user.id] = true;
     this.usersService.updateRole(user.id, { role }).subscribe({
       next: updated => {
         this.users = this.users.map(item => item.id === updated.id ? updated : item);
+        this.actionChanges[user.id] = false;
         this.snackbar.open('Role atualizada com sucesso.', 'Fechar');
       },
-      error: error => this.snackbar.open(this.safeError(error), 'Fechar')
+      error: error => {
+        this.actionChanges[user.id] = false;
+        this.snackbar.open(this.safeError(error), 'Fechar');
+      }
     });
   }
 
@@ -131,26 +138,64 @@ export class UsersComponent implements OnInit {
   }
 
   removeUser(user: ManagedUser): void {
-    if (!this.canActOn(user) || !window.confirm(`Remover ${user.username}?`)) return;
+    if (!this.canActOn(user) || this.actionChanges[user.id] || !window.confirm(`Remover ${user.username}?`)) return;
+    this.actionChanges[user.id] = true;
     this.usersService.remove(user.id).subscribe({
       next: () => {
         this.users = this.users.filter(item => item.id !== user.id);
         this.snackbar.open('Usuário removido com sucesso.', 'Fechar');
       },
-      error: error => this.snackbar.open(this.safeError(error), 'Fechar')
+      error: error => {
+        this.actionChanges[user.id] = false;
+        this.snackbar.open(this.safeError(error), 'Fechar');
+      }
     });
   }
 
   regenerateActivation(user: ManagedUser): void {
-    if (!this.canActOn(user) || user.status !== 'PENDING') return;
+    if (!this.canActOn(user) || user.status !== 'PENDING' || this.actionChanges[user.id]) return;
+    this.actionChanges[user.id] = true;
+    this.clearActivationLink();
     this.usersService.regenerateActivation(user.id).subscribe({
       next: response => {
-        const link = `${window.location.origin}/activate?token=${encodeURIComponent(response.activationToken)}`;
-        navigator.clipboard?.writeText(link).catch(() => undefined);
-        this.snackbar.open('Novo link de ativação copiado.', 'Fechar');
+        this.actionChanges[user.id] = false;
+        this.prepareActivationLink(response.activationToken, 'Novo link de ativação.');
       },
-      error: error => this.snackbar.open(this.safeError(error), 'Fechar')
+      error: error => {
+        this.actionChanges[user.id] = false;
+        this.snackbar.open(this.safeError(error), 'Fechar');
+      }
     });
+  }
+
+  selectActivationLink(input: HTMLInputElement): void {
+    input.focus();
+    input.select();
+  }
+
+  private clearActivationLink(): void {
+    this.activationLink = '';
+    this.activationCopyFailed = false;
+  }
+
+  private prepareActivationLink(token: string, message: string): void {
+    this.activationLink = `${window.location.origin}/activate?token=${encodeURIComponent(token)}`;
+    this.activationCopyFailed = true;
+    const clipboard = this.getClipboard();
+    if (!clipboard) {
+      this.snackbar.open(`${message} Selecione o link abaixo para copiá-lo manualmente.`, 'Fechar');
+      return;
+    }
+    clipboard.writeText(this.activationLink).then(() => {
+      this.activationCopyFailed = false;
+      this.snackbar.open(`${message} Link de ativação copiado.`, 'Fechar');
+    }).catch(() => {
+      this.snackbar.open(`${message} Não foi possível copiar automaticamente. Selecione o link abaixo.`, 'Fechar');
+    });
+  }
+
+  private getClipboard(): Pick<Clipboard, 'writeText'> | undefined {
+    return navigator.clipboard;
   }
 
   private safeError(error: HttpErrorResponse): string {
@@ -159,5 +204,14 @@ export class UsersComponent implements OnInit {
     if (error.status === 404) return 'Usuário não encontrado nesta Guild.';
     if (error.status >= 400 && error.status < 500) return 'Não foi possível concluir a operação. Confira os dados.';
     return 'Não foi possível concluir a operação agora.';
+  }
+
+  fieldError(controlName: string): string {
+    const control = this.form.get(controlName);
+    if (!control || !control.touched || control.valid) return '';
+    if (control.hasError('required')) return 'Campo obrigatório.';
+    if (control.hasError('email')) return 'Informe um e-mail válido.';
+    if (control.hasError('minlength')) return 'Informe pelo menos 3 caracteres.';
+    return 'Valor inválido.';
   }
 }
