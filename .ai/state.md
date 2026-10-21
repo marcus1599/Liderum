@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-10-19
+> **Última inspeção:** 2026-10-21
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -27,6 +27,8 @@
 - Task `align-domain-action-visibility-with-rbac` concluída com QA, Security e Auditor aprovados. Members, Teams, Events e Attendance exibem mutações apenas a MARECHAL/GENERAL/MAJOR; perfis CAPITÃO/SOLDADO mantêm leitura permitida. Role vem de `/users/me`; backend/RBAC não foram alterados. Angular: 86/86 testes e production build SUCCESS. Task Verdict APROVADO; Release Verdict permanece BLOQUEADO pelo achado RabbitMQ AMQP 406 preexistente e adiado. Evidências: `tasks/completed/align-domain-action-visibility-with-rbac/audit.md`.
 
 - Task `enable-accessible-team-member-assignment` concluída com QA, Security e Auditor aprovados. `/teams` permite associar Member disponível a Team por teclado/toque além de drag-and-drop; sem mudança de API ou backend. Angular: 92/92 em duas execuções consecutivas e production build SUCCESS. Não houve inspeção visual autenticada desktop/viewport estreito. Release Verdict permanece BLOQUEADO pelo achado RabbitMQ AMQP 406 preexistente e adiado. Evidências: `tasks/completed/enable-accessible-team-member-assignment/audit.md`.
+
+- Task `validate-authenticated-responsive-ux` concluída com Task Verdict APROVADO. Sete rotas foram revisadas autenticadas em 1280×800 e 390×844; corrigidos em SCSS altura responsiva dos campos de Events e contraste da página Users. Angular 92/92, build SUCCESS e detector Impeccable sem achados. A página observada em produção não foi atualizada após as correções; 401/403, mutações, role/Guild alternativa e aparelho físico não foram testados. Release Verdict permanece BLOQUEADO pelo RabbitMQ AMQP 406 preexistente. Evidências: `tasks/completed/validate-authenticated-responsive-ux/audit.md`.
 
 - Task `add-authenticated-password-change` concluída em 2026-10-15 com QA, Security, SRE/DevOps e Task Verdict APROVADOS. Backend `clean verify`: 81 testes; PostgreSQL 18.6 fresh/upgrade: 3/3; frontend: 70/70 e build SUCCESS. V4 aditiva preserva Users e defaults de credential version; Hibernate `validate` e contextos `prod` passaram. Implementação e testes versionados em `63fb032`. O Release Verdict daquela auditoria ficou BLOQUEADO até rollout coordenado, realizado posteriormente na task operacional acima; durante a execução da task de implementação não houve deploy ou push. A inspeção visual autenticada desktop/handset não foi manual. ADR-002 recomendado, não criado sem autorização explícita; ADR-001 intacto. Referência: `tasks/completed/add-authenticated-password-change/audit.md`.
 
@@ -456,5 +458,5 @@ O README descreve o produto e suas principais funcionalidades.
 
 ## Estado corrente de execução
 
-- Nenhuma task ativa. `enable-accessible-team-member-assignment` foi implementada, testada, aprovada pelos gates e movida para concluídas. A reassociação explícita de líder continua disponível para que, após transferir todas as Teams, o administrador use o fluxo existente de desativação de Staff.
+- Nenhuma task ativa. `validate-authenticated-responsive-ux` foi concluída com QA e Auditor aprovados; ajustes locais SCSS passaram 92/92 testes e build. Sem deploy ou commits.
 - O erro RabbitMQ AMQP 406 permanece um bloqueador global conhecido de Release, mas sua investigação foi explicitamente adiada pelo usuário; não reabrir ou iniciar sem nova orientação.

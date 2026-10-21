@@ -84,10 +84,11 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 - `align-domain-action-visibility-with-rbac` concluída em 2026-10-19: as ações visuais de Members, Teams, Events e Attendance acompanham as permissões existentes, preservando consulta para roles de leitura. QA, Security e Auditor aprovados; Angular 86/86 e build SUCCESS.
 - `enable-accessible-team-member-assignment` concluída em 2026-10-19: Members disponíveis podem ser atribuídos a Teams também por seletores acessíveis e botão, preservando o drag-and-drop. QA/Security/Auditor aprovados; Angular 92/92 em duas execuções e build SUCCESS. Inspeção visual autenticada permanece como limitação registrada.
+- `validate-authenticated-responsive-ux` concluída (P1): sete rotas autenticadas revisadas em 1280×800 e 390×844; corrigidos flex-basis excessivo dos campos Events mobile e contraste da página Users. Angular 92/92, build SUCCESS, QA/Auditor aprovados. Sem deploy; Release permanece bloqueado pelo RabbitMQ AMQP 406.
 
 ### NEXT
 
-- reavaliar lacunas operacionais restantes do Ciclo 3, incluindo a validação visual autenticada ainda pendente;
+- reavaliar o backlog do Ciclo 3 e escolher uma próxima task; não há task ativa;
 
 ### LATER
 

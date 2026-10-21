@@ -4,18 +4,18 @@
 
 ## Estado atual
 
-As seis fases do roadmap original estão concluídas. No Ciclo 3, `enable-accessible-team-member-assignment` foi concluída com Task Verdict APROVADO; Angular 92/92 em duas execuções e build passaram. `/teams` agora permite atribuir Members por controles operáveis sem drag-and-drop. A inspeção visual autenticada desktop/viewport estreito segue pendente. Release global permanece BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente, cuja investigação foi adiada pelo usuário.
+As seis fases do roadmap original estão concluídas. No Ciclo 3, `validate-authenticated-responsive-ux` foi concluída com Task Verdict APROVADO: sete rotas revisadas autenticadas em 1280×800 e 390×844; ajustes locais para altura de campos em Events/mobile e contraste em Users; Angular 92/92 e build SUCCESS. Sem deploy. Release global permanece BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente, cuja investigação foi adiada pelo usuário.
 
 ## Última task concluída
 
-- Nome: `enable-accessible-team-member-assignment`
-- Resultado: QA, Security e Auditor aprovados; atribuição por seleção e botão adicionada, preservando drag-and-drop e endpoint existente. Angular 92/92 em duas execuções e build SUCCESS. Task Verdict APROVADO; Release Verdict BLOQUEADO pelo RabbitMQ AMQP 406 preexistente e adiado. Inspeção visual autenticada desktop/viewport estreito não realizada.
-- Data: 2026-10-19
-- Referência: [[tasks/completed/enable-accessible-team-member-assignment/audit.md]]
+- Nome: `validate-authenticated-responsive-ux`
+- Resultado: QA e Auditor aprovaram; matriz autenticada desktop/mobile concluída; dois ajustes SCSS locais. Angular 92/92 e build SUCCESS. Task Verdict APROVADO; Release Verdict BLOQUEADO pelo RabbitMQ AMQP 406 preexistente e adiado. Sem deploy, commit ou push.
+- Data: 2026-10-21
+- Referência: [[tasks/completed/validate-authenticated-responsive-ux/audit.md]]
 
 ## Task ativa
 
-- Nenhuma task ativa no momento. `enable-accessible-team-member-assignment` foi encerrada após aprovação dos gates e movida para concluídas.
+- Nenhuma task ativa. O viewport de produção não foi modificado; ajustes estão apenas no working tree e não foram implantados.
 - Skills `ux-review` e Impeccable disponíveis para tarefas de interface no Ciclo 3; Impeccable é de uso manual no Codex, sem hooks automáticos.
 
 ## Validações recentes
@@ -40,7 +40,7 @@ As seis fases do roadmap original estão concluídas. No Ciclo 3, `enable-access
 
 ## Próximo passo recomendado
 
-Reavaliar as lacunas restantes do Ciclo 3, incluindo a inspeção visual autenticada desktop/viewport estreito ainda pendente. O erro RabbitMQ AMQP 406 continua bloqueando Release e foi adiado pelo usuário; não iniciar investigação sem nova orientação. As seis fases originais e Ciclos 1/2 permanecem concluídos; Ciclo 3 continua em andamento.
+Reavaliar o backlog remanescente do Ciclo 3 e escolher a próxima task; nenhuma está ativa. O erro RabbitMQ AMQP 406 continua bloqueando Release e foi adiado pelo usuário; não iniciar investigação sem nova orientação. As seis fases originais e Ciclos 1/2 permanecem concluídos; Ciclo 3 continua em andamento.
 
 ## Contexto relevante
 
