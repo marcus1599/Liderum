@@ -257,7 +257,7 @@ ngAfterViewInit() {
   }
 
   deleteGroup(group: Group) {
-    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded || !window.confirm(`Excluir o grupo ${group.name}?`)) return;
     this.mutate(this.groupService.deleteGroup(group.id), 'Grupo excluído.', 'excluir grupo');
   }
 

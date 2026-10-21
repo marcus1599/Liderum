@@ -40,6 +40,21 @@ describe('GroupsComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('does not delete a group when confirmation is cancelled', () => {
+    component.loaded = true;
+    spyOn(window, 'confirm').and.returnValue(false);
+    component.deleteGroup({ id: 8, name: 'Raid', members: [] });
+    expect(service.deleteGroup).not.toHaveBeenCalled();
+  });
+
+  it('deletes a group only after confirmation', () => {
+    component.loaded = true;
+    spyOn(window, 'confirm').and.returnValue(true);
+    service.deleteGroup.and.returnValue(of(void 0));
+    component.deleteGroup({ id: 8, name: 'Raid', members: [] });
+    expect(service.deleteGroup).toHaveBeenCalledWith(8);
+  });
+
   it('does not mistake a failed members request for no available members', () => {
     service.getMembers.and.returnValue(new Subject<Member[]>());
     component.loadGroups();
