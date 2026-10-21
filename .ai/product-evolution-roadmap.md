@@ -88,7 +88,7 @@ Se notificações se tornarem feature real (**opção B**), criar task própria 
 
 ### NEXT
 
-- reavaliar o backlog do Ciclo 3 e escolher uma próxima task; não há task ativa;
+- `make-staff-activation-link-handoff-reliable`, `fix-attendance-event-selection-placeholder`, `stabilize-user-management-operational-states`, `make-dashboard-data-states-trustworthy` e `confirm-destructive-domain-actions-consistently` concluídas com QA, Security e Auditor aprovados. Gate final `validate-cycle-3-operational-flows` aprovado; Angular 103/103 e build SUCCESS. Ciclo 3 encerrado no nível automatizado local;
 
 ### LATER
 

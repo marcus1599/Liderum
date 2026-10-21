@@ -4,18 +4,18 @@
 
 ## Estado atual
 
-As seis fases do roadmap original estão concluídas. No Ciclo 3, `validate-authenticated-responsive-ux` foi concluída com Task Verdict APROVADO: sete rotas revisadas autenticadas em 1280×800 e 390×844; ajustes locais para altura de campos em Events/mobile e contraste em Users; Angular 92/92 e build SUCCESS. Sem deploy. Release global permanece BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente, cuja investigação foi adiada pelo usuário.
+As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `validate-authenticated-responsive-ux`, `make-staff-activation-link-handoff-reliable`, `fix-attendance-event-selection-placeholder`, `stabilize-user-management-operational-states`, `make-dashboard-data-states-trustworthy` e `confirm-destructive-domain-actions-consistently` foram aprovadas. A suíte Angular final ficou em 103/103 e o build SUCCESS. Release global permanece BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente, cuja investigação foi adiada pelo usuário.
 
 ## Última task concluída
 
-- Nome: `validate-authenticated-responsive-ux`
-- Resultado: QA e Auditor aprovaram; matriz autenticada desktop/mobile concluída; dois ajustes SCSS locais. Angular 92/92 e build SUCCESS. Task Verdict APROVADO; Release Verdict BLOQUEADO pelo RabbitMQ AMQP 406 preexistente e adiado. Sem deploy, commit ou push.
+- Nome: `validate-cycle-3-operational-flows`
+- Resultado: QA, Security e Auditor aprovaram o gate final do Ciclo 3. As cinco tasks funcionais sequenciais passaram suas suítes e build; Angular final 103/103 e build SUCCESS. Task Verdict APROVADO; Release Verdict BLOQUEADO pelo RabbitMQ AMQP 406 preexistente e adiado.
 - Data: 2026-10-21
 - Referência: [[tasks/completed/validate-authenticated-responsive-ux/audit.md]]
 
 ## Task ativa
 
-- Nenhuma task ativa. O viewport de produção não foi modificado; ajustes estão apenas no working tree e não foram implantados.
+- Nenhuma task ativa. O Ciclo 3 está concluído no nível automatizado local; a próxima iniciativa deve ser planejada fora deste ciclo.
 - Skills `ux-review` e Impeccable disponíveis para tarefas de interface no Ciclo 3; Impeccable é de uso manual no Codex, sem hooks automáticos.
 
 ## Validações recentes
@@ -40,7 +40,7 @@ As seis fases do roadmap original estão concluídas. No Ciclo 3, `validate-auth
 
 ## Próximo passo recomendado
 
-Reavaliar o backlog remanescente do Ciclo 3 e escolher a próxima task; nenhuma está ativa. O erro RabbitMQ AMQP 406 continua bloqueando Release e foi adiado pelo usuário; não iniciar investigação sem nova orientação. As seis fases originais e Ciclos 1/2 permanecem concluídos; Ciclo 3 continua em andamento.
+O Ciclo 3 foi concluído e validado no nível automatizado local. Não há task ativa. O erro RabbitMQ AMQP 406 continua bloqueando Release, separado e adiado pelo usuário; qualquer próxima iniciativa deve ser planejada como novo ciclo/task.
 
 ## Contexto relevante
 
