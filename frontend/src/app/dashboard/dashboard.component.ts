@@ -10,6 +10,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { SumPipe } from './sum.pipe';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-dashboard',
@@ -29,6 +30,9 @@ import { SumPipe } from './sum.pipe';
 })
 export class DashboardComponent implements OnInit {
   eventFilterCount = 10;
+  loading = false;
+  dashboardLoaded = false;
+  errorMessage = '';
 
   presencePieChartData = {
     labels: ['Presenças', 'Faltas', 'Justificadas'],
@@ -72,7 +76,12 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboardData() {
-    this.dashboardService.getDashboardMetrics(this.eventFilterCount).subscribe((metrics: DashboardMetrics) => {
+    this.loading = true;
+    this.dashboardLoaded = false;
+    this.errorMessage = '';
+    const count = Math.min(50, Math.max(1, Number(this.eventFilterCount) || 10));
+    this.eventFilterCount = count;
+    this.dashboardService.getDashboardMetrics(count).subscribe({ next: (metrics: DashboardMetrics) => {
       this.presencePieChartData = {
         labels: metrics.presencePie.map(p => p.status),
         datasets: [{
@@ -119,7 +128,13 @@ export class DashboardComponent implements OnInit {
 
       this.alerts = metrics.alerts;
       this.highlights = metrics.highlights;
-    });
+      this.loading = false;
+      this.dashboardLoaded = true;
+    }, error: (error: HttpErrorResponse) => {
+      this.loading = false;
+      this.dashboardLoaded = false;
+      this.errorMessage = error.status === 403 ? 'Você não tem permissão para consultar o Dashboard.' : 'Não foi possível carregar os dados do Dashboard agora.';
+    }});
   }
 
   onEventFilterChange() {

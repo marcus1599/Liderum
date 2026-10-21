@@ -1,4 +1,8 @@
 <div class="content">
+        <p *ngIf="loading" role="status">Carregando dados do Dashboard...</p>
+        <p *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
+        <button mat-button type="button" *ngIf="errorMessage && !loading" (click)="loadDashboardData()">Tentar carregar novamente</button>
+        <ng-container *ngIf="dashboardLoaded && !loading && !errorMessage">
 
         <!-- ── KPI strip ── -->
         <div class="kpi-strip">
@@ -227,4 +231,5 @@
           </mat-card>
 
         </div>
+        </ng-container>
 </div>
