@@ -118,6 +118,18 @@ describe('AttendenceComponent', () => {
     expect(component.loading).toBeFalse();
   });
 
+  it('treats the native placeholder as no event and avoids an attendance request', () => {
+    component.onEventChange('null');
+    expect(component.selectedEventId).toBeNull();
+    expect(attendance.getAttendances).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads attendance only for a valid positive event id', () => {
+    component.onEventChange('2');
+    expect(component.selectedEventId).toBe(2);
+    expect(attendance.getAttendances).toHaveBeenCalledTimes(2);
+  });
+
   it('allows the first attendance when the selected event has no records', () => {
     component.onEventChange(1);
     fixture.detectChanges();

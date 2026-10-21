@@ -217,7 +217,10 @@ export class AttendenceComponent implements OnInit, OnDestroy {
   onEventChange(eventId: any) {
     if (this.saving || !this.loaded) return;
     this.statusMessage = '';
-    this.selectedEventId = eventId ? Number(eventId) : null;
+    const parsedEventId = Number(eventId);
+    this.selectedEventId = eventId === null || eventId === undefined || eventId === '' || eventId === 'null'
+      ? null
+      : Number.isInteger(parsedEventId) && parsedEventId > 0 ? parsedEventId : null;
     this.attendancesLoaded = false;
     this.errorMessage = '';
     if (this.selectedEventId === null) return;
