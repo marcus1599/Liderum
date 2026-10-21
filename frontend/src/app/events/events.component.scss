@@ -16,7 +16,6 @@
   mat-form-field {
     min-width: 100%;
     width: 100%;
-   
   }
   .form-actions {
     flex-direction: column;
@@ -228,6 +227,12 @@ button[mat-button]:hover {
   background: #23242a;
   border-radius: 50%;
   transition: background 0.2s;
+}
+
+@media (max-width: 900px) {
+  .event-form mat-form-field {
+    flex: 0 1 auto;
+  }
 }
 
 .event-actions button[mat-icon-button]:hover {
