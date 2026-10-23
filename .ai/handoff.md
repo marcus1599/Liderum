@@ -8,10 +8,10 @@ As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `v
 
 ## Última task concluída
 
-- Nome: `resolve-rabbitmq-amqp-406-queue-topology`
-- Resultado: topologia operacional corrigida; QA, Security, SRE/DevOps e Auditor aprovaram a task. Backend `clean verify` 93/93, notification-service 4/4 e 3 integrações RabbitMQ isoladas passaram. Task Verdict APROVADO. Release Verdict continua BLOQUEADO por ausência de validação de um fluxo único no broker real de produção; integração local separada não equivale a smoke em produção.
-- Data: 2026-10-21
-- Referência: [[tasks/completed/resolve-rabbitmq-amqp-406-queue-topology/audit.md]]
+- Nome: `clarify-user-management-actions-and-language`
+- Resultado: ações de gestão de usuários organizadas por identidade, cargo e conta; rótulos/localização e contexto acessível adicionados sem mudar RBAC, tenant ou contratos. Angular 106/106 e build SUCCESS; QA aprovado com limitação de fixtures locais, Security aprovado com evidência limitada e Task Verdict APROVADO. Release Verdict global continua BLOQUEADO pelo smoke RabbitMQ de produção ausente.
+- Data: 2026-10-23
+- Referência: [[tasks/completed/clarify-user-management-actions-and-language/audit.md]]
 
 ## Encerramento administrativo recente
 

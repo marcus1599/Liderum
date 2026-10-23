@@ -75,6 +75,18 @@ export class UsersComponent implements OnInit {
     return target.guildRole !== 'GENERAL' && target.guildRole !== 'MARECHAL';
   }
 
+  roleLabel(role: GuildRole): string { return role; }
+
+  statusLabel(status: ManagedUser['status']): string {
+    return { PENDING: 'Aguardando ativação', ACTIVE: 'Ativo', DISABLED: 'Desativado' }[status];
+  }
+
+  actionStatus(user: ManagedUser): string {
+    if (this.statusChanges[user.id]) return `Atualizando o status de ${user.username}.`;
+    if (this.actionChanges[user.id]) return `Atualizando ${user.username}.`;
+    return '';
+  }
+
   loadUsers(): void {
     this.isLoading = true;
     this.errorMessage = '';
@@ -109,7 +121,7 @@ export class UsersComponent implements OnInit {
       next: updated => {
         this.users = this.users.map(item => item.id === updated.id ? updated : item);
         this.actionChanges[user.id] = false;
-        this.snackbar.open('Role atualizada com sucesso.', 'Fechar');
+        this.snackbar.open('Cargo atualizado com sucesso.', 'Fechar');
       },
       error: error => {
         this.actionChanges[user.id] = false;

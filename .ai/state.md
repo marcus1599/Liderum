@@ -440,7 +440,7 @@ O README descreve o produto e suas principais funcionalidades.
 | OpenAPI              | Implementado                              |
 | CI Backend           | Implementado                              |
 | Testes Backend       | Último `clean verify` da task de reassociação de líder: 92 testes, 0 failures/errors/skipped, BUILD SUCCESS; validações PostgreSQL anteriores permanecem documentadas nas respectivas tasks |
-| Testes Frontend      | Última suíte completa: 92/92, exit code 0 em duas execuções consecutivas; build Angular SUCCESS. Warnings Sass/CSS/baseline-browser-mapping permanecem não bloqueantes. |
+| Testes Frontend      | Última suíte completa: 106/106 ChromeHeadless, exit code 0; build Angular SUCCESS. Warnings Sass/CSS/baseline-browser-mapping permanecem não bloqueantes. |
 | Security Review      | Task Security Verdict da reassociação de líder APROVADO; Release Verdict global BLOQUEADO pelo achado RabbitMQ preexistente |
 | Documentação         | ADR-001, roadmap, handoff e artefatos de tasks versionados em `.ai/`; Impeccable documentada em `.ai/docs/impeccable-codex.md` |
 

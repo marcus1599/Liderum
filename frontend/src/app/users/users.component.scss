@@ -2,12 +2,18 @@
 header { margin-bottom: 1.5rem; }
 .create-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; align-items: center; margin-bottom: 2rem; }
 .create-form h2 { grid-column: 1 / -1; }
-.user-list { display: grid; gap: .75rem; }
-.user-row { display: grid; grid-template-columns: 1fr auto auto auto; gap: .75rem; align-items: center; padding: 1rem; border: 1px solid #ddd; border-radius: 8px; }
-.user-row div { display: flex; flex-direction: column; }
-.user-row span { opacity: .75; }
+.user-list { display: grid; gap: 1rem; }
+.user-row { display: grid; grid-template-columns: minmax(13rem, 1fr) minmax(15rem, 1.2fr) minmax(12rem, auto); gap: 1.25rem; align-items: start; padding: 1.25rem; border: 1px solid #8f8aa4; border-radius: 12px; background: #3e424b; }
+.user-identity, .user-role, .account-actions, .role { display: flex; flex-direction: column; align-items: flex-start; gap: .45rem; min-width: 0; }
+.user-identity span, .user-row .role { color: #cbc7dc; overflow-wrap: anywhere; }
+.status { display: inline-flex; width: fit-content; border-radius: 999px; padding: .2rem .55rem; background: #524d6b; color: #f0edff !important; font-size: .82rem; font-weight: 600; opacity: 1 !important; }
+.section-label { color: #cfc6ff; font-size: .78rem; font-weight: 700; letter-spacing: .02em; text-transform: uppercase; }
+.user-role mat-form-field { width: 100%; margin-top: .25rem; }
+.account-actions { gap: .35rem; }
+.account-actions button, .user-role button { text-align: left; justify-content: flex-start; }
+.action-status { grid-column: 2 / -1; min-height: 1.25rem; margin: -.5rem 0 0; color: #d9d2ff; font-size: .86rem; }
 .error { color: #ffb3b3; }.denied { padding: 2rem; }.empty { opacity: .7; }
 .activation-link { display: grid; gap: .5rem; margin: 1rem 0; }
 .activation-link mat-form-field { width: 100%; }
 .activation-link small { opacity: .8; }
-@media (max-width: 700px) { .users-page { padding: 1rem; }.user-row { grid-template-columns: 1fr; } }
+@media (max-width: 800px) { .users-page { padding: 1rem; }.user-row { grid-template-columns: 1fr; gap: 1rem; }.action-status { grid-column: auto; margin: 0; } }

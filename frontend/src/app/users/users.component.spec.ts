@@ -66,6 +66,29 @@ describe('UsersComponent', () => {
     username?.markAsTouched();
     expect(component.fieldError('username')).toBe('Campo obrigatório.');
   });
+  it('presents localized account states and a contextual role workflow', () => {
+    profile$.next(marechal);
+    fixture.detectChanges();
+    const content = fixture.nativeElement.textContent;
+    expect(component.statusLabel('ACTIVE')).toBe('Ativo');
+    expect(content).toContain('Cargo atual');
+    expect(content).toContain('Novo cargo para soldier');
+    expect(content).toContain('Ações da conta');
+    expect(content).not.toContain('Salvar role');
+  });
+  it('keeps pending-account actions distinct and contextually labelled', () => {
+    profile$.next(marechal);
+    component.users = [{ id: 2, username: 'pending-user', email: 'p@example.com', guildRole: 'SOLDADO', status: 'PENDING' }];
+    fixture.detectChanges();
+    const buttons = Array.from(fixture.nativeElement.querySelectorAll('button')) as HTMLButtonElement[];
+    expect(buttons.some(button => button.getAttribute('aria-label') === 'Regenerar link de ativação de pending-user')).toBeTrue();
+    expect(buttons.some(button => button.getAttribute('aria-label') === 'Desativar pending-user')).toBeFalse();
+  });
+  it('announces an in-progress account action with the user context', () => {
+    const user = { id: 2, username: 'soldier', email: 's@example.com', guildRole: 'SOLDADO' as const, status: 'ACTIVE' as const };
+    component.statusChanges[user.id] = true;
+    expect(component.actionStatus(user)).toBe('Atualizando o status de soldier.');
+  });
   it('changes status after confirmation and updates the rendered user', () => {
     profile$.next(general);
     spyOn(window, 'confirm').and.returnValue(true);
