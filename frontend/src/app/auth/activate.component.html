@@ -1,0 +1,44 @@
+<main class="auth-page activate-page">
+  <div class="auth-backdrop" aria-hidden="true"></div>
+
+  <section class="auth-surface activate-surface" aria-labelledby="activate-title">
+    <h1 id="activate-title">Ativar conta</h1>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" [attr.aria-busy]="saving">
+      <mat-form-field appearance="outline" class="auth-field">
+        <mat-label>Nova senha</mat-label>
+        <input matInput type="password" formControlName="password" aria-label="Nova senha" autocomplete="new-password" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="auth-field">
+        <mat-label>Confirmar senha</mat-label>
+        <input
+          matInput
+          type="password"
+          formControlName="confirmation"
+          aria-label="Confirmar senha"
+          [attr.aria-describedby]="form.get('confirmation')?.touched && form.value.password !== form.value.confirmation ? 'confirmation-error' : null"
+        />
+      </mat-form-field>
+
+      <p
+        *ngIf="form.value.password !== form.value.confirmation && form.get('confirmation')?.touched"
+        id="confirmation-error"
+        class="auth-validation-message"
+        role="alert"
+      >
+        As senhas não conferem.
+      </p>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="auth-submit"
+        type="submit"
+        [disabled]="form.invalid || form.value.password !== form.value.confirmation || saving"
+      >
+        Ativar conta
+      </button>
+    </form>
+  </section>
+</main>

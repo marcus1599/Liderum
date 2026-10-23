@@ -10,7 +10,6 @@ import { AuthService } from './auth.service';
 
 import { Router } from '@angular/router';
 import { RouterLink } from '@angular/router';
-import { MatProgressSpinner } from '@angular/material/progress-spinner';
 
 @Component({
   selector: 'app-login',
@@ -23,13 +22,12 @@ import { MatProgressSpinner } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatProgressSpinner
-    ,RouterLink
+    RouterLink
     
   
   ],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss']
+  styleUrls: ['./auth-surface.scss', './login.component.scss']
 })
 export class LoginComponent {
   form: FormGroup;

@@ -1,0 +1,38 @@
+# Execução — `harmonize-login-and-activation-presentation`
+
+## Investigação do fluxo (2026-10-23)
+
+- `ActivateComponent` lê `route.snapshot.queryParamMap.get('token')` no construtor, mantém o valor em memória e chama `Location.replaceState('/activate')` quando presente. Isso substitui a URL corrente sem query; o código não documenta a motivação. Efeito plausível (inferência): reduzir exposição por barra de endereço/histórico/referrer; não há evidência de que seja defeito.
+- Não há chamada de validação antes do submit. No cliente, há somente presença do token, `required`, senha 8–128 caracteres e confirmação coincidente.
+- O backend recebe `POST /auth/activate` com `{token,password}`. `ActivationRequestDTO` valida token/senha não vazios e senha 8–128; `UserActivationServiceImpl` só então valida hash, expiração, revogação/uso e estado `PENDING`, troca hash da senha e ativa o usuário. Controller retorna 204 no sucesso e 400 para token inválido; validação DTO também retorna 400.
+- Rotas `/login` e `/activate` são públicas; somente áreas internas usam `authGuard`. O endpoint está em `SecurityConfig` como `permitAll`.
+- Estados reais no UI: login disabled/loading, snackbar de erro “Usuário ou senha inválidos”, navegação `/dashboard` após sucesso; ativação mismatch, botão disabled/saving, overlay/spinner global, snackbar de sucesso e navegação `/login`, snackbar “Link inválido ou expirado.” em qualquer erro HTTP. Não há validação antecipada ou erro para token ausente.
+- Specs atuais: `login.component.spec.ts` só verifica criação; `auth.service.spec.ts` testa login HTTP com sucesso e sessão inválida, mas não erro visual do login. Não existe spec de `ActivateComponent` nem de `UserManagementService.activate`. Backend tem `UserActivationConcurrencyIntegrationTest`, que cobre uma ativação concorrente como 204 e a repetida como 400; não cobre todos os tipos de token inválido.
+- Defeitos confirmados fora do escopo desta task: token ausente permite campos válidos e botão habilitado, mas `submit()` retorna silenciosamente; todo erro de ativação, inclusive rede/5xx, é descrito como link inválido/expirado. Não mudar autenticação nem semântica de erro nesta task; encaminhar separadamente.
+
+## Implementação
+
+- Login e ativação usam uma superfície compartilhada escura/violeta alinhada ao tema Material existente, tipografia e espaçamento consistentes, campos em coluna, foco visível e botão de largura total com estados legíveis. O link de cadastro usa o acento lilás da Direção B. A inspeção final identificou rótulos Material escuros sobre a superfície; tokens locais foram ajustados e o `mat-label` computou `rgb(216, 208, 226)` nas quatro rotas/viewports.
+- A ativação foi extraída do template inline para HTML/SCSS externos sem mudar token, payload, serviço, endpoint, validações, mensagens ou navegação. Os campos recebem nomes acessíveis e `autocomplete="new-password"`; a divergência de confirmação é associada ao campo por `aria-describedby` e anunciada por `role="alert"`.
+- O login deixou de renderizar o spinner local que duplicava o indicador global. A decoração animada foi removida e estilos de motion/transição respeitam `prefers-reduced-motion`; nenhuma dependência, backend, rota, serviço, interceptor ou contrato foi alterado.
+- Specs novos/atualizados cobrem os formulários, mismatch, request pendente, erro e sucesso/navegação por spies, sem rede real.
+
+## Validação final — 2026-10-23
+
+- `frontend`: `npm test -- --watch=false --browsers=ChromeHeadless` — 119/119 specs passaram (incluindo specs de Login e Ativação). Os primeiros testes exploratórios revelaram expectativas de harness inadequadas sobre o overlay do Material; corrigidos os próprios testes para observar o spy do snackbar e a associação acessível; a execução completa final passou.
+- `frontend`: `npm run build` — build Angular de produção concluído. Permanecem avisos de depreciação Sass e budgets excedidos nos estilos preexistentes de Dashboard/Members, fora desta task; sem erro de compilação.
+- Impeccable: revisão manual das telas renderizadas e `.agents/skills/impeccable/scripts/impeccable.cmd detect --json --target frontend/src/app/auth/login.component.html --target frontend/src/app/auth/activate.component.html` — `[]`, sem achados automáticos.
+- Inspeção renderizada final das quatro combinações: `/login` e `/activate` em 1280×800 e 390×844. Métricas no documento interno de cada app: largura de scroll = largura cliente (1280/390) e altura de scroll = altura cliente (800/844), sem overflow. Hierarquia, alinhamento, legibilidade, card responsivo e cores coerentes com Direção B observados.
+- Estado de confirmação divergente foi mostrado junto ao campo e anunciado; mock HTTP local retornou 401 no login e 400 na ativação, com as mensagens reais “Usuário ou senha inválidos” e “Link inválido ou expirado.” no AX tree/tela. No estado pendente, overlay e indicador global apareceram e o botão ficou indisponível; no Login não há segundo spinner local.
+- Teclado: ordem semântica deriva do DOM formulário-campos-botão-link; captura final mostrou foco de teclado visível no link. Nomes de controles e feedback foram conferidos no AX tree. `prefers-reduced-motion: reduce` foi emulado no navegador: media query ativa e duração computada de animação/transição `0s`; emulação restaurada ao final.
+- A fixture e mock eram locais/temporários, sem forwarding; evidência de log limitada a método/rota/status. Não se utilizou backend de produção, credencial real, nem token real. Valores efêmeros foram redigidos pela inspeção AX e não foram enviados a logs/artefatos. Configuração temporária de `environment.development.ts` e arquivos de fixture foram restaurados/removidos após a inspeção.
+- Não foi solicitada revisão formal de Security: a alteração ficou estritamente em apresentação/semântica e specs, sem mudança de autenticação, token, autorização, endpoint, mensagem ou contrato. O Auditor deve conferir essa fronteira.
+- Parecer QA formal: APROVADO COM LIMITAÇÕES em `qa.md`; Auditoria formal: Task Verdict APROVADO e Release Verdict BLOQUEADO por achado RabbitMQ preexistente e não relacionado em `audit.md`. Security não exigido conforme escopo visual/semântico e plano; Auditor conferiu a fronteira sem mudanças de auth/token/endpoint/contrato. `finish-task` permitido. Release global segue bloqueado; isso não reprova esta task.
+
+## Inspeção visual inicial
+
+- Login renderizado em iframe local CSS 1280×800 e 390×844: painel central e tema escuro/violeta; submit desabilitado visualmente imperceptível, link azul padrão com contraste fraco; campo/controles ainda legíveis. Em erro 401 mock, snackbar é compreensível; loading mostra overlay/spinner global e spinner local simultaneamente.
+- Ativação renderizada em 1280×800 e 390×844: sem superfície/estrutura de página, heading escuro sobre fundo escuro; campos Material sem respiro e em linha com botão de submit; nomes dos campos não aparecem no AX tree consultado. Erro 400 mock produz snackbar real “Link inválido ou expirado.”. Loading mostra overlay e spinner global.
+- Mock temporário: `127.0.0.1:43127`; rota `/auth/login` → 401, `/auth/activate` → 400, demais → 404; sem forwarding. Logs contêm somente método, rota e status. Nenhum token/senha foi registrado. Valores fictícios apenas.
+- Fixture temporária: `frontend/public/assets/ux-visual-fixture.html`, usa iframe com 1280×800 ou 390×844 e rota real. Deve ser removida após uso.
+- Capturas e AX são observação renderizada desta implementação real, não mock de conteúdo. Esta inspeção inicial registra apenas a linha de base; resultados finais, incluindo correção de contraste e gates, estão na seção “Validação final”.
