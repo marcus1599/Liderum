@@ -4,9 +4,16 @@
 
 ## Estado atual
 
-As seis fases do roadmap original estão concluídas. O backlog UX/UI incremental está em execução sequencial: `clarify-user-management-actions-and-language` e `clarify-team-assignment-and-leadership-flow` foram concluídas; a próxima candidata é `explain-empty-dashboard-analytics`, sujeita a confirmar os contratos/condições reais das métricas. A task Teams passou no gate de QA (107/107 testes e build SUCCESS, com limitações de inspeção visual autenticada) e no Task Verdict. A direção visual canônica B está em [[docs/liderum-visual-direction.md]]. A iniciativa RabbitMQ está encerrada administrativamente com limitações; nenhum novo veredito técnico foi atribuído e o Release Verdict global permanece BLOQUEADO pelo smoke de produção não executado.
+As seis fases do roadmap original estão concluídas. O backlog UX/UI incremental está em execução sequencial. `explain-empty-dashboard-analytics` foi arquivada após QA APROVADO COM LIMITAÇÕES, Task Verdict APROVADO, Angular 111/111 e build SUCCESS. A inspeção visual autenticada não foi realizada por ausência de fixture segura e WCAG completa não foi alegada. Seu commit local isolado ainda está pendente; não iniciar próxima task antes de confirmar o commit. `clarify-team-assignment-and-leadership-flow` e a task anterior de Users também estão concluídas. A direção visual canônica B está em [[docs/liderum-visual-direction.md]]. A iniciativa RabbitMQ está encerrada administrativamente com limitações; o Release Verdict global permanece BLOQUEADO pelo smoke de produção não executado.
 
 ## Última task concluída
+
+- Nome: `explain-empty-dashboard-analytics`
+- Resultado: estados vazios do Dashboard distinguem ausência de eventos, eventos sem registros de presença e ausência de membros; taxa sem denominador é `—`, contagens zero permanecem. Sem mudança de cálculo, endpoint, RBAC ou tenant. Angular 111/111 e build SUCCESS; QA APROVADO COM LIMITAÇÕES, Auditor Task Verdict APROVADO. Inspeção visual renderizada/autenticada em 1280×800 e 390×844 não realizada por ausência de fixture segura; WCAG completa não reivindicada. Commit local isolado pendente; sem push. Release Verdict global continua BLOQUEADO pelo RabbitMQ preexistente.
+- Data: 2026-10-23
+- Referência: [[tasks/completed/explain-empty-dashboard-analytics/audit.md]]
+
+## Task anterior concluída
 
 - Nome: `clarify-team-assignment-and-leadership-flow`
 - Resultado: atribuição membro→grupo e troca de liderança contextualizadas em `/teams`, sem mudar RBAC, tenant, contratos ou lógica de negócio. Angular 107/107 e build SUCCESS; QA APROVADO COM LIMITAÇÕES, Auditor Task Verdict APROVADO; inspeção visual autenticada/390px não realizada. Commit local: `8aa771a615c9904a534fe96de0baf61ad3d165a2` (sem push). Release Verdict global continua BLOQUEADO pelo achado RabbitMQ preexistente.
@@ -19,7 +26,7 @@ As seis fases do roadmap original estão concluídas. O backlog UX/UI incrementa
 
 ## Task ativa
 
-- Nenhuma. Task Teams arquivada e commit local confirmado (`8aa771a615c9904a534fe96de0baf61ad3d165a2`); working tree limpo na verificação posterior. Próxima task elegível: `explain-empty-dashboard-analytics`; contratos e condições foram confirmados no código e a pasta ativa deve conter somente essa task após planejamento. Impeccable é de uso manual no Codex, sem hooks automáticos.
+- Nenhuma. `explain-empty-dashboard-analytics` está em `tasks/completed/` e aguarda commit local isolado. Após validar o commit, próxima task elegível é `harmonize-login-and-activation-presentation`; ativá-la somente então. O checkpoint operacional está em `.ai/roadmap-execution-state.json` e deve ser reconciliado com Git/filesystem ao retomar. Impeccable é de uso manual no Codex, sem hooks automáticos.
 
 ## Validações recentes
 
@@ -43,7 +50,7 @@ As seis fases do roadmap original estão concluídas. O backlog UX/UI incrementa
 
 ## Próximo passo recomendado
 
-Iniciar somente `explain-empty-dashboard-analytics`, começando por definir estados vazios honestos para as coleções/derivações existentes e validar visualmente com fixture local segura em 1280×800 e 390×844, se disponível. Não alterar fórmulas/endpoints nem retomar RabbitMQ sem decisão explícita; não fazer push.
+Inspecionar/stage seletivamente apenas os artefatos da task Dashboard, validar `git diff --cached --check` e revisar o staged diff antes do commit local autorizado. Não iniciar outra task até o commit estar confirmado. Em retomada, ler Router/checkpoint/state/handoff e reconciliar arquivos e Git. Não alterar fórmulas/endpoints nem retomar RabbitMQ; não fazer push.
 
 ### Registro histórico — antes da autorização Docker/best-effort — 2026-10-21
 

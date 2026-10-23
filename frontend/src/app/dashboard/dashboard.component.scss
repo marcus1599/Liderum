@@ -430,10 +430,16 @@ $radius-sm: 6px;
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: $text-muted;
+  color: $text-secondary;
   padding: 8px 0;
 
-  mat-icon { font-size: 18px; color: $text-muted; }
+  mat-icon { font-size: 18px; color: $text-secondary; }
+}
+
+.panel-note {
+  margin: 0 0 8px;
+  color: $text-secondary;
+  font-size: 13px;
 }
 
 // ── Responsividade ────────────────────────────────────────────────────────────

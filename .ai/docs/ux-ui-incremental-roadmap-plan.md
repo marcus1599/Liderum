@@ -1,6 +1,6 @@
 # Plano incremental de UX/UI — pós-Ciclo 3
 
-Status: execução sequencial. Tasks concluídas: `clarify-user-management-actions-and-language`, `clarify-team-assignment-and-leadership-flow` (Task Verdict APROVADO; commit local `8aa771a615c9904a534fe96de0baf61ad3d165a2`, sem push). Nenhuma task ativa; próxima elegível: `explain-empty-dashboard-analytics`. Contratos e condições dos estados foram confirmados no serviço Angular e nos endpoints tenant-scoped; iniciar apenas essa task após registrar seu PRD/plano.
+Status: execução sequencial. Tasks concluídas: `clarify-user-management-actions-and-language`, `clarify-team-assignment-and-leadership-flow` (Task Verdict APROVADO; commits locais `8aa771a615c9904a534fe96de0baf61ad3d165a2` e `c7a894c`, sem push) e `explain-empty-dashboard-analytics` (Task Verdict APROVADO; commit local isolado pendente, sem push). Nenhuma task ativa até validar o commit; próxima elegível após commit: `harmonize-login-and-activation-presentation`.
 
 ## Base e limites
 
@@ -33,6 +33,8 @@ Preservar Angular standalone, Angular Material, rotas, RBAC, tenant server-side,
 - **Risco:** regressão de seleção e de estado assíncrono. **Agents:** Planner, Frontend Dev, QA, Auditor; Security se fluxo de autorização for afetado. **Skills:** `ux-review`, Impeccable, `test-frontend`, `audit-task`, `finish-task`.
 
 ### 3. `explain-empty-dashboard-analytics` — A / P2 / SMALL
+
+**Status: concluída em 2026-10-23.** QA APROVADO COM LIMITAÇÕES; Task Verdict APROVADO; Angular 111/111 e build SUCCESS. Inspeção autenticada/renderizada em 1280×800 e 390×844 não realizada por ausência de fixture local segura; WCAG completa não reivindicada. Commit local ainda pendente.
 
 - **Objetivo:** explicar métricas e gráficos quando a Guild ainda não tem dados suficientes.
 - **Evidência:** em viewport estreita, KPIs antecedem um gráfico amplo sem dados; o template já distingue loading/erro do carregamento geral. A semântica do agregado deve ser confirmada antes de mudar mensagens.
@@ -73,4 +75,4 @@ Preservar Angular standalone, Angular Material, rotas, RBAC, tenant server-side,
 
 ## Ordem e governança
 
-As tasks 1–4 podem ser planejadas individualmente; executar 1 antes de 5 para estabelecer o padrão administrativo, e 2–3 em sequência conforme disponibilidade de fixtures. A task 5 depende da evidência visual acumulada. A task 6 não é necessária para considerar este roadmap incremental concluído se o gatilho não ocorrer. Não ativar todas simultaneamente: mantenha somente uma task UX/UI em `tasks/active/`. A primeira ação para este backlog é planejar/ativar apenas a task 1, preservando o encerramento administrativo da iniciativa RabbitMQ sem atribuir-lhe um veredito novo.
+As tasks 1–4 podem ser planejadas individualmente; executar 1 antes de 5 para estabelecer o padrão administrativo, e 2–3 em sequência conforme disponibilidade de fixtures. A task 5 depende da evidência visual acumulada. A task 6 não é necessária para considerar este roadmap incremental concluído se o gatilho não ocorrer. Não ativar todas simultaneamente: mantenha somente uma task UX/UI em `tasks/active/`. Na retomada, reconciliar `.ai/roadmap-execution-state.json` com Git e filesystem; ativar somente a próxima task após a confirmação do commit da task 3, preservando o encerramento administrativo da iniciativa RabbitMQ sem atribuir-lhe um veredito novo.

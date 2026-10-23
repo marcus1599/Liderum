@@ -67,6 +67,27 @@ export class DashboardComponent implements OnInit {
   highlights: { member: any, presencas: number }[] = [];
   alerts: { member: any, faltasConsecutivas: number }[] = [];
 
+  get presenceTotal(): number {
+    return this.presencePieChartData.datasets[0].data.reduce((total, count) => total + count, 0);
+  }
+
+  get presenceRate(): number | null {
+    if (this.presenceTotal === 0) return null;
+    return this.presencePieChartData.datasets[0].data[0] / this.presenceTotal * 100;
+  }
+
+  get hasEvents(): boolean {
+    return this.presenceLineChartData.labels.length > 0;
+  }
+
+  get hasPresenceRecords(): boolean {
+    return this.presenceTotal > 0;
+  }
+
+  get hasMembers(): boolean {
+    return this.highlights.length > 0;
+  }
+
   constructor(
     private dashboardService: DashboardService
   ) {}

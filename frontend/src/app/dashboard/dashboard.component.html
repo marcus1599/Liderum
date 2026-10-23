@@ -9,12 +9,7 @@
           <div class="kpi-card">
             <span class="kpi-label">Taxa de presença</span>
             <span class="kpi-value">
-              {{ presencePieChartData.datasets[0].data[0] &&
-                 (presencePieChartData.datasets[0].data[0] /
-                  (presencePieChartData.datasets[0].data[0] +
-                   presencePieChartData.datasets[0].data[1] +
-                   presencePieChartData.datasets[0].data[2]) * 100 | number:'1.0-0')
-              }}%
+              {{ presenceRate === null ? '—' : (presenceRate | number:'1.0-0') + '%' }}
             </span>
             <span class="kpi-sub">dos membros presentes</span>
           </div>
@@ -51,7 +46,7 @@
               </div>
             </mat-card-header>
             <mat-card-content>
-              <div class="donut-wrap">
+              <div class="donut-wrap" *ngIf="hasPresenceRecords; else noPresenceDonut">
                 <canvas baseChart
                   [data]="presencePieChartData"
                   [type]="'doughnut'"
@@ -65,6 +60,13 @@
                   }">
                 </canvas>
               </div>
+              <ng-template #noPresenceDonut>
+                <div class="empty-state" role="status">
+                  <mat-icon aria-hidden="true">donut_large</mat-icon>
+                  <span *ngIf="hasEvents">Há eventos nesta seleção, mas ainda não há registros de presença.</span>
+                  <span *ngIf="!hasEvents">Sem eventos nesta seleção. Os dados de presença aparecerão quando houver eventos cadastrados.</span>
+                </div>
+              </ng-template>
               <div class="donut-legend">
                 <div class="legend-item">
                   <span class="legend-dot dot-green"></span>
@@ -103,6 +105,12 @@
               </div>
             </mat-card-header>
             <mat-card-content>
+              <p class="panel-note" *ngIf="hasEvents && !hasPresenceRecords" role="status">
+                Os eventos selecionados estão listados; ainda não há registros de presença para comparar.
+              </p>
+              <p class="empty-state" *ngIf="!hasEvents" role="status">
+                Sem eventos para exibir na seleção atual.
+              </p>
               <div class="chart-wrap">
                 <canvas baseChart
                   [data]="presenceLineChartData"
@@ -153,6 +161,10 @@
             </mat-card-header>
             <mat-card-content>
               <div class="class-bars">
+                <div class="empty-state" *ngIf="!hasMembers" role="status">
+                  <mat-icon aria-hidden="true">groups</mat-icon>
+                  <span>Adicione membros para ver a distribuição por classe.</span>
+                </div>
                 <ng-container *ngFor="let label of classPieChartData.labels; let i = index">
                   <div class="bar-row">
                     <span class="bar-label">{{ label }}</span>
@@ -179,9 +191,14 @@
               </div>
             </mat-card-header>
             <mat-card-content>
-              <div class="alert-ok" *ngIf="alerts.length === 0">
-                <mat-icon class="alert-check">check_circle</mat-icon>
-                <span>Nenhuma falta consecutiva detectada</span>
+              <div class="empty-state" *ngIf="!hasMembers" role="status">
+                <mat-icon aria-hidden="true">groups</mat-icon>
+                <span>Adicione membros para acompanhar alertas de presença.</span>
+              </div>
+              <div class="empty-state" *ngIf="hasMembers && alerts.length === 0" role="status">
+                <mat-icon aria-hidden="true">info</mat-icon>
+                <span *ngIf="!hasEvents || !hasPresenceRecords">Dados insuficientes para avaliar faltas consecutivas nesta seleção.</span>
+                <span *ngIf="hasEvents && hasPresenceRecords">Nenhum alerta calculado para os eventos selecionados.</span>
               </div>
               <div class="alert-warn-item" *ngFor="let alert of alerts">
                 <mat-icon class="alert-warn-icon">warning_amber</mat-icon>
@@ -216,9 +233,9 @@
               </div>
             </mat-card-header>
             <mat-card-content>
-              <div class="empty-state" *ngIf="highlights.length === 0">
-                <mat-icon>hourglass_empty</mat-icon>
-                <span>Nenhum destaque no momento.</span>
+              <div class="empty-state" *ngIf="highlights.length === 0" role="status">
+                <mat-icon aria-hidden="true">groups</mat-icon>
+                <span>Adicione membros para exibir destaques.</span>
               </div>
               <div class="highlight-row" *ngFor="let h of highlights; let i = index">
                 <div class="highlight-rank" [class.rank-gold]="i === 0" [class.rank-silver]="i === 1" [class.rank-bronze]="i === 2">
