@@ -4,9 +4,19 @@
 
 ## Estado atual
 
-As seis fases do roadmap original estão concluídas. O backlog UX/UI incremental está em execução sequencial. `explain-empty-dashboard-analytics` foi arquivada após QA APROVADO COM LIMITAÇÕES, Task Verdict APROVADO, Angular 111/111 e build SUCCESS. A inspeção visual autenticada não foi realizada por ausência de fixture segura e WCAG completa não foi alegada. Seu commit local isolado ainda está pendente; não iniciar próxima task antes de confirmar o commit. `clarify-team-assignment-and-leadership-flow` e a task anterior de Users também estão concluídas. A direção visual canônica B está em [[docs/liderum-visual-direction.md]]. A iniciativa RabbitMQ está encerrada administrativamente com limitações; o Release Verdict global permanece BLOQUEADO pelo smoke de produção não executado.
+As seis fases do roadmap original estão concluídas. As tasks UX/UI incrementais elegíveis foram executadas sequencialmente; `normalize-domain-page-visual-rhythm` foi aprovada, arquivada e commitada em `24d647a50205a49487c60374ad76172303382833`, sem push. QA APROVADO COM LIMITAÇÕES e Auditor Task Verdict APROVADO. Angular 119/119, build SUCCESS com avisos preexistentes; alteração somente scoped em Attendance. Capturas não exportadas; estados populados/loading/erro/sucesso, WCAG completa, toque/zoom e RBAC por papel não comprovados. A task 6 de padrões reutilizáveis é condicional e não elegível: o inventário não encontrou repetição/custo de manutenção que justifique abstração. Não há task ativa. A direção visual canônica B está em [[docs/liderum-visual-direction.md]]. A iniciativa RabbitMQ está encerrada administrativamente com limitações; o Release Verdict global permanece BLOQUEADO pelo smoke de produção não executado.
 
 ## Última task concluída
+
+- Nome: `normalize-domain-page-visual-rhythm`
+- Resultado: inventário renderizado de Dashboard, Members, Teams, Events, Attendance e Users a 1280×800/390×844; ajuste CSS localizado em Attendance. Angular 119/119, build SUCCESS com avisos preexistentes, Impeccable layout `[]`; QA APROVADO COM LIMITAÇÕES e Auditor Task Verdict APROVADO. Estados vazios observados; screenshots não exportados e estados populated/loading/erro/sucesso, WCAG completa, toque/zoom e RBAC por papel não comprovados. Release Verdict global BLOQUEADO pelo RabbitMQ preexistente e não relacionado. Commit isolado `24d647a50205a49487c60374ad76172303382833`, sem push.
+- Data: 2026-10-23
+- Referência: [[tasks/completed/normalize-domain-page-visual-rhythm/audit.md]]
+
+- Nome: `harmonize-login-and-activation-presentation`
+- Resultado: Login/Ativação harmonizados visualmente sem alterar autenticação, token, contratos, rotas, RBAC ou tenant. QA APROVADO COM LIMITAÇÕES; Task Verdict APROVADO; Release Verdict global BLOQUEADO pelo RabbitMQ preexistente e não relacionado. Angular 119/119, build exit 0 com avisos preexistentes Sass/budget, Impeccable `[]`; inspeção renderizada em 1280×800/390×844 sem overflow e com erros/loading/foco/reduced-motion observados. WCAG completa e teste contra backend real não realizados. Commit local isolado `f2e9f68a9347efa38a2018237bfb01a3b9791bfe`; sem push.
+- Data: 2026-10-23
+- Referência: [[tasks/completed/harmonize-login-and-activation-presentation/audit.md]]
 
 - Nome: `explain-empty-dashboard-analytics`
 - Resultado: estados vazios do Dashboard distinguem ausência de eventos, eventos sem registros de presença e ausência de membros; taxa sem denominador é `—`, contagens zero permanecem. Sem mudança de cálculo, endpoint, RBAC ou tenant. Angular 111/111 e build SUCCESS; QA APROVADO COM LIMITAÇÕES, Auditor Task Verdict APROVADO. Inspeção visual renderizada/autenticada em 1280×800 e 390×844 não realizada por ausência de fixture segura; WCAG completa não reivindicada. Commit local isolado pendente; sem push. Release Verdict global continua BLOQUEADO pelo RabbitMQ preexistente.
@@ -26,7 +36,7 @@ As seis fases do roadmap original estão concluídas. O backlog UX/UI incrementa
 
 ## Task ativa
 
-- Nenhuma. `explain-empty-dashboard-analytics` está em `tasks/completed/` e aguarda commit local isolado. Após validar o commit, próxima task elegível é `harmonize-login-and-activation-presentation`; ativá-la somente então. O checkpoint operacional está em `.ai/roadmap-execution-state.json` e deve ser reconciliado com Git/filesystem ao retomar. Impeccable é de uso manual no Codex, sem hooks automáticos.
+- Nenhuma task UX/UI ativa. A task seguinte do roadmap é condicional e não foi ativada porque o inventário não encontrou benefício concreto para extrair padrões reutilizáveis.
 
 ## Validações recentes
 
@@ -50,7 +60,7 @@ As seis fases do roadmap original estão concluídas. O backlog UX/UI incrementa
 
 ## Próximo passo recomendado
 
-Inspecionar/stage seletivamente apenas os artefatos da task Dashboard, validar `git diff --cached --check` e revisar o staged diff antes do commit local autorizado. Não iniciar outra task até o commit estar confirmado. Em retomada, ler Router/checkpoint/state/handoff e reconciliar arquivos e Git. Não alterar fórmulas/endpoints nem retomar RabbitMQ; não fazer push.
+Roadmap UX/UI incremental `COMPLETED`; cinco tasks obrigatórias commitadas e task condicional 6 `NOT_APPLICABLE`. Não há task ativa ou próxima task elegível. Em uma solicitação “Continue o roadmap ativo”, reconciliar checkpoint/Git/filesystem e informar que não há pendências; não reativar tasks nem iniciar outro roadmap sem autorização explícita. Release global segue BLOQUEADO pelo achado RabbitMQ preexistente; não retomar RabbitMQ e não fazer push.
 
 ### Registro histórico — antes da autorização Docker/best-effort — 2026-10-21
 
