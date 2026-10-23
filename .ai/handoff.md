@@ -13,10 +13,13 @@ As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `v
 - Data: 2026-10-21
 - Referência: [[tasks/completed/resolve-rabbitmq-amqp-406-queue-topology/audit.md]]
 
+## Encerramento administrativo recente
+
+- `validate-production-rabbitmq-event-flow` foi encerrada administrativamente em 2026-10-23 como `CLOSED_WITH_LIMITATIONS`, sem `finish-task`, em [[tasks/closed/validate-production-rabbitmq-event-flow/closure.md]]. O último preflight encontrou 0 consumers e as filas vazias; nenhum Event foi criado e o smoke de produção não foi executado. QA, Security e Auditoria não foram executados nesta task; nenhum veredito técnico ou de release foi aprovado. Release Verdict permanece BLOQUEADO.
+
 ## Task ativa
 
-- `validate-production-rabbitmq-event-flow` está ativa e pausada antes de qualquer mutação; execução em `tasks/active/validate-production-rabbitmq-event-flow/execution.md`. A sessão `/events` do Liderum está autenticada, health retornou UP e Discord foi reconfirmado desabilitado. Após reautenticação CloudAMQP, o snapshot mostrou 0 consumers e ambas as filas vazias. Nenhum Event foi criado; retomar somente quando houver consumer ativo em operação normal. Release Verdict permanece BLOQUEADO. A task RabbitMQ anterior continua concluída com Task Verdict APROVADO. O Ciclo 3 está concluído no nível automatizado local.
-- Skills `ux-review` e Impeccable disponíveis para tarefas de interface no Ciclo 3; Impeccable é de uso manual no Codex, sem hooks automáticos.
+- Nenhuma. O Router pode ativar somente a próxima task UX/UI priorizada, uma por vez. Skills `ux-review` e Impeccable estão disponíveis para tarefas de interface; Impeccable é de uso manual no Codex, sem hooks automáticos.
 
 ## Validações recentes
 
@@ -40,7 +43,7 @@ As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `v
 
 ## Próximo passo recomendado
 
-O Ciclo 3 foi concluído e validado no nível automatizado local. A task P0 `resolve-rabbitmq-amqp-406-queue-topology` foi finalizada com Task Verdict APROVADO após QA das integrações isoladas de publisher/backend, AuditLog, retry e DLQ; Security APROVADO para Discord desabilitado e SRE/DevOps APROVADO COM LIMITAÇÕES sob best-effort. Release permanece BLOQUEADO porque ainda não houve teste único no broker real de produção. A task `validate-production-rabbitmq-event-flow` foi autorizada e pausada antes de mutação: após login CloudAMQP, snapshot mostrou 0 consumers, embora as filas estivessem vazias. Sessão Liderum, health UP e Discord desabilitado foram confirmados. Retomar somente após leitura mostrar consumer ativo e filas vazias; não alterar configuração/deploy nem enviar Discord.
+O Ciclo 3 foi concluído e validado no nível automatizado local. A task P0 `resolve-rabbitmq-amqp-406-queue-topology` foi finalizada com Task Verdict APROVADO após QA das integrações isoladas de publisher/backend, AuditLog, retry e DLQ; Security APROVADO para Discord desabilitado e SRE/DevOps APROVADO COM LIMITAÇÕES sob best-effort. Release permanece BLOQUEADO porque ainda não houve teste único no broker real de produção. A task `validate-production-rabbitmq-event-flow` foi encerrada administrativamente como `CLOSED_WITH_LIMITATIONS`: o último preflight registrou 0 consumers e filas vazias, e o smoke não foi executado. Não retomar sem decisão explícita de reabertura; não alterar configuração/deploy nem enviar Discord. O próximo trabalho pode ativar a task UX/UI prioritária do plano incremental, uma por vez.
 
 ### Registro histórico — antes da autorização Docker/best-effort — 2026-10-21
 

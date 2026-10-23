@@ -65,6 +65,10 @@ Para fullstack, Backend define/valida contrato antes de Frontend quando o contra
 
 Para “Execute a task ativa”, leia o contexto mínimo, localize exatamente uma task em `tasks/active/`, leia seu plano e classifique os arquivos/risco afetados. Selecione Agents, Skills e ordem; registre os não selecionados relevantes com motivo. Se não houver task ativa, houver mais de uma sem prioridade clara, ou faltar plano essencial, pause e solicite direção.
 
+## Encerramento administrativo
+
+O proprietário pode encerrar explicitamente uma iniciativa sem aprovação técnica usando `CLOSED_WITH_LIMITATIONS`. Isso não equivale a conclusão, aprovação de QA/Security/Auditoria ou Release; não executa `finish-task` e não apaga pendências ou evidências. Registre a decisão e o estado técnico em `tasks/closed/<id>/closure.md`, preservando os artefatos existentes. Mova a pasta da task de `active/` para `closed/` somente após registrar identificador, motivo, data, gates, limitações, evidências e condições de reabertura. `state.md` e `handoff.md` devem apontar para o encerramento e preservar blockers globais. Tasks em `closed/` não bloqueiam o Router; reabertura exige decisão explícita e retorno a `active/`. Nunca altere os vereditos existentes para viabilizar o encerramento. `finish-task` continua exclusivo para task com Auditoria APROVADA.
+
 ## Escalonamento e anti-loop
 
 Executor encontra decisão estrutural inesperada → Arquiteto; vulnerabilidade/superfície insegura → Security; problema ambiental → SRE; comportamento sem cobertura → QA; scope creep ou autorização necessária → sessão principal. Após escalar, retome o Agent anterior somente com decisão ou evidência nova; caso contrário permaneça bloqueado.
