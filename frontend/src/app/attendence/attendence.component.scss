@@ -7,6 +7,24 @@
 :host > p[role='alert'] { color: #ffb3b3; }
 :host > button { margin: 0 16px 12px; }
 
+:host > mat-card {
+  background: #31353e;
+  color: #e8e6f0;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+:host > mat-card > mat-card-title {
+  padding: 16px 20px 0;
+  color: #cfc6ff;
+}
+
+:host > mat-card > mat-card-content {
+  padding: 14px 20px 20px;
+  margin: 0;
+}
+
 .attendance-layout {
   display: flex;
   gap: 24px;
@@ -161,6 +179,7 @@
   .absence-alert-list {
     min-width: 0;
     width: 100%;
+    flex: 0 1 auto;
   }
 
   .event-select {
@@ -169,6 +188,14 @@
 }
 
 @media (max-width: 600px) {
+  :host > mat-card > mat-card-title {
+    padding: 14px 14px 0;
+  }
+
+  :host > mat-card > mat-card-content {
+    padding: 12px 14px 16px;
+  }
+
   .styled-table th,
   .styled-table td {
     padding: 8px 8px;
