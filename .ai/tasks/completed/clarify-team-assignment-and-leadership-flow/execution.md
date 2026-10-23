@@ -37,4 +37,4 @@ Conclusão: nenhum problema real de imagem/UX/A11y foi identificado; os cinco av
 - Security: não requerido pelo plano aprovado; não houve mudança de visibilidade, autorização, auth, tenant, secrets ou exposição de dados. Os guards e testes RBAC existentes foram verificados.
 - Auditor: **Task Verdict APROVADO**; `audit.md` registrado.
 - Release: não aplicável à task local de UX; Release Verdict global continua BLOQUEADO por evidência de RabbitMQ registrada em task separada. Isso não constitui evidência técnica contra esta task.
-- `finish-task` e arquivamento executados após gates aprovados. Commit local ainda pendente de staging/diff seletivos e autorização de escrita em `.git/`; nenhum push foi realizado.
+- `finish-task` e arquivamento executados após gates aprovados. Commit local isolado `8aa771a615c9904a534fe96de0baf61ad3d165a2` criado após autorização específica para staging/commit; nenhum push foi realizado. Hash registrado no handoff/state/roadmap após o commit em follow-up documental.

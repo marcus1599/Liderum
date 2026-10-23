@@ -9,7 +9,7 @@ As seis fases do roadmap original estão concluídas. O backlog UX/UI incrementa
 ## Última task concluída
 
 - Nome: `clarify-team-assignment-and-leadership-flow`
-- Resultado: atribuição membro→grupo e troca de liderança contextualizadas em `/teams`, sem mudar RBAC, tenant, contratos ou lógica de negócio. Angular 107/107 e build SUCCESS; QA APROVADO COM LIMITAÇÕES, Auditor Task Verdict APROVADO; inspeção visual autenticada/390px não realizada. Release Verdict global continua BLOQUEADO pelo achado RabbitMQ preexistente.
+- Resultado: atribuição membro→grupo e troca de liderança contextualizadas em `/teams`, sem mudar RBAC, tenant, contratos ou lógica de negócio. Angular 107/107 e build SUCCESS; QA APROVADO COM LIMITAÇÕES, Auditor Task Verdict APROVADO; inspeção visual autenticada/390px não realizada. Commit local: `8aa771a615c9904a534fe96de0baf61ad3d165a2` (sem push). Release Verdict global continua BLOQUEADO pelo achado RabbitMQ preexistente.
 - Data: 2026-10-23
 - Referência: [[tasks/completed/clarify-team-assignment-and-leadership-flow/audit.md]]
 
@@ -19,7 +19,7 @@ As seis fases do roadmap original estão concluídas. O backlog UX/UI incrementa
 
 ## Task ativa
 
-- Nenhuma após `finish-task`; commit local seletivo da task Teams ainda pendente de autorização de escrita em `.git/`. Não ativar outra task antes de confirmar esse commit. Em seguida, o Router pode ativar apenas `explain-empty-dashboard-analytics`, após confirmar os contratos e as condições reais dos agregados. Impeccable é de uso manual no Codex, sem hooks automáticos.
+- Nenhuma. Task Teams arquivada e commit local confirmado (`8aa771a615c9904a534fe96de0baf61ad3d165a2`); working tree limpo na verificação posterior. Próxima task elegível: `explain-empty-dashboard-analytics`; contratos e condições foram confirmados no código e a pasta ativa deve conter somente essa task após planejamento. Impeccable é de uso manual no Codex, sem hooks automáticos.
 
 ## Validações recentes
 
@@ -43,7 +43,7 @@ As seis fases do roadmap original estão concluídas. O backlog UX/UI incrementa
 
 ## Próximo passo recomendado
 
-Concluir o commit local isolado de `clarify-team-assignment-and-leadership-flow` após autorização para escrita em `.git/`; não fazer push. Depois, confirmar Router sem task ativa e iniciar somente `explain-empty-dashboard-analytics`, começando por validar os contratos e condições de métricas. Não retomar RabbitMQ sem decisão explícita de reabertura; não alterar configuração/deploy nem enviar Discord.
+Iniciar somente `explain-empty-dashboard-analytics`, começando por definir estados vazios honestos para as coleções/derivações existentes e validar visualmente com fixture local segura em 1280×800 e 390×844, se disponível. Não alterar fórmulas/endpoints nem retomar RabbitMQ sem decisão explícita; não fazer push.
 
 ### Registro histórico — antes da autorização Docker/best-effort — 2026-10-21
 

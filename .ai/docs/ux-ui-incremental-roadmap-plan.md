@@ -1,6 +1,6 @@
 # Plano incremental de UX/UI — pós-Ciclo 3
 
-Status: execução sequencial. Tasks concluídas: `clarify-user-management-actions-and-language`, `clarify-team-assignment-and-leadership-flow` (Task Verdict APROVADO; commit local pendente de autorização). Nenhuma task ativa até confirmar esse commit. Próxima elegível: `explain-empty-dashboard-analytics`, condicionada à confirmação dos contratos e condições reais das métricas.
+Status: execução sequencial. Tasks concluídas: `clarify-user-management-actions-and-language`, `clarify-team-assignment-and-leadership-flow` (Task Verdict APROVADO; commit local `8aa771a615c9904a534fe96de0baf61ad3d165a2`, sem push). Nenhuma task ativa; próxima elegível: `explain-empty-dashboard-analytics`. Contratos e condições dos estados foram confirmados no serviço Angular e nos endpoints tenant-scoped; iniciar apenas essa task após registrar seu PRD/plano.
 
 ## Base e limites
 
