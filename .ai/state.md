@@ -4,7 +4,7 @@
 >
 > Este arquivo representa o estado conhecido do Liderum com base no código, configuração e histórico Git disponíveis.
 >
-> **Última inspeção:** 2026-10-21
+> **Última inspeção:** 2026-10-23
 >
 > **Repositório:** `marcus1599/Liderum`
 >
@@ -17,6 +17,8 @@
 ## Estado geral
 
 ### Evolução pós-MVP (2026-09-15)
+
+- Task UX/UI `clarify-team-assignment-and-leadership-flow` concluída em 2026-10-23 com Task QA APROVADO COM LIMITAÇÕES e Task Verdict APROVADO. `/teams` explicita atribuição membro→grupo e contexto de troca de liderança; Angular 107/107 e build SUCCESS. Não houve inspeção visual autenticada/390px; nenhum contrato, regra de RBAC ou tenant foi alterado. Cinco avisos Impeccable de imagem foram classificados como falsos positivos de `[src]` Angular dinâmico. Release global permanece BLOQUEADO pelo achado RabbitMQ não relacionado. Evidências: `tasks/completed/clarify-team-assignment-and-leadership-flow/{execution,qa,audit}.md`.
 
 - Task operacional `rollout-authenticated-password-change-and-jwt-transition` concluída em 2026-10-17 com QA, Security, SRE/DevOps e Task Verdict APROVADOS. GitHub/CI da revisão `fb0b9a4` confirmados; Render já a havia autoimplantado e marcou a revisão anterior `deactivated`. PostgreSQL 18.6 registrou V4 com sucesso, Hibernate/JPA e Tomcat iniciaram, e health retornou 200/UP. Smoke de conta descartável aprovou registro, login, perfil, rota tenant-scoped, troca de senha, revogação do JWT anterior e novo login. O request direto com JWT legado assinado não foi executado por ausência de artefato de smoke pré-deploy; o usuário aceitou explicitamente a evidência equivalente de teste de integração assinado na revisão implantada, CI, deploy antigo desativado e revogação em produção. Release Verdict permanece BLOQUEADO por erro AMQP 406 da fila de notificações observado também em 2026-10-13, achado preexistente não relacionado a este rollout; requer diagnóstico separado. Evidências: `tasks/completed/rollout-authenticated-password-change-and-jwt-transition/audit.md`.
 

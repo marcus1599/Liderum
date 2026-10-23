@@ -146,6 +146,18 @@ describe('GroupsComponent', () => {
     expect(component.statusMessage).toContain('transferida');
   });
 
+  it('shows the group and current leader context during reassignment', () => {
+    const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Old', members: [] };
+    component.groups = [group];
+    component.loaded = true;
+    service.getLeaderCandidates.and.returnValue(of([{ id: 2, username: 'New' }]));
+    component.beginLeaderReassignment(group);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Líder atual: Old');
+    expect(fixture.nativeElement.textContent).toContain('Novo líder para Raid');
+    expect(fixture.nativeElement.textContent).toContain('A alteração só aparece após confirmação do servidor.');
+  });
+
   it('does not change displayed leader when reassignment fails', () => {
     const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Old', members: [] };
     component.groups = [group];
@@ -199,9 +211,12 @@ describe('GroupsComponent', () => {
     component.loaded = true;
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.textContent).toContain('Adicionar membro a um grupo');
+    expect(fixture.nativeElement.textContent).toContain('Atribuir membro');
+    expect(fixture.nativeElement.textContent).toContain('Escolha um membro disponível e o grupo de destino');
+    expect(fixture.nativeElement.textContent).toContain('1. Membro disponível');
+    expect(fixture.nativeElement.textContent).toContain('2. Grupo de destino');
     const memberLabel = Array.from(fixture.nativeElement.querySelectorAll('mat-label'))
-      .find((label: any) => label.textContent.includes('Membro disponível'));
+      .find((label: any) => label.textContent.includes('1. Membro disponível'));
     expect(memberLabel).toBeTruthy();
     const addButton = Array.from(fixture.nativeElement.querySelectorAll('button'))
       .find((button: any) => button.textContent.includes('Adicionar ao grupo')) as HTMLButtonElement;
@@ -215,11 +230,11 @@ describe('GroupsComponent', () => {
     component.loaded = true;
     profile$.next(null);
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).not.toContain('Adicionar membro a um grupo');
+    expect(fixture.nativeElement.textContent).not.toContain('Atribuir membro');
 
     profile$.next({ id: 4, username: 'soldier', email: 'soldier@example.test', guildRole: 'SOLDADO' });
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).not.toContain('Adicionar membro a um grupo');
+    expect(fixture.nativeElement.textContent).not.toContain('Atribuir membro');
     component.selectedAssignmentMemberId = 3;
     component.selectedAssignmentGroupId = 5;
     component.addSelectedMemberToGroup();

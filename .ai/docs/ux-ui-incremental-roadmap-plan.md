@@ -1,6 +1,6 @@
 # Plano incremental de UX/UI — pós-Ciclo 3
 
-Status: proposta de planejamento, sem implementação nem task funcional ativada.
+Status: execução sequencial. Tasks concluídas: `clarify-user-management-actions-and-language`, `clarify-team-assignment-and-leadership-flow` (Task Verdict APROVADO; commit local pendente de autorização). Nenhuma task ativa até confirmar esse commit. Próxima elegível: `explain-empty-dashboard-analytics`, condicionada à confirmação dos contratos e condições reais das métricas.
 
 ## Base e limites
 

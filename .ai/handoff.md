@@ -4,14 +4,14 @@
 
 ## Estado atual
 
-As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `validate-authenticated-responsive-ux`, `make-staff-user-activation-link-handoff-reliable`, `fix-attendance-event-selection-placeholder`, `stabilize-user-management-operational-states`, `make-dashboard-data-states-trustworthy` e `confirm-destructive-domain-actions-consistently` foram aprovadas. A suíte Angular final ficou em 103/103 e o build SUCCESS. A task P0 RabbitMQ foi concluída com Task Verdict APROVADO, mas o Release Verdict global continua BLOQUEADO porque esta rodada não executou um teste integrado único no broker real de produção. O proprietário aprovou notificações best-effort; disponibilidade 24/7 não é requisito nesta fase.
+As seis fases do roadmap original estão concluídas. O backlog UX/UI incremental está em execução sequencial: `clarify-user-management-actions-and-language` e `clarify-team-assignment-and-leadership-flow` foram concluídas; a próxima candidata é `explain-empty-dashboard-analytics`, sujeita a confirmar os contratos/condições reais das métricas. A task Teams passou no gate de QA (107/107 testes e build SUCCESS, com limitações de inspeção visual autenticada) e no Task Verdict. A direção visual canônica B está em [[docs/liderum-visual-direction.md]]. A iniciativa RabbitMQ está encerrada administrativamente com limitações; nenhum novo veredito técnico foi atribuído e o Release Verdict global permanece BLOQUEADO pelo smoke de produção não executado.
 
 ## Última task concluída
 
-- Nome: `clarify-user-management-actions-and-language`
-- Resultado: ações de gestão de usuários organizadas por identidade, cargo e conta; rótulos/localização e contexto acessível adicionados sem mudar RBAC, tenant ou contratos. Angular 106/106 e build SUCCESS; QA aprovado com limitação de fixtures locais, Security aprovado com evidência limitada e Task Verdict APROVADO. Release Verdict global continua BLOQUEADO pelo smoke RabbitMQ de produção ausente.
+- Nome: `clarify-team-assignment-and-leadership-flow`
+- Resultado: atribuição membro→grupo e troca de liderança contextualizadas em `/teams`, sem mudar RBAC, tenant, contratos ou lógica de negócio. Angular 107/107 e build SUCCESS; QA APROVADO COM LIMITAÇÕES, Auditor Task Verdict APROVADO; inspeção visual autenticada/390px não realizada. Release Verdict global continua BLOQUEADO pelo achado RabbitMQ preexistente.
 - Data: 2026-10-23
-- Referência: [[tasks/completed/clarify-user-management-actions-and-language/audit.md]]
+- Referência: [[tasks/completed/clarify-team-assignment-and-leadership-flow/audit.md]]
 
 ## Encerramento administrativo recente
 
@@ -19,7 +19,7 @@ As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `v
 
 ## Task ativa
 
-- Nenhuma. O Router pode ativar somente a próxima task UX/UI priorizada, uma por vez. Skills `ux-review` e Impeccable estão disponíveis para tarefas de interface; Impeccable é de uso manual no Codex, sem hooks automáticos.
+- Nenhuma após `finish-task`; commit local seletivo da task Teams ainda pendente de autorização de escrita em `.git/`. Não ativar outra task antes de confirmar esse commit. Em seguida, o Router pode ativar apenas `explain-empty-dashboard-analytics`, após confirmar os contratos e as condições reais dos agregados. Impeccable é de uso manual no Codex, sem hooks automáticos.
 
 ## Validações recentes
 
@@ -43,7 +43,7 @@ As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `v
 
 ## Próximo passo recomendado
 
-O Ciclo 3 foi concluído e validado no nível automatizado local. A task P0 `resolve-rabbitmq-amqp-406-queue-topology` foi finalizada com Task Verdict APROVADO após QA das integrações isoladas de publisher/backend, AuditLog, retry e DLQ; Security APROVADO para Discord desabilitado e SRE/DevOps APROVADO COM LIMITAÇÕES sob best-effort. Release permanece BLOQUEADO porque ainda não houve teste único no broker real de produção. A task `validate-production-rabbitmq-event-flow` foi encerrada administrativamente como `CLOSED_WITH_LIMITATIONS`: o último preflight registrou 0 consumers e filas vazias, e o smoke não foi executado. Não retomar sem decisão explícita de reabertura; não alterar configuração/deploy nem enviar Discord. O próximo trabalho pode ativar a task UX/UI prioritária do plano incremental, uma por vez.
+Concluir o commit local isolado de `clarify-team-assignment-and-leadership-flow` após autorização para escrita em `.git/`; não fazer push. Depois, confirmar Router sem task ativa e iniciar somente `explain-empty-dashboard-analytics`, começando por validar os contratos e condições de métricas. Não retomar RabbitMQ sem decisão explícita de reabertura; não alterar configuração/deploy nem enviar Discord.
 
 ### Registro histórico — antes da autorização Docker/best-effort — 2026-10-21
 

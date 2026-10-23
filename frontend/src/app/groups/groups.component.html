@@ -61,10 +61,11 @@
           </button>
         </div>
         <section *ngIf="canManageDomain()" class="team-assignment" aria-labelledby="team-assignment-title">
-          <h4 id="team-assignment-title">Adicionar membro a um grupo</h4>
+          <h4 id="team-assignment-title">Atribuir membro</h4>
+          <p class="team-assignment-help" id="team-assignment-help">Escolha um membro disponível e o grupo de destino. A lista será atualizada após a confirmação do servidor.</p>
           <div class="team-assignment-controls">
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Membro disponível</mat-label>
+              <mat-label>1. Membro disponível</mat-label>
               <mat-select [(value)]="selectedAssignmentMemberId" [disabled]="!loaded || loading || saving || stale">
                 <mat-option *ngFor="let member of availableMembers" [value]="member.id">
                   {{ member.nickname }} · {{ member.classe }}
@@ -73,14 +74,14 @@
               <mat-hint *ngIf="loaded && availableMembers.length === 0">Não há membros disponíveis.</mat-hint>
             </mat-form-field>
             <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Grupo de destino</mat-label>
+              <mat-label>2. Grupo de destino</mat-label>
               <mat-select [(value)]="selectedAssignmentGroupId" [disabled]="!loaded || loading || saving || stale">
                 <mat-option *ngFor="let group of groups" [value]="group.id">{{ group.name }}</mat-option>
               </mat-select>
               <mat-hint *ngIf="loaded && groups.length === 0">Cadastre um grupo antes de atribuir membros.</mat-hint>
             </mat-form-field>
             <button mat-raised-button color="primary" type="button" (click)="addSelectedMemberToGroup()"
-              [disabled]="!canAssignSelectedMember()">
+              [disabled]="!canAssignSelectedMember()" aria-describedby="team-assignment-help">
               Adicionar ao grupo
             </button>
           </div>
@@ -118,16 +119,18 @@
               </span>
             </div>
             <p class="team-leader">Líder: {{ group.leaderName || 'Sem líder definido' }}</p>
-            <section *ngIf="canReassignLeader()" class="leader-reassignment" aria-label="Transferir liderança da equipe">
+            <section *ngIf="canReassignLeader()" class="leader-reassignment" [attr.aria-label]="'Transferir liderança de ' + group.name">
               <button mat-button type="button" (click)="beginLeaderReassignment(group)"
                 [disabled]="saving || loading || !loaded || leaderCandidatesLoading">
-                Trocar líder
+                Transferir liderança
               </button>
               <div *ngIf="reassigningTeam?.id === group.id" class="leader-form">
+                <p class="leader-current">Líder atual: <strong>{{ group.leaderName || 'Sem líder definido' }}</strong></p>
+                <p class="leader-form-help" [id]="'leader-form-help-' + group.id">Selecione uma pessoa ativa para assumir a liderança de {{ group.name }}. A alteração só aparece após confirmação do servidor.</p>
                 <p *ngIf="leaderCandidatesLoading" role="status">Carregando usuários ativos...</p>
                 <ng-container *ngIf="!leaderCandidatesLoading">
                   <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Novo líder de {{ group.name }}</mat-label>
+                    <mat-label>Novo líder para {{ group.name }}</mat-label>
                     <mat-select [(ngModel)]="selectedLeaderId" [ngModelOptions]="{standalone: true}">
                       <mat-option *ngFor="let candidate of leaderCandidates" [value]="candidate.id">{{ candidate.username }}</mat-option>
                     </mat-select>
@@ -135,7 +138,7 @@
                   <p *ngIf="leaderCandidatesLoaded && leaderCandidates.length === 0">Nenhum outro usuário ativo disponível para assumir a liderança.</p>
                   <div class="form-actions">
                     <button mat-raised-button color="primary" type="button" (click)="confirmLeaderReassignment()"
-                      [disabled]="saving || selectedLeaderId == null || selectedLeaderId === group.leaderId">
+                      [disabled]="saving || selectedLeaderId == null || selectedLeaderId === group.leaderId" [attr.aria-describedby]="'leader-form-help-' + group.id">
                       {{ saving ? 'Transferindo…' : 'Confirmar transferência' }}
                     </button>
                     <button mat-button type="button" (click)="cancelLeaderReassignment()" [disabled]="saving">Cancelar</button>
