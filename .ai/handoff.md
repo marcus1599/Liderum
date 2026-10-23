@@ -4,18 +4,18 @@
 
 ## Estado atual
 
-As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `validate-authenticated-responsive-ux`, `make-staff-activation-link-handoff-reliable`, `fix-attendance-event-selection-placeholder`, `stabilize-user-management-operational-states`, `make-dashboard-data-states-trustworthy` e `confirm-destructive-domain-actions-consistently` foram aprovadas. A suíte Angular final ficou em 103/103 e o build SUCCESS. Release global permanece BLOQUEADO pelo erro RabbitMQ AMQP 406 preexistente, cuja investigação foi adiada pelo usuário.
+As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `validate-authenticated-responsive-ux`, `make-staff-user-activation-link-handoff-reliable`, `fix-attendance-event-selection-placeholder`, `stabilize-user-management-operational-states`, `make-dashboard-data-states-trustworthy` e `confirm-destructive-domain-actions-consistently` foram aprovadas. A suíte Angular final ficou em 103/103 e o build SUCCESS. A task P0 RabbitMQ foi concluída com Task Verdict APROVADO, mas o Release Verdict global continua BLOQUEADO porque esta rodada não executou um teste integrado único no broker real de produção. O proprietário aprovou notificações best-effort; disponibilidade 24/7 não é requisito nesta fase.
 
 ## Última task concluída
 
-- Nome: `validate-cycle-3-operational-flows`
-- Resultado: QA, Security e Auditor aprovaram o gate final do Ciclo 3. As cinco tasks funcionais sequenciais passaram suas suítes e build; Angular final 103/103 e build SUCCESS. Task Verdict APROVADO; Release Verdict BLOQUEADO pelo RabbitMQ AMQP 406 preexistente e adiado.
+- Nome: `resolve-rabbitmq-amqp-406-queue-topology`
+- Resultado: topologia operacional corrigida; QA, Security, SRE/DevOps e Auditor aprovaram a task. Backend `clean verify` 93/93, notification-service 4/4 e 3 integrações RabbitMQ isoladas passaram. Task Verdict APROVADO. Release Verdict continua BLOQUEADO por ausência de validação de um fluxo único no broker real de produção; integração local separada não equivale a smoke em produção.
 - Data: 2026-10-21
-- Referência: [[tasks/completed/validate-authenticated-responsive-ux/audit.md]]
+- Referência: [[tasks/completed/resolve-rabbitmq-amqp-406-queue-topology/audit.md]]
 
 ## Task ativa
 
-- Nenhuma task ativa. O Ciclo 3 está concluído no nível automatizado local; a próxima iniciativa deve ser planejada fora deste ciclo.
+- `validate-production-rabbitmq-event-flow` está ativa e pausada antes de qualquer mutação; execução em `tasks/active/validate-production-rabbitmq-event-flow/execution.md`. A sessão `/events` do Liderum está autenticada, health retornou UP e Discord foi reconfirmado desabilitado. Após reautenticação CloudAMQP, o snapshot mostrou 0 consumers e ambas as filas vazias. Nenhum Event foi criado; retomar somente quando houver consumer ativo em operação normal. Release Verdict permanece BLOQUEADO. A task RabbitMQ anterior continua concluída com Task Verdict APROVADO. O Ciclo 3 está concluído no nível automatizado local.
 - Skills `ux-review` e Impeccable disponíveis para tarefas de interface no Ciclo 3; Impeccable é de uso manual no Codex, sem hooks automáticos.
 
 ## Validações recentes
@@ -31,7 +31,7 @@ As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `v
 
 ## Bloqueadores e pendências
 
-- Logs RabbitMQ exibem AMQP 406 por divergência de argumentos da fila `notification.guild-event-created`, observado antes e depois do rollout JWT; achado preexistente não relacionado com possível impacto na entrega de notificações. Release Verdict permanece BLOQUEADO até diagnóstico/validação em task separada. Rollback para código anterior a `uid`/`cv` pode reabilitar aceitação de JWT revogado e exige nova revisão Security.
+- O AMQP 406 foi causado pela fila persistida sem argumentos, divergente do DLX exigido pelo código. A topologia foi recriada e nenhum novo 406 foi observado. QA, Security e SRE/DevOps passaram para a task concluída; Release Verdict continua BLOQUEADO porque não foi exercitado um único fluxo EventService→consumer no broker de produção. A confirmação do proprietário é Discord desabilitado e webhook configurada; habilitar Discord exige nova revisão de destino global. Deduplicação permanece em memória e a entrega best-effort não é garantida. Rollback para código anterior a `uid`/`cv` pode reabilitar aceitação de JWT revogado e exige nova revisão Security.
 - Task de feedback HTTP sem bloqueador de gate. Encaminhamentos não bloqueantes: avaliar respostas de erro backend que podem incluir detalhes internos; RBAC visual das áreas de domínio; inspeção visual autenticada em desktop/handset não realizada nesta task.
 - Rollout V3: sem bloqueador conhecido após QA, Security, SRE/DevOps e Auditor aprovados. Limitação não bloqueante: status HTTP direto dos requests autenticados não foi capturado nos request logs Render; a conclusão baseia-se no fluxo de login/guard e na tela tenant-scoped funcional.
 - Dívida técnica não bloqueante: Flyway 9.22.3 declara suporte testado até PostgreSQL 15; os cenários executados em PostgreSQL 18.6 passaram. Avaliar upgrade do Flyway em task separada.
@@ -40,7 +40,15 @@ As seis fases do roadmap original estão concluídas. O Ciclo 3 foi validado: `v
 
 ## Próximo passo recomendado
 
-O Ciclo 3 foi concluído e validado no nível automatizado local. Não há task ativa. O erro RabbitMQ AMQP 406 continua bloqueando Release, separado e adiado pelo usuário; qualquer próxima iniciativa deve ser planejada como novo ciclo/task.
+O Ciclo 3 foi concluído e validado no nível automatizado local. A task P0 `resolve-rabbitmq-amqp-406-queue-topology` foi finalizada com Task Verdict APROVADO após QA das integrações isoladas de publisher/backend, AuditLog, retry e DLQ; Security APROVADO para Discord desabilitado e SRE/DevOps APROVADO COM LIMITAÇÕES sob best-effort. Release permanece BLOQUEADO porque ainda não houve teste único no broker real de produção. A task `validate-production-rabbitmq-event-flow` foi autorizada e pausada antes de mutação: após login CloudAMQP, snapshot mostrou 0 consumers, embora as filas estivessem vazias. Sessão Liderum, health UP e Discord desabilitado foram confirmados. Retomar somente após leitura mostrar consumer ativo e filas vazias; não alterar configuração/deploy nem enviar Discord.
+
+### Registro histórico — antes da autorização Docker/best-effort — 2026-10-21
+
+Os gates foram avaliados, mas não aprovados: backend `clean verify` 92/92 e Notification Service 4/4 passam; integração `*IT` não executada porque Docker Engine está inacessível e o POM não a executa no `verify`. Log confirma AuditLog e descarte da publicação repetida sintética. Snapshot mais recente CloudAMQP: 0 consumers/0 conexões, filas sem ready/unacked. Discord/webhook efetivos não confirmados; não compartilhar valores secretos. QA REPROVADO por evidência incompleta, Security BLOQUEADO, SRE ESCALONAR, Auditor Task Verdict BLOQUEADO; Release permanece BLOQUEADO e a task continua ativa. Próximo passo: executar teste isolado completo quando Docker estiver acessível, verificar no Render somente status enabled/configured dos canais sem expor valores e decidir se o consumer free best-effort atende ao produto. Smoke de produção via EventService exige procedimento e autorização explícita.
+
+### Docker/integração e best-effort RabbitMQ — atualização 2026-10-21
+
+O Docker Engine funcionou fora do sandbox com aprovação (v29.5.3, Docker Desktop 4.77.0). `RabbitMqNotificationIntegrationIT`: 1/1, BUILD SUCCESS, exit 0, contra RabbitMQ 3.13 local descartável; container removido, porta livre. O teste cobre publicação direta no exchange→fila/listener→dispatcher mockado, não o publisher real do backend, AuditLog, retry/DLQ ou idempotência após restart. Reavaliação posterior: SRE/DevOps APROVADO COM LIMITAÇÕES; proprietário confirmou Discord desabilitado/webhook configurada e Security APROVADO para configuração atual; QA REPROVADO e Auditor Task Verdict/Release permanecem BLOQUEADOS. Próximo passo: fechar lacunas de testes; habilitar Discord exige nova revisão Security.
 
 ## Contexto relevante
 
