@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { EventService, Event } from '../services/event.service';
 import { FormsModule } from '@angular/forms';
@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs';
   styleUrls: ['./events.component.scss']
 })
 export class EventsComponent implements OnInit, OnDestroy {
+  @ViewChild('eventFormHeading') private eventFormHeading?: ElementRef<HTMLElement>;
   events: Event[] = [];
   newEvent: Partial<Event> = { name: '', date: '', description: '' };
   isEditing: boolean = false;
@@ -100,10 +101,13 @@ export class EventsComponent implements OnInit, OnDestroy {
     this.newEvent = { ...event };
     this.isEditing = true;
     this.editingEventId = event.id;
+    this.eventFormHeading?.nativeElement.focus();
   }
 
   deleteEvent(id: number) {
-    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded || !confirm('Tem certeza que deseja excluir este evento?')) return;
+    if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
+    const eventName = this.events.find(event => event.id === id)?.name ?? 'selecionado';
+    if (!confirm(`Tem certeza que deseja excluir o evento "${eventName}"?`)) return;
     this.saving = true;
     this.errorMessage = '';
     this.statusMessage = '';

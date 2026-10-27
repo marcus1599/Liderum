@@ -33,9 +33,8 @@ describe('EventsComponent HTTP feedback', () => {
     profile$.next({ id: 2, username: 'captain', email: 'captain@example.test', guildRole: 'CAPITÃO' });
     fixture.detectChanges();
     expect(fixture.nativeElement.textContent).toContain('Raid');
-    expect(fixture.nativeElement.textContent).not.toContain('Novo Evento');
-    expect(fixture.nativeElement.querySelector('[aria-label="Editar evento"]')).toBeNull();
-    expect(fixture.nativeElement.querySelector('[aria-label="Excluir evento"]')).toBeNull();
+    expect(fixture.nativeElement.textContent).not.toContain('Novo evento');
+    expect(fixture.nativeElement.querySelector('.event-actions')).toBeNull();
     component.saveEvent();
     component.editEvent(component.events[0]);
     component.deleteEvent(3);
@@ -52,6 +51,30 @@ describe('EventsComponent HTTP feedback', () => {
       profile$.next({ id: 1, username: 'admin', email: 'admin@example.test', guildRole });
       expect(component.canManageDomain()).toBeTrue();
     }
+  });
+
+  it('identifies the selected event and moves focus to the edit form', () => {
+    const event: Event = { id: 3, name: 'Raid', date: '2026-10-15T20:00:00' };
+    component.events = [event];
+    fixture.detectChanges();
+
+    component.editEvent(event);
+    fixture.detectChanges();
+
+    expect(document.activeElement).toBe(fixture.nativeElement.querySelector('.form-heading'));
+    expect(fixture.nativeElement.querySelector('.editing-context').textContent).toContain('Raid');
+    expect(fixture.nativeElement.querySelector('[aria-label="Editar evento Raid"]')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('.event-description')).toBeNull();
+  });
+
+  it('names the target before confirming deletion', () => {
+    component.events = [{ id: 3, name: 'Raid', date: '2026-10-15T20:00:00' }];
+    spyOn(window, 'confirm').and.returnValue(false);
+
+    component.deleteEvent(3);
+
+    expect(window.confirm).toHaveBeenCalledWith('Tem certeza que deseja excluir o evento "Raid"?');
+    expect(service.deleteEvent).not.toHaveBeenCalled();
   });
 
   it('does not present an API failure as an empty list and retry clears it', () => {

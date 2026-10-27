@@ -1,23 +1,24 @@
+<h1 class="page-title">Eventos</h1>
 <p *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
 <p *ngIf="statusMessage" role="status">{{ statusMessage }}</p>
 <button mat-button type="button" *ngIf="errorMessage && !loading" (click)="loadEvents()">Tentar carregar novamente</button>
 <p *ngIf="loading" role="status">Carregando eventos...</p>
 <p *ngIf="saving" role="status">Salvando alteração...</p>
 <p *ngIf="stale && events.length > 0">Lista anterior: atualize antes de realizar outra ação.</p>
-<p *ngIf="loaded && !loading && events.length === 0">Nenhum evento cadastrado.</p>
 <mat-card *ngIf="canManageDomain()">
-  <mat-card-title>{{ isEditing ? 'Editar Evento' : 'Novo Evento' }}</mat-card-title>
+  <h2 mat-card-title class="form-heading" #eventFormHeading tabindex="-1">{{ isEditing ? 'Editar evento' : 'Novo evento' }}</h2>
+  <p class="editing-context" *ngIf="isEditing">Editando: {{ newEvent.name }}</p>
   <mat-card-content>
     <form (ngSubmit)="saveEvent()" class="event-form">
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Nome</mat-label>
         <input matInput [(ngModel)]="newEvent.name" name="name" required />
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Data e Hora</mat-label>
         <input matInput [(ngModel)]="newEvent.date" name="date" type="datetime-local" required />
       </mat-form-field>
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
         <mat-label>Descrição</mat-label>
         <input matInput [(ngModel)]="newEvent.description" name="description" />
       </mat-form-field>
@@ -32,8 +33,9 @@
 </mat-card>
 
 <mat-card>
-  <mat-card-title>Lista de Eventos</mat-card-title>
+  <h2 mat-card-title>Lista de eventos</h2>
   <mat-card-content>
+    <p class="empty-message" *ngIf="loaded && !loading && events.length === 0">Nenhum evento cadastrado.</p>
     <div *ngIf="loaded && !loading && events.length > 0" class="event-list">
       <mat-card class="event-item" *ngFor="let event of events">
         <div class="event-header">
@@ -43,18 +45,18 @@
           </span>
           <span class="event-date">
             <mat-icon>calendar_month</mat-icon>
-            {{ event.date | date:'short' }}
+            {{ event.date | date:'dd/MM/yyyy HH:mm' }}
           </span>
         </div>
-        <div class="event-description">
+        <div class="event-description" *ngIf="event.description">
           <mat-icon>description</mat-icon>
           <span>{{ event.description }}</span>
         </div>
         <div class="event-actions" *ngIf="canManageDomain()">
-          <button mat-icon-button color="primary" (click)="editEvent(event)" matTooltip="Editar" aria-label="Editar evento" [disabled]="saving || stale">
+          <button mat-icon-button color="primary" (click)="editEvent(event)" [attr.aria-label]="'Editar evento ' + event.name" [disabled]="saving || stale">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="deleteEvent(event.id)" matTooltip="Excluir" aria-label="Excluir evento" [disabled]="saving || stale">
+          <button mat-icon-button color="warn" (click)="deleteEvent(event.id)" [attr.aria-label]="'Excluir evento ' + event.name" [disabled]="saving || stale">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
