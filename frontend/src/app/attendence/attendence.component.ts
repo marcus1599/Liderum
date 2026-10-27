@@ -47,6 +47,10 @@ export class AttendenceComponent implements OnInit, OnDestroy {
   private selectionRequest = 0;
   private alertRequest = 0;
 
+  get selectedEvent(): Event | null {
+    return this.events.find(event => event.id === this.selectedEventId) ?? null;
+  }
+
   constructor(
     private memberService: MemberService,
     private eventService: EventService,
