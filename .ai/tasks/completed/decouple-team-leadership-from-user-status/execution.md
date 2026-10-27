@@ -25,4 +25,4 @@ RBAC de gestão (MARECHAL, GENERAL e MAJOR), resolução server-side do Guild, c
 
 ## Limitações e próximo passo
 
-Não foi comprovado PostgreSQL nesta sessão nem realizada inspeção renderizada em browser. Não há teste específico para selecionar Member associado a User em status `PENDING`; o caso `DISABLED` passa e a lógica não consulta status/associação de User. A sessão não fez staging, commit ou push. Uma validação/commit PostgreSQL pode ocorrer posteriormente sem reabrir esta task; não iniciar nova task automaticamente.
+Não foi comprovado PostgreSQL nesta sessão nem realizada inspeção renderizada em browser. Não há teste específico para selecionar Member associado a User em status `PENDING`; o caso `DISABLED` passa e a lógica não consulta status/associação de User. Commits locais isolados, sem push: implementação/testes `3c22f61` e governança/encerramento `02d09a0`. Não iniciar nova task automaticamente.
