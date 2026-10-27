@@ -6,7 +6,14 @@
 
 As seis fases do roadmap original estão concluídas. As tasks UX/UI incrementais elegíveis foram executadas sequencialmente; `normalize-domain-page-visual-rhythm` foi aprovada, arquivada e commitada em `24d647a50205a49487c60374ad76172303382833`, sem push. QA APROVADO COM LIMITAÇÕES e Auditor Task Verdict APROVADO. Angular 119/119, build SUCCESS com avisos preexistentes; alteração somente scoped em Attendance. Capturas não exportadas; estados populados/loading/erro/sucesso, WCAG completa, toque/zoom e RBAC por papel não comprovados. A task 6 de padrões reutilizáveis é condicional e não elegível: o inventário não encontrou repetição/custo de manutenção que justifique abstração. Não há task ativa. A direção visual canônica B está em [[docs/liderum-visual-direction.md]]. A iniciativa RabbitMQ está encerrada administrativamente com limitações; o Release Verdict global permanece BLOQUEADO pelo smoke de produção não executado.
 
+Atualização após autorização do proprietário: a task fora do roadmap `decouple-team-leadership-from-user-status` está concluída e arquivada. Liderança é uma marcação tática temporária para GvG e pode ser atribuída a qualquer Member atualmente associado ao mesmo Team, sem dependência de User, status de conta ou GuildRole; mudanças de associação limpam a marca antiga. Backend `clean verify` 95/95; Angular 122/122 antes do ajuste final de acessibilidade, focused 26/26 depois e build final SUCCESS. QA APROVADO COM LIMITAÇÕES, Security APROVADO, Auditor Task Verdict APROVADO COM LIMITAÇÕES. Migração PostgreSQL e inspeção visual renderizada não foram executadas. Os arquivos de produto e governança estão no working tree e não foram commitados nesta sessão. Roadmap UX/UI continua COMPLETED; não há task ativa ou próxima task elegível. Release global continua BLOQUEADO pelo achado RabbitMQ independente.
+
 ## Última task concluída
+
+- Nome: `decouple-team-leadership-from-user-status`
+- Resultado: liderança de Team vinculada a Member atual do próprio grupo como marca tática temporária de GvG; criação sem líder, elegibilidade sem relação com status/conta/role, limpeza atômica em move/remove/delete, preservação de RBAC/tenant e migração V5 com histórico legado inerte. Backend `clean verify` 95/95; Angular completa 122/122 antes do ajuste final e testes focados 26/26 depois; build final SUCCESS. QA APROVADO COM LIMITAÇÕES, Security APROVADO, Task Verdict APROVADO COM LIMITAÇÕES. PostgreSQL e inspeção visual não comprovados. Sem commit/push. Release Verdict global continua BLOQUEADO pelo RabbitMQ preexistente.
+- Data: 2026-10-23
+- Referência: [[tasks/completed/decouple-team-leadership-from-user-status/audit.md]]
 
 - Nome: `normalize-domain-page-visual-rhythm`
 - Resultado: inventário renderizado de Dashboard, Members, Teams, Events, Attendance e Users a 1280×800/390×844; ajuste CSS localizado em Attendance. Angular 119/119, build SUCCESS com avisos preexistentes, Impeccable layout `[]`; QA APROVADO COM LIMITAÇÕES e Auditor Task Verdict APROVADO. Estados vazios observados; screenshots não exportados e estados populated/loading/erro/sucesso, WCAG completa, toque/zoom e RBAC por papel não comprovados. Release Verdict global BLOQUEADO pelo RabbitMQ preexistente e não relacionado. Commit isolado `24d647a50205a49487c60374ad76172303382833`, sem push.
@@ -36,7 +43,7 @@ As seis fases do roadmap original estão concluídas. As tasks UX/UI incrementai
 
 ## Task ativa
 
-- Nenhuma task UX/UI ativa. A task seguinte do roadmap é condicional e não foi ativada porque o inventário não encontrou benefício concreto para extrair padrões reutilizáveis.
+- Nenhuma task ativa. Roadmap UX/UI incremental `COMPLETED`; a etapa condicional de padrões reutilizáveis continua `NOT_APPLICABLE`, pois o inventário não encontrou benefício concreto para extração. Esta correção de regra de negócio foi autorizada fora do roadmap; não iniciar outra task ou roadmap automaticamente.
 
 ## Validações recentes
 
@@ -60,7 +67,7 @@ As seis fases do roadmap original estão concluídas. As tasks UX/UI incrementai
 
 ## Próximo passo recomendado
 
-Roadmap UX/UI incremental `COMPLETED`; cinco tasks obrigatórias commitadas e task condicional 6 `NOT_APPLICABLE`. Não há task ativa ou próxima task elegível. Em uma solicitação “Continue o roadmap ativo”, reconciliar checkpoint/Git/filesystem e informar que não há pendências; não reativar tasks nem iniciar outro roadmap sem autorização explícita. Release global segue BLOQUEADO pelo achado RabbitMQ preexistente; não retomar RabbitMQ e não fazer push.
+Roadmap UX/UI incremental `COMPLETED`; cinco tasks obrigatórias commitadas e task condicional 6 `NOT_APPLICABLE`. A correção separada de liderança tática foi aprovada e arquivada, mas não commitada. Não há task ativa ou próxima task elegível. Em uma solicitação “Continue o roadmap ativo”, reconciliar checkpoint/Git/filesystem e informar que não há pendências; não reativar tasks nem iniciar outro roadmap sem autorização explícita. Release global segue BLOQUEADO pelo achado RabbitMQ preexistente; não retomar RabbitMQ e não fazer push.
 
 ### Registro histórico — antes da autorização Docker/best-effort — 2026-10-21
 
