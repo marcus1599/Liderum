@@ -15,18 +15,18 @@ describe('GroupService leader operations', () => {
 
   afterEach(() => http.verify());
 
-  it('loads reduced leader candidates from the team endpoint', () => {
-    service.getLeaderCandidates().subscribe(candidates => expect(candidates).toEqual([{ id: 5, username: 'Active' }]));
-    const request = http.expectOne(request => request.url.endsWith('/teams/leader-candidates'));
+  it('loads member-only leadership candidates scoped to the selected team', () => {
+    service.getLeaderCandidates(8).subscribe(candidates => expect(candidates).toEqual([{ id: 5, nickname: 'Unlinked member' }]));
+    const request = http.expectOne(request => request.url.endsWith('/teams/8/leader-candidates'));
     expect(request.request.method).toBe('GET');
-    request.flush([{ id: 5, username: 'Active' }]);
+    request.flush([{ id: 5, nickname: 'Unlinked member' }]);
   });
 
-  it('sends only leaderId in the dedicated reassignment contract', () => {
+  it('sends only leaderMemberId in the dedicated reassignment contract', () => {
     service.reassignLeader(8, 5).subscribe();
     const request = http.expectOne(request => request.url.endsWith('/teams/8/leader'));
     expect(request.request.method).toBe('PUT');
-    expect(request.request.body).toEqual({ leaderId: 5 });
-    request.flush({ id: 8, name: 'Raid', leaderId: 5, leaderName: 'Active', members: [] });
+    expect(request.request.body).toEqual({ leaderMemberId: 5 });
+    request.flush({ id: 8, name: 'Raid', leaderMemberId: 5, leaderNickname: 'Unlinked member', members: [] });
   });
 });

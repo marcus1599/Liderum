@@ -1,18 +1,15 @@
 package com.example.Liderum.Services.Impl;
 
 import com.example.Liderum.Entities.Guild;
+import com.example.Liderum.Entities.Member;
 import com.example.Liderum.Entities.Team;
-import com.example.Liderum.Entities.User;
 import com.example.Liderum.Repository.MemberRepository;
 import com.example.Liderum.Repository.TeamRepository;
-import com.example.Liderum.Repository.UserRepository;
 import com.example.Liderum.Tenancy.TenantService;
-import com.example.Liderum.exceptions.UserStatusConflictException;
 import com.example.Liderum.dto.TeamRequestDTO;
 import com.example.Liderum.dto.TeamResponseDTO;
-import com.example.Liderum.Enums.UserStatus;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,118 +21,99 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class TeamServiceImplTest {
-
-    @Mock
-    private TeamRepository teamRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @Mock
-    private MemberRepository memberRepository;
-
-    @Mock
-    private TenantService tenantService;
-
-    @Mock
-    private EntityManager entityManager;
-
-    @InjectMocks
-    private TeamServiceImpl teamService;
+class TeamServiceImplTest {
+    @Mock TeamRepository teamRepository;
+    @Mock MemberRepository memberRepository;
+    @Mock TenantService tenantService;
+    @Mock EntityManager entityManager;
+    @InjectMocks TeamServiceImpl teamService;
 
     private Guild guild;
-    private User leader;
     private Team team;
+    private Member member;
 
     @BeforeEach
-    public void setUp() {
-        guild = Guild.builder().id(1L).name("Guilda Teste").build();
-        leader = User.builder().id(1L).username("Marcus").status(UserStatus.ACTIVE).guild(guild).build();
-        team = Team.builder().id(1L).name("Guilda Top").leader(leader).guild(guild).build();
-
+    void setUp() {
+        guild = Guild.builder().id(1L).name("Guild Test").build();
+        team = Team.builder().id(2L).name("Team A").guild(guild).build();
+        member = Member.builder().id(3L).nickname("Tactical leader").guild(guild).team(team).build();
+        team.setLeader(member);
         lenient().when(tenantService.getCurrentGuild()).thenReturn(guild);
         lenient().when(tenantService.getCurrentGuildId()).thenReturn(1L);
     }
 
     @Test
-    public void shouldCreateTeamSuccessfully() {
-        TeamRequestDTO request = new TeamRequestDTO();
-        request.setName("Guilda Top");
-        request.setLeaderId(1L);
-
-        when(userRepository.findAllByGuildIdAndGuildRoleOrderById(1L, com.example.Liderum.Enums.GuildRole.MARECHAL)).thenReturn(List.of());
-        when(userRepository.findByIdAndGuildIdForUpdate(1L, 1L)).thenReturn(Optional.of(leader));
-        when(teamRepository.save(any(Team.class))).thenReturn(team);
-
-        TeamResponseDTO response = teamService.create(request);
-
-        assertNotNull(response);
-        assertEquals("Guilda Top", response.getName());
-        assertEquals("Marcus", response.getLeaderName());
-        assertEquals(1L, response.getLeaderId());
+    void newTeamsHaveNoLeader() {
+        when(teamRepository.save(any(Team.class))).thenAnswer(call -> call.getArgument(0));
+        TeamResponseDTO response = teamService.create(new TeamRequestDTO());
+        assertNull(response.getLeaderMemberId());
+        assertNull(response.getLeaderNickname());
+        verify(teamRepository).save(argThat(saved -> saved.getLeader() == null));
     }
 
     @Test
-    public void shouldThrowWhenLeaderNotFound() {
-        TeamRequestDTO request = new TeamRequestDTO();
-        request.setName("Guilda Teste");
-        request.setLeaderId(99L);
-
-        when(userRepository.findAllByGuildIdAndGuildRoleOrderById(1L, com.example.Liderum.Enums.GuildRole.MARECHAL)).thenReturn(List.of());
-        when(userRepository.findByIdAndGuildIdForUpdate(99L, 1L)).thenReturn(Optional.empty());
-
-        assertThrows(EntityNotFoundException.class, () -> teamService.create(request));
+    void returnsOnlyMembersForRequestedTeamAsCandidates() {
+        when(teamRepository.findByIdAndGuildId(2L, 1L)).thenReturn(Optional.of(team));
+        when(memberRepository.findAllByTeamAndGuild(2L, 1L)).thenReturn(List.of(member));
+        var candidates = teamService.findLeaderCandidates(2L);
+        assertEquals(1, candidates.size());
+        assertEquals(3L, candidates.get(0).id());
+        assertEquals("Tactical leader", candidates.get(0).nickname());
     }
 
     @Test
-    public void shouldRevalidateDefaultLeaderStatusBeforeCreatingTeam() {
-        TeamRequestDTO request = new TeamRequestDTO();
-        request.setName("Guilda Top");
-        User authenticatedUser = User.builder().id(1L).username("Marcus").guild(guild).build();
-        User disabledLeader = User.builder().id(1L).username("Marcus").status(UserStatus.DISABLED).guild(guild).build();
+    void reassignsLeadershipToMemberWithoutAccountDependency() {
+        when(memberRepository.findByIdAndGuildIdForUpdate(3L, 1L)).thenReturn(Optional.of(member));
+        when(teamRepository.findByIdAndGuildIdForUpdate(2L, 1L)).thenReturn(Optional.of(team));
+        when(teamRepository.save(team)).thenReturn(team);
+        var result = teamService.reassignLeader(2L, 3L);
+        assertEquals(3L, result.getLeaderMemberId());
+        assertEquals("Tactical leader", result.getLeaderNickname());
+        verifyNoInteractions(entityManager);
+    }
 
-        when(tenantService.getCurrentUser()).thenReturn(authenticatedUser);
-        when(userRepository.findAllByGuildIdAndGuildRoleOrderById(1L, com.example.Liderum.Enums.GuildRole.MARECHAL)).thenReturn(List.of());
-        when(userRepository.findByIdAndGuildIdForUpdate(1L, 1L)).thenReturn(Optional.of(disabledLeader));
-
-        assertThrows(UserStatusConflictException.class, () -> teamService.create(request));
+    @Test
+    void rejectsLeaderMemberNotAssignedToTargetTeam() {
+        Member outsider = Member.builder().id(4L).nickname("Outsider").guild(guild).build();
+        when(memberRepository.findByIdAndGuildIdForUpdate(4L, 1L)).thenReturn(Optional.of(outsider));
+        when(teamRepository.findByIdAndGuildIdForUpdate(2L, 1L)).thenReturn(Optional.of(team));
+        assertThrows(EntityNotFoundException.class, () -> teamService.reassignLeader(2L, 4L));
         verify(teamRepository, never()).save(any(Team.class));
     }
 
     @Test
-    public void shouldReturnAllTeams() {
-        when(teamRepository.findAllByGuildId(1L)).thenReturn(List.of(team));
-
-        List<TeamResponseDTO> teams = teamService.findAll();
-
-        assertEquals(1, teams.size());
-        assertEquals("Guilda Top", teams.get(0).getName());
-        assertEquals("Marcus", teams.get(0).getLeaderName());
-        assertEquals(1L, teams.get(0).getLeaderId());
+    void movingCurrentLeaderClearsSourceTeamBeforeMembershipChanges() {
+        Team destination = Team.builder().id(5L).name("Team B").guild(guild).build();
+        when(memberRepository.findByIdAndGuildIdForUpdate(3L, 1L)).thenReturn(Optional.of(member));
+        when(teamRepository.findAllByIdsAndGuildIdForUpdate(List.of(2L, 5L), 1L)).thenReturn(List.of(team, destination));
+        teamService.addMemberToTeam(5L, 3L);
+        assertNull(team.getLeader());
+        assertEquals(destination, member.getTeam());
+        verify(teamRepository).saveAndFlush(team);
+        verify(memberRepository).saveAndFlush(member);
     }
 
     @Test
-    public void shouldFindTeamById() {
-        when(teamRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(team));
-
-        TeamResponseDTO dto = teamService.findById(1L);
-
-        assertNotNull(dto);
-        assertEquals("Guilda Top", dto.getName());
-        assertEquals("Marcus", dto.getLeaderName());
+    void removingCurrentLeaderClearsTeamMarker() {
+        when(memberRepository.findByIdAndGuildIdForUpdate(3L, 1L)).thenReturn(Optional.of(member));
+        when(teamRepository.findAllByIdsAndGuildIdForUpdate(List.of(2L), 1L)).thenReturn(List.of(team));
+        teamService.removeMemberFromTeam(2L, 3L);
+        assertNull(team.getLeader());
+        assertNull(member.getTeam());
+        verify(teamRepository).saveAndFlush(team);
     }
 
     @Test
-    public void shouldDeleteTeam() {
-        when(teamRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(team));
-        doNothing().when(teamRepository).delete(team);
-
-        teamService.delete(1L);
-
-        verify(teamRepository, times(1)).delete(team);
+    void deletingTeamFlushesLeaderClearBeforeCascadeDelete() {
+        when(memberRepository.findAllByTeamAndGuildForUpdate(2L, 1L)).thenReturn(List.of(member));
+        when(teamRepository.findByIdAndGuildIdForUpdate(2L, 1L)).thenReturn(Optional.of(team));
+        teamService.delete(2L);
+        assertNull(team.getLeader());
+        verify(teamRepository).saveAndFlush(team);
+        verify(teamRepository).delete(team);
     }
 }

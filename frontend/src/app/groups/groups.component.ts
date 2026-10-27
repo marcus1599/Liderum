@@ -69,7 +69,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
   leaderCandidates: TeamLeaderCandidate[] = [];
   leaderCandidatesLoading = false;
   leaderCandidatesLoaded = false;
-  selectedLeaderId: number | null = null;
+  leaderCandidatesError = '';
+  selectedLeaderMemberId: number | null = null;
   reassigningTeam: Group | null = null;
   selectedAssignmentMemberId: number | null = null;
   selectedAssignmentGroupId: number | null = null;
@@ -95,48 +96,62 @@ export class GroupsComponent implements OnInit, OnDestroy {
   beginLeaderReassignment(group: Group): void {
     if (!this.canManageDomain() || this.saving || this.loading || !this.loaded) return;
     this.reassigningTeam = group;
-    this.selectedLeaderId = group.leaderId ?? null;
+    this.selectedLeaderMemberId = null;
     this.leaderCandidates = [];
     this.leaderCandidatesLoading = true;
     this.leaderCandidatesLoaded = false;
-    this.errorMessage = '';
-    this.groupService.getLeaderCandidates().subscribe({
+    this.leaderCandidatesError = '';
+    this.groupService.getLeaderCandidates(group.id).subscribe({
       next: candidates => {
-        this.leaderCandidates = candidates.filter(candidate => candidate.id !== group.leaderId);
+        this.leaderCandidates = candidates.filter(candidate => candidate.id !== group.leaderMemberId);
         this.leaderCandidatesLoading = false;
         this.leaderCandidatesLoaded = true;
       },
       error: (error: HttpErrorResponse) => {
         this.leaderCandidatesLoading = false;
-        this.errorMessage = httpFeedback(error, 'consultar candidatos a líder', true);
+        this.leaderCandidatesError = httpFeedback(error, 'consultar membros do grupo', true);
       }
     });
+  }
+
+  retryLeaderCandidates(): void {
+    if (this.reassigningTeam) this.beginLeaderReassignment(this.reassigningTeam);
+  }
+
+  leaderCandidatesEmptyMessage(group: Group): string {
+    if (group.members.length === 0) return 'Adicione membros a este grupo antes de escolher uma liderança.';
+    if (group.leaderMemberId != null && group.members.length === 1) {
+      return 'Este grupo não tem outro membro para assumir a liderança.';
+    }
+    return 'Nenhum outro membro deste grupo está disponível para assumir a liderança.';
   }
 
   cancelLeaderReassignment(): void {
     if (this.saving) return;
     this.reassigningTeam = null;
-    this.selectedLeaderId = null;
+    this.selectedLeaderMemberId = null;
     this.leaderCandidates = [];
     this.leaderCandidatesLoaded = false;
+    this.leaderCandidatesError = '';
   }
 
   confirmLeaderReassignment(): void {
     const team = this.reassigningTeam;
-    const leaderId = this.selectedLeaderId;
-    if (!team || !this.canManageDomain() || leaderId == null || leaderId === team.leaderId || this.saving || this.leaderCandidatesLoading) return;
+    const leaderMemberId = this.selectedLeaderMemberId;
+    if (!team || !this.canManageDomain() || leaderMemberId == null || leaderMemberId === team.leaderMemberId ||
+        !this.leaderCandidates.some(candidate => candidate.id === leaderMemberId) || this.saving || this.leaderCandidatesLoading) return;
     this.saving = true;
     this.errorMessage = '';
     this.statusMessage = '';
-    this.groupService.reassignLeader(team.id, leaderId).subscribe({
+    this.groupService.reassignLeader(team.id, leaderMemberId).subscribe({
       next: updated => {
         this.groups = this.groups.map(group => group.id === updated.id ? {
           ...group,
-          leaderId: updated.leaderId ?? leaderId,
-          leaderName: updated.leaderName ?? this.leaderCandidates.find(candidate => candidate.id === leaderId)?.username ?? null
+          leaderMemberId: updated.leaderMemberId ?? leaderMemberId,
+          leaderNickname: updated.leaderNickname ?? this.leaderCandidates.find(candidate => candidate.id === leaderMemberId)?.nickname ?? null
         } : group);
         this.saving = false;
-        this.statusMessage = `Liderança de ${team.name} transferida.`;
+        this.statusMessage = `Liderança tática de ${team.name} atualizada.`;
         this.cancelLeaderReassignment();
       },
       error: (error: HttpErrorResponse) => {

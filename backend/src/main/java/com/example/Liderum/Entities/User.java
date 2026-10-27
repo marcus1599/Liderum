@@ -1,6 +1,5 @@
 package com.example.Liderum.Entities;
 
-import java.util.List;
 
 import com.example.Liderum.Enums.GuildRole;
 import com.example.Liderum.Enums.UserStatus;
@@ -15,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
@@ -65,9 +63,6 @@ public class User {
     @ManyToOne
     @JoinColumn(name = "guild_id", nullable = false)
     private Guild guild;
-
-    @OneToMany(mappedBy = "leader")
-    private List<Team> teamsLed;
 
     @OneToOne
     @JoinColumn(name = "member_id")

@@ -37,11 +37,11 @@ public class TeamController {
         return ResponseEntity.ok(teamService.findAll());
     }
 
-    @GetMapping("/leader-candidates")
+    @GetMapping("/{teamId}/leader-candidates")
     @PreAuthorize("hasAnyRole('MARECHAL', 'GENERAL', 'MAJOR')")
-    @Operation(summary = "Listar candidatos ativos a líder de equipe")
-    public ResponseEntity<List<TeamLeaderCandidateDTO>> findLeaderCandidates() {
-        return ResponseEntity.ok(teamService.findLeaderCandidates());
+    @Operation(summary = "Listar membros candidatos a líder da equipe")
+    public ResponseEntity<List<TeamLeaderCandidateDTO>> findLeaderCandidates(@PathVariable Long teamId) {
+        return ResponseEntity.ok(teamService.findLeaderCandidates(teamId));
     }
 
     @PutMapping("/{teamId}/leader")
@@ -50,7 +50,7 @@ public class TeamController {
     public ResponseEntity<TeamResponseDTO> reassignLeader(
             @PathVariable Long teamId,
             @Valid @RequestBody TeamLeaderUpdateRequestDTO request) {
-        return ResponseEntity.ok(teamService.reassignLeader(teamId, request.leaderId()));
+        return ResponseEntity.ok(teamService.reassignLeader(teamId, request.leaderMemberId()));
     }
 
     @GetMapping("/{id}")

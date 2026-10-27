@@ -12,8 +12,12 @@ import com.example.Liderum.dto.MemberResponseDTO;
 import com.example.Liderum.exceptions.MemberNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Comparator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -25,36 +29,46 @@ public class MemberServiceImpl implements MemberService {
     private final TenantService tenantService;
 
     @Override
+    @Transactional
     public MemberResponseDTO create(MemberRequestDTO dto) {
         Guild guild = tenantService.getCurrentGuild();
-        Team team = resolveTeam(dto.getTeamId(), guild.getId());
-
         Member member = Member.builder()
                 .nickname(dto.getNickname())
                 .phone(dto.getPhone())
                 .guildRole(dto.getGuildRole())
                 .rank(dto.getRank())
                 .classe(dto.getClasse())
-                .team(team)
                 .guild(guild)
                 .build();
 
-        return toDTO(memberRepository.save(member));
+        if (dto.getTeamId() != null) {
+            Team team = teamRepository.findByIdAndGuildIdForUpdate(dto.getTeamId(), guild.getId())
+                    .orElseThrow(() -> new RuntimeException("Team not found"));
+            member.setTeam(team);
+        }
+        return toDTO(memberRepository.saveAndFlush(member));
     }
 
     @Override
+    @Transactional
     public MemberResponseDTO update(Long id, MemberRequestDTO dto) {
         Long guildId = tenantService.getCurrentGuildId();
-        Member existing = findMemberInCurrentGuild(id, guildId);
+        Member existing = memberRepository.findByIdAndGuildIdForUpdate(id, guildId)
+                .orElseThrow(() -> new MemberNotFoundException("Member with ID " + id + " not found."));
+        Long oldTeamId = existing.getTeam() == null ? null : existing.getTeam().getId();
+        Map<Long, Team> lockedTeams = lockTeamsInOrder(guildId, oldTeamId, dto.getTeamId());
 
         existing.setNickname(dto.getNickname());
         existing.setPhone(dto.getPhone());
         existing.setClasse(dto.getClasse());
         existing.setGuildRole(dto.getGuildRole());
         existing.setRank(dto.getRank());
-        existing.setTeam(resolveTeam(dto.getTeamId(), guildId));
+        if (!java.util.Objects.equals(oldTeamId, dto.getTeamId())) {
+            clearLeaderIfAssigned(lockedTeams.get(oldTeamId), existing);
+            existing.setTeam(dto.getTeamId() == null ? null : requireTeam(lockedTeams, dto.getTeamId()));
+        }
 
-        return toDTO(memberRepository.save(existing));
+        return toDTO(memberRepository.saveAndFlush(existing));
     }
 
     @Override
@@ -70,8 +84,16 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional
     public void delete(Long id) {
-        memberRepository.delete(findMemberInCurrentGuild(id, tenantService.getCurrentGuildId()));
+        Long guildId = tenantService.getCurrentGuildId();
+        Member member = memberRepository.findByIdAndGuildIdForUpdate(id, guildId)
+                .orElseThrow(() -> new MemberNotFoundException("Member with ID " + id + " not found."));
+        Long teamId = member.getTeam() == null ? null : member.getTeam().getId();
+        Map<Long, Team> lockedTeams = lockTeamsInOrder(guildId, teamId);
+        clearLeaderIfAssigned(lockedTeams.get(teamId), member);
+        memberRepository.delete(member);
+        memberRepository.flush();
     }
 
     private Member findMemberInCurrentGuild(Long id, Long guildId) {
@@ -79,13 +101,34 @@ public class MemberServiceImpl implements MemberService {
                 .orElseThrow(() -> new MemberNotFoundException("Member with ID " + id + " not found."));
     }
 
-    private Team resolveTeam(Long teamId, Long guildId) {
-        if (teamId == null) {
-            return null;
+    private Map<Long, Team> lockTeamsInOrder(Long guildId, Long... ids) {
+        List<Long> sortedIds = java.util.Arrays.stream(ids)
+                .filter(id -> id != null)
+                .distinct()
+                .sorted(Comparator.naturalOrder())
+                .toList();
+        if (sortedIds.isEmpty()) {
+            return Map.of();
         }
+        Map<Long, Team> result = new LinkedHashMap<>();
+        teamRepository.findAllByIdsAndGuildIdForUpdate(sortedIds, guildId)
+                .forEach(team -> result.put(team.getId(), team));
+        return result;
+    }
 
-        return teamRepository.findByIdAndGuildId(teamId, guildId)
-                .orElseThrow(() -> new RuntimeException("Team not found"));
+    private Team requireTeam(Map<Long, Team> teams, Long teamId) {
+        Team team = teams.get(teamId);
+        if (team == null) {
+            throw new RuntimeException("Team not found");
+        }
+        return team;
+    }
+
+    private void clearLeaderIfAssigned(Team team, Member member) {
+        if (team != null && team.getLeader() != null && team.getLeader().getId().equals(member.getId())) {
+            team.setLeader(null);
+            teamRepository.saveAndFlush(team);
+        }
     }
 
     private MemberResponseDTO toDTO(Member member) {

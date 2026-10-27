@@ -118,28 +118,40 @@
                 </button>
               </span>
             </div>
-            <p class="team-leader">Líder: {{ group.leaderName || 'Sem líder definido' }}</p>
-            <section *ngIf="canReassignLeader()" class="leader-reassignment" [attr.aria-label]="'Transferir liderança de ' + group.name">
+            <p class="team-leader">Liderança tática: {{ group.leaderNickname || 'Não definida' }}</p>
+            <section *ngIf="canReassignLeader()" class="leader-reassignment" [attr.aria-label]="'Alterar liderança tática de ' + group.name">
               <button mat-button type="button" (click)="beginLeaderReassignment(group)"
                 [disabled]="saving || loading || !loaded || leaderCandidatesLoading">
-                Transferir liderança
+                Alterar liderança
               </button>
               <div *ngIf="reassigningTeam?.id === group.id" class="leader-form">
-                <p class="leader-current">Líder atual: <strong>{{ group.leaderName || 'Sem líder definido' }}</strong></p>
-                <p class="leader-form-help" [id]="'leader-form-help-' + group.id">Selecione uma pessoa ativa para assumir a liderança de {{ group.name }}. A alteração só aparece após confirmação do servidor.</p>
-                <p *ngIf="leaderCandidatesLoading" role="status">Carregando usuários ativos...</p>
-                <ng-container *ngIf="!leaderCandidatesLoading">
+                <p class="leader-current">Liderança atual: <strong>{{ group.leaderNickname || 'Não definida' }}</strong></p>
+                <p *ngIf="leaderCandidatesLoading" role="status" aria-live="polite">Carregando membros deste grupo...</p>
+                <div *ngIf="leaderCandidatesError" role="alert" class="leader-candidates-error">
+                  <p>{{ leaderCandidatesError }}</p>
+                  <button mat-button type="button" (click)="retryLeaderCandidates()" [disabled]="saving || leaderCandidatesLoading">
+                    Tentar carregar membros novamente
+                  </button>
+                </div>
+                <ng-container *ngIf="!leaderCandidatesLoading && !leaderCandidatesError">
                   <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Novo líder para {{ group.name }}</mat-label>
-                    <mat-select [(ngModel)]="selectedLeaderId" [ngModelOptions]="{standalone: true}">
-                      <mat-option *ngFor="let candidate of leaderCandidates" [value]="candidate.id">{{ candidate.username }}</mat-option>
+                    <mat-select [(ngModel)]="selectedLeaderMemberId" [ngModelOptions]="{standalone: true}"
+                      [disabled]="saving || leaderCandidates.length === 0">
+                      <mat-option *ngFor="let candidate of leaderCandidates" [value]="candidate.id">{{ candidate.nickname }}</mat-option>
                     </mat-select>
+                    <mat-hint class="leader-form-help" [id]="'leader-form-help-' + group.id">
+                      Escolha qualquer membro atualmente associado a este grupo. A liderança é uma marcação tática temporária para o GvG e pode mudar sempre que o grupo for reorganizado; a alteração só aparece após confirmação do servidor.
+                    </mat-hint>
                   </mat-form-field>
-                  <p *ngIf="leaderCandidatesLoaded && leaderCandidates.length === 0">Nenhum outro usuário ativo disponível para assumir a liderança.</p>
+                  <p *ngIf="leaderCandidatesLoaded && leaderCandidates.length === 0" role="status">
+                    {{ leaderCandidatesEmptyMessage(group) }}
+                  </p>
                   <div class="form-actions">
                     <button mat-raised-button color="primary" type="button" (click)="confirmLeaderReassignment()"
-                      [disabled]="saving || selectedLeaderId == null || selectedLeaderId === group.leaderId" [attr.aria-describedby]="'leader-form-help-' + group.id">
-                      {{ saving ? 'Transferindo…' : 'Confirmar transferência' }}
+                      [disabled]="saving || selectedLeaderMemberId == null || selectedLeaderMemberId === group.leaderMemberId"
+                      [attr.aria-describedby]="'leader-form-help-' + group.id">
+                      {{ saving ? 'Atualizando…' : 'Confirmar liderança' }}
                     </button>
                     <button mat-button type="button" (click)="cancelLeaderReassignment()" [disabled]="saving">Cancelar</button>
                   </div>

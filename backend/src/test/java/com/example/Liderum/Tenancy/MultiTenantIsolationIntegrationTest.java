@@ -75,8 +75,8 @@ class MultiTenantIsolationIntegrationTest {
         userA = userRepository.save(user("user-a", "user-a@example.test", guildA));
         userB = userRepository.save(user("user-b", "user-b@example.test", guildB));
 
-        teamA = teamRepository.save(Team.builder().name("Team A").guild(guildA).leader(userA).build());
-        teamB = teamRepository.save(Team.builder().name("Team B").guild(guildB).leader(userB).build());
+        teamA = teamRepository.save(Team.builder().name("Team A").guild(guildA).build());
+        teamB = teamRepository.save(Team.builder().name("Team B").guild(guildB).build());
 
         memberA = memberRepository.save(member("member-a", guildA, teamA));
         memberB = memberRepository.save(member("member-b", guildB, teamB));
@@ -139,18 +139,13 @@ class MultiTenantIsolationIntegrationTest {
     }
 
     @Test
-    void shouldRejectCrossGuildLeaderWhenCreatingTeam() {
+    void shouldCreateTeamWithoutLeaderEvenWhenLegacyLeaderInputIsProvided() {
         TeamRequestDTO request = new TeamRequestDTO();
         request.setName("Invalid cross-guild team");
-        request.setLeaderId(userB.getId());
-
-        assertThatThrownBy(() -> teamService.create(request))
-                .isInstanceOf(EntityNotFoundException.class)
-                .hasMessage("Lider nao encontrado");
-
-        assertThat(teamRepository.findAllByGuildId(guildA.getId()))
-                .extracting(Team::getName)
-                .containsExactly("Team A");
+        var created = teamService.create(request);
+        assertThat(created.getLeaderMemberId()).isNull();
+        assertThat(teamRepository.findAllByGuildId(guildA.getId())).extracting(Team::getName)
+                .containsExactly("Team A", "Invalid cross-guild team");
     }
 
     @Test

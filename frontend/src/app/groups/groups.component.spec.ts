@@ -129,49 +129,68 @@ describe('GroupsComponent', () => {
     expect(component.errorMessage).toContain('Atualize a lista');
   });
 
-  it('loads candidates and changes the displayed leader only after server confirmation', () => {
-    const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Old', members: [] };
+  it('loads same-team Members and changes the displayed leader only after server confirmation', () => {
+    const group: Group = {
+      id: 8, name: 'Raid', leaderMemberId: 1, leaderNickname: 'Old',
+      members: [{ id: 1, nickname: 'Old' } as Member, { id: 2, nickname: 'New' } as Member]
+    };
     component.groups = [group];
     component.loaded = true;
-    service.getLeaderCandidates.and.returnValue(of([{ id: 2, username: 'New' }]));
-    service.reassignLeader.and.returnValue(of({ ...group, leaderId: 2, leaderName: 'New' }));
+    service.getLeaderCandidates.and.returnValue(of([{ id: 1, nickname: 'Old' }, { id: 2, nickname: 'New' }]));
+    service.reassignLeader.and.returnValue(of({ ...group, leaderMemberId: 2, leaderNickname: 'New' }));
 
     component.beginLeaderReassignment(group);
-    expect(component.leaderCandidates).toEqual([{ id: 2, username: 'New' }]);
-    component.selectedLeaderId = 2;
+    expect(service.getLeaderCandidates).toHaveBeenCalledOnceWith(8);
+    expect(component.leaderCandidates).toEqual([{ id: 2, nickname: 'New' }]);
+    component.selectedLeaderMemberId = 2;
     component.confirmLeaderReassignment();
 
     expect(service.reassignLeader).toHaveBeenCalledWith(8, 2);
-    expect(component.groups[0].leaderName).toBe('New');
-    expect(component.statusMessage).toContain('transferida');
+    expect(component.groups[0].leaderNickname).toBe('New');
+    expect(component.statusMessage).toContain('Liderança tática');
   });
 
-  it('shows the group and current leader context during reassignment', () => {
-    const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Old', members: [] };
+  it('explains the tactical, changeable same-group leadership and provides an accessible selection', () => {
+    const group: Group = {
+      id: 8, name: 'Raid', leaderMemberId: 1, leaderNickname: 'Old',
+      members: [{ id: 1, nickname: 'Old' } as Member, { id: 2, nickname: 'New' } as Member]
+    };
     component.groups = [group];
     component.loaded = true;
-    service.getLeaderCandidates.and.returnValue(of([{ id: 2, username: 'New' }]));
+    service.getLeaderCandidates.and.returnValue(of([{ id: 2, nickname: 'New' }]));
     component.beginLeaderReassignment(group);
     fixture.detectChanges();
-    expect(fixture.nativeElement.textContent).toContain('Líder atual: Old');
+    expect(fixture.nativeElement.textContent).toContain('Liderança atual: Old');
     expect(fixture.nativeElement.textContent).toContain('Novo líder para Raid');
-    expect(fixture.nativeElement.textContent).toContain('A alteração só aparece após confirmação do servidor.');
+    expect(fixture.nativeElement.textContent).toContain('Escolha qualquer membro atualmente associado a este grupo');
+    expect(fixture.nativeElement.textContent).toContain('marcação tática temporária para o GvG');
+    const leaderField = Array.from(fixture.nativeElement.querySelectorAll('mat-form-field'))
+      .find((field: any) => field.textContent.includes('Novo líder para Raid')) as HTMLElement;
+    expect(leaderField).toBeTruthy();
+    const select = leaderField.querySelector('[role="combobox"]');
+    expect(select).toBeTruthy();
+    expect(select?.getAttribute('aria-describedby')).toContain('leader-form-help-8');
+    expect(fixture.nativeElement.querySelector('#leader-form-help-8')).toBeTruthy();
+    expect(fixture.nativeElement.textContent).not.toContain('usuário ativo');
   });
 
   it('does not change displayed leader when reassignment fails', () => {
-    const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Old', members: [] };
+    const group: Group = {
+      id: 8, name: 'Raid', leaderMemberId: 1, leaderNickname: 'Old',
+      members: [{ id: 1, nickname: 'Old' } as Member, { id: 2, nickname: 'New' } as Member]
+    };
     component.groups = [group];
     component.loaded = true;
-    component.leaderCandidates = [{ id: 2, username: 'New' }];
+    component.leaderCandidates = [{ id: 2, nickname: 'New' }];
     component.reassigningTeam = group;
-    component.selectedLeaderId = 2;
+    component.selectedLeaderMemberId = 2;
     service.reassignLeader.and.returnValue(new Subject<Group>());
 
     component.confirmLeaderReassignment();
     (service.reassignLeader.calls.mostRecent().returnValue as Subject<Group>)
       .error(new HttpErrorResponse({ status: 409 }));
 
-    expect(component.groups[0].leaderName).toBe('Old');
+    expect(component.groups[0].leaderNickname).toBe('Old');
     expect(component.saving).toBeFalse();
     expect(component.errorMessage).toContain('conflito');
   });
@@ -319,17 +338,74 @@ describe('GroupsComponent', () => {
   });
 
   it('does not present a failed candidate request as an empty list', () => {
-    const group: Group = { id: 8, name: 'Raid', leaderId: 1, leaderName: 'Current', members: [] };
+    const group: Group = { id: 8, name: 'Raid', leaderMemberId: 1, leaderNickname: 'Current', members: [] };
     component.groups = [group];
     component.loaded = true;
     service.getLeaderCandidates.and.returnValue(new Subject<TeamLeaderCandidate[]>());
     component.beginLeaderReassignment(group);
+    expect(service.getLeaderCandidates).toHaveBeenCalledOnceWith(8);
     (service.getLeaderCandidates.calls.mostRecent().returnValue as Subject<TeamLeaderCandidate[]>)
       .error(new HttpErrorResponse({ status: 500 }));
     fixture.detectChanges();
 
     expect(component.leaderCandidatesLoaded).toBeFalse();
-    expect(fixture.nativeElement.textContent).not.toContain('Nenhum outro usuário ativo disponível');
-    expect(component.errorMessage).toContain('carregar os dados');
+    expect(fixture.nativeElement.textContent).not.toContain('Nenhum outro membro deste grupo está disponível');
+    expect(fixture.nativeElement.querySelector('[role="alert"]')?.textContent).toContain('carregar os dados');
+    const retryButton = Array.from(fixture.nativeElement.querySelectorAll('button'))
+      .find((button: any) => button.textContent.includes('Tentar carregar membros novamente'));
+    expect(retryButton).toBeTruthy();
+  });
+
+  it('announces candidate loading without presenting an empty state prematurely', () => {
+    const group: Group = { id: 8, name: 'Raid', members: [{ id: 4, nickname: 'Membro' } as Member] };
+    component.groups = [group];
+    component.loaded = true;
+    service.getLeaderCandidates.and.returnValue(new Subject<TeamLeaderCandidate[]>());
+
+    component.beginLeaderReassignment(group);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('[role="status"]')?.textContent).toContain('Carregando membros deste grupo');
+    expect(fixture.nativeElement.textContent).not.toContain('Adicione membros a este grupo');
+    expect(component.leaderCandidatesLoaded).toBeFalse();
+  });
+
+  it('allows a current group Member without any linked-account data to be selected', () => {
+    const group: Group = { id: 8, name: 'Raid', members: [{ id: 42, nickname: 'Sem conta' } as Member] };
+    const candidate: TeamLeaderCandidate = { id: 42, nickname: 'Sem conta' };
+    component.groups = [group];
+    component.loaded = true;
+    service.getLeaderCandidates.and.returnValue(of([candidate]));
+    service.reassignLeader.and.returnValue(of({ ...group, leaderMemberId: 42, leaderNickname: 'Sem conta' }));
+
+    component.beginLeaderReassignment(group);
+    expect(component.leaderCandidates).toEqual([candidate]);
+    component.selectedLeaderMemberId = 42;
+    component.confirmLeaderReassignment();
+
+    expect(service.reassignLeader).toHaveBeenCalledOnceWith(8, 42);
+    expect(component.groups[0].leaderNickname).toBe('Sem conta');
+  });
+
+  it('describes no-members and no-alternative empty states without implying an account requirement', () => {
+    expect(component.leaderCandidatesEmptyMessage({ id: 1, name: 'Vazia', members: [] }))
+      .toBe('Adicione membros a este grupo antes de escolher uma liderança.');
+    expect(component.leaderCandidatesEmptyMessage({
+      id: 2, name: 'Solo', leaderMemberId: 7,
+      members: [{ id: 7, nickname: 'Único' } as Member]
+    })).toBe('Este grupo não tem outro membro para assumir a liderança.');
+  });
+
+  it('does not assign an ID that is absent from the current team candidate response', () => {
+    const group: Group = { id: 8, name: 'Raid', members: [{ id: 2, nickname: 'New' } as Member] };
+    component.groups = [group];
+    component.loaded = true;
+    component.reassigningTeam = group;
+    component.leaderCandidates = [{ id: 2, nickname: 'New' }];
+    component.selectedLeaderMemberId = 99;
+
+    component.confirmLeaderReassignment();
+
+    expect(service.reassignLeader).not.toHaveBeenCalled();
   });
 });

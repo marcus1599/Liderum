@@ -35,8 +35,8 @@ public class Team {
     private Guild guild;
 
     @ManyToOne
-    @JoinColumn(name = "leader_id")
-    private User leader;
+    @JoinColumn(name = "leader_member_id")
+    private Member leader;
     
     @OneToMany(mappedBy = "team", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members;

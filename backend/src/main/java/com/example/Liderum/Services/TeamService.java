@@ -14,7 +14,7 @@ public interface TeamService {
     void addMemberToTeam(Long teamId, Long memberId);
     void removeMemberFromTeam(Long teamId, Long memberId);
     TeamResponseDTO update(Long teamId, TeamRequestDTO request);
-    List<TeamLeaderCandidateDTO> findLeaderCandidates();
-    TeamResponseDTO reassignLeader(Long teamId, Long leaderId);
+    List<TeamLeaderCandidateDTO> findLeaderCandidates(Long teamId);
+    TeamResponseDTO reassignLeader(Long teamId, Long leaderMemberId);
 
 }

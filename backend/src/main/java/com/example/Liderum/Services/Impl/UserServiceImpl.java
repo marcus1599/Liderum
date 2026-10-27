@@ -3,7 +3,6 @@ package com.example.Liderum.Services.Impl;
 import com.example.Liderum.Entities.User;
 import com.example.Liderum.Enums.GuildRole;
 import com.example.Liderum.Repository.UserRepository;
-import com.example.Liderum.Repository.TeamRepository;
 import com.example.Liderum.Services.UserService;
 import com.example.Liderum.Services.UserActivationService;
 import com.example.Liderum.Repository.UserActivationTokenRepository;
@@ -36,7 +35,6 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserActivationService activationService;
     private final UserActivationTokenRepository activationTokenRepository;
-    private final TeamRepository teamRepository;
     private final EntityManager entityManager;
 
     @Override
@@ -153,9 +151,6 @@ public class UserServiceImpl implements UserService {
             throw new UserStatusConflictException();
         }
         if (requested == UserStatus.DISABLED) {
-            if (teamRepository.existsByGuildIdAndLeaderId(guildId, target.getId())) {
-                throw new UserStatusConflictException();
-            }
             assertLastActiveMarechalIsPreserved(target, requested, guildId);
             target.setCredentialVersion(target.getCredentialVersion() + 1);
         } else if (target.getPassword() == null || target.getPassword().isBlank()) {

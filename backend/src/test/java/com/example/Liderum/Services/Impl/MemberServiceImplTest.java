@@ -71,8 +71,12 @@ public class MemberServiceImplTest {
                 .guild(guild)
                 .build();
 
-        when(teamRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(team));
-        when(memberRepository.save(any(Member.class))).thenReturn(member);
+        when(memberRepository.saveAndFlush(any(Member.class))).thenAnswer(call -> {
+            Member saved = call.getArgument(0);
+            if (saved.getId() == null) saved.setId(1L);
+            return saved;
+        });
+        when(teamRepository.findByIdAndGuildIdForUpdate(1L, 1L)).thenReturn(Optional.of(team));
 
         MemberResponseDTO response = memberService.create(request);
 
@@ -141,11 +145,15 @@ public class MemberServiceImplTest {
                 .guild(guild)
                 .build();
 
-        when(memberRepository.findByIdAndGuildId(1L, 1L)).thenReturn(Optional.of(member));
+        member.setTeam(team);
+        team.setLeader(member);
+        when(memberRepository.findByIdAndGuildIdForUpdate(1L, 1L)).thenReturn(Optional.of(member));
+        when(teamRepository.findAllByIdsAndGuildIdForUpdate(List.of(1L), 1L)).thenReturn(List.of(team));
         doNothing().when(memberRepository).delete(member);
 
         memberService.delete(id);
 
+        assertNull(team.getLeader());
         verify(memberRepository, times(1)).delete(member);
     }
 }

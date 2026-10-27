@@ -31,8 +31,8 @@ class FlywaySchemaIntegrationTest {
     @Test
     void appliesAllMigrationsAndCreatesExpectedSchemaWithoutHibernateUpdate() {
         assertThat(jdbcTemplate.queryForObject(
-                "SELECT COUNT(*) FROM \"flyway_schema_history\" WHERE \"version\" IN ('1', '2', '3', '4') AND \"success\" = TRUE", Integer.class))
-                .isEqualTo(4);
+                "SELECT COUNT(*) FROM \"flyway_schema_history\" WHERE \"version\" IN ('1', '2', '3', '4', '5') AND \"success\" = TRUE", Integer.class))
+                .isEqualTo(5);
 
         for (String table : new String[] {"GUILDS", "USERS", "MEMBER", "TEAM", "EVENT", "ATTENDANCE", "USER_ACTIVATION_TOKENS"}) {
             Integer count = jdbcTemplate.queryForObject(
@@ -59,6 +59,42 @@ class FlywaySchemaIntegrationTest {
         assertThat(jdbcTemplate.queryForObject(
                 "SELECT COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA='PUBLIC' AND TABLE_NAME='USERS' AND COLUMN_NAME='CREDENTIAL_VERSION'", String.class))
                 .contains("0");
+    }
+
+    @Test
+    void v5BackfillsOnlySameTeamGuildMembersAndPreservesLegacyLeaderIds() {
+        String url = "jdbc:h2:mem:leadership_backfill;DB_CLOSE_DELAY=-1";
+        org.flywaydb.core.Flyway.configure().dataSource(url, "sa", "")
+                .locations("classpath:db/migration").target("4").load().migrate();
+        JdbcTemplate migrationJdbc = new JdbcTemplate(new org.springframework.jdbc.datasource.DriverManagerDataSource(url, "sa", ""));
+        migrationJdbc.update("INSERT INTO guilds (id, name) VALUES (1, 'Backfill guild')");
+        migrationJdbc.update("INSERT INTO guilds (id, name) VALUES (2, 'Other guild')");
+        migrationJdbc.update("INSERT INTO team (id, name, guild_id, leader_id) VALUES (10, 'Match', 1, NULL), (11, 'Mismatch', 1, NULL), (12, 'Unlinked', 1, NULL), (13, 'Wrong guild', 1, NULL)");
+        migrationJdbc.update("INSERT INTO member (id, nickname, guild_id, team_id) VALUES (20, 'Match member', 1, 10), (21, 'Different team', 1, 10), (22, 'Different guild', 2, 13), (23, 'Other team', 1, 11)");
+        migrationJdbc.update("INSERT INTO users (id, username, email, password, guild_role, guild_id, member_id, status, credential_version) VALUES "
+                + "(30, 'match-user', 'match@example.test', 'hash', 'MARECHAL', 1, 20, 'DISABLED', 0), "
+                + "(31, 'mismatch-user', 'mismatch@example.test', 'hash', 'MARECHAL', 1, 21, 'ACTIVE', 0), "
+                + "(32, 'unlinked-user', 'unlinked@example.test', 'hash', 'MARECHAL', 1, NULL, 'ACTIVE', 0), "
+                + "(33, 'wrong-guild-user', 'wrong-guild@example.test', 'hash', 'MARECHAL', 1, 22, 'ACTIVE', 0)");
+        migrationJdbc.update("UPDATE team SET leader_id = 30 WHERE id = 10");
+        migrationJdbc.update("UPDATE team SET leader_id = 31 WHERE id = 11");
+        migrationJdbc.update("UPDATE team SET leader_id = 32 WHERE id = 12");
+        migrationJdbc.update("UPDATE team SET leader_id = 33 WHERE id = 13");
+
+        org.flywaydb.core.Flyway.configure().dataSource(url, "sa", "")
+                .locations("classpath:db/migration").load().migrate();
+
+        assertThat(migrationJdbc.queryForObject("SELECT leader_member_id FROM team WHERE id = 10", Long.class)).isEqualTo(20L);
+        assertThat(migrationJdbc.queryForObject("SELECT leader_member_id FROM team WHERE id = 11", Long.class)).isNull();
+        assertThat(migrationJdbc.queryForObject("SELECT leader_member_id FROM team WHERE id = 12", Long.class)).isNull();
+        assertThat(migrationJdbc.queryForObject("SELECT leader_member_id FROM team WHERE id = 13", Long.class)).isNull();
+        assertThat(migrationJdbc.queryForObject("SELECT leader_id FROM team WHERE id = 10", Long.class)).isEqualTo(30L);
+        assertThat(migrationJdbc.queryForObject("SELECT leader_id FROM team WHERE id = 11", Long.class)).isEqualTo(31L);
+        assertThat(migrationJdbc.queryForObject("SELECT leader_id FROM team WHERE id = 12", Long.class)).isEqualTo(32L);
+        assertThat(migrationJdbc.queryForObject("SELECT leader_id FROM team WHERE id = 13", Long.class)).isEqualTo(33L);
+        assertThat(migrationJdbc.queryForObject("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA='PUBLIC' AND CONSTRAINT_NAME='FK_TEAM_LEADER'", Integer.class)).isZero();
+        assertThatThrownBy(() -> migrationJdbc.update("UPDATE team SET leader_member_id = 23 WHERE id = 10"))
+                .isInstanceOf(DataIntegrityViolationException.class);
     }
 
     @Test
