@@ -155,16 +155,85 @@ describe('AttendenceComponent', () => {
     expect(component.attendances[0].status).toBe('PRESENTE');
   });
 
-  it('keeps saved attendance confirmed if the refresh fails', () => {
+  it('confirms a successful attendance from the response without reloading the list', () => {
     component.selectedEventId = 1;
     component.attendancesLoaded = true;
     attendance.createAttendance.and.returnValue(of({ id: 4, memberId: 1, eventId: 1, status: 'PRESENTE' }));
-    attendance.getAttendances.and.returnValue(new Subject<Attendance[]>());
     component.markAttendance(1, 'PRESENTE');
-    expect(component.statusMessage).toBe('Presença salva.');
-    (attendance.getAttendances.calls.mostRecent().returnValue as Subject<Attendance[]>).error(
-      new HttpErrorResponse({ status: 500 }));
-    expect(component.errorMessage).toContain('Presença salva, mas a lista não foi atualizada');
-    expect(component.loaded).toBeFalse();
+    expect(component.getStatus(1)).toBe('PRESENTE');
+    expect(component.attendances[0].id).toBe(4);
+    expect(component.memberFeedback.get(1)?.kind).toBe('success');
+    expect(component.pendingMemberIds.size).toBe(0);
+    expect(attendance.getAttendances).toHaveBeenCalledTimes(1);
+  });
+
+  it('saves different members independently and keeps the confirmed value until each response', () => {
+    const other = { id: 2, nickname: 'Mage' } as Member;
+    component.members = [hero, other];
+    component.selectedEventId = 1;
+    component.attendancesLoaded = true;
+    const first = new Subject<Attendance>();
+    const second = new Subject<Attendance>();
+    attendance.createAttendance.and.returnValues(first, second);
+    fixture.detectChanges();
+
+    component.markAttendance(1, 'PRESENTE');
+    component.markAttendance(1, 'FALTOU');
+    component.markAttendance(2, 'FALTOU');
+    fixture.detectChanges();
+    expect(attendance.createAttendance).toHaveBeenCalledTimes(2);
+    expect(component.pendingMemberIds.has(1)).toBeTrue();
+    expect(component.pendingMemberIds.has(2)).toBeTrue();
+    expect(component.getStatus(1)).toBeNull();
+    expect(component.getStatus(2)).toBeNull();
+    expect(fixture.nativeElement.querySelector('input[aria-label="Marcar Hero presente"]').disabled).toBeTrue();
+    expect(fixture.nativeElement.querySelector('input[aria-label="Marcar Mage presente"]').disabled).toBeTrue();
+
+    second.next({ id: 12, memberId: 2, eventId: 1, status: 'FALTOU' });
+    second.complete();
+    expect(component.getStatus(2)).toBe('FALTOU');
+    expect(component.getStatus(1)).toBeNull();
+    expect(component.pendingMemberIds.has(1)).toBeTrue();
+    expect(component.pendingMemberIds.has(2)).toBeFalse();
+
+    first.next({ id: 11, memberId: 1, eventId: 1, status: 'PRESENTE' });
+    first.complete();
+    expect(component.getStatus(1)).toBe('PRESENTE');
+    expect(component.getStatus(2)).toBe('FALTOU');
+    expect(component.pendingMemberIds.size).toBe(0);
+  });
+
+  it('keeps another saved member intact when one write fails and allows retry', () => {
+    component.members = [hero, { id: 2, nickname: 'Mage' } as Member];
+    component.selectedEventId = 1;
+    component.attendancesLoaded = true;
+    const failing = new Subject<Attendance>();
+    attendance.createAttendance.and.returnValues(failing, of({ id: 12, memberId: 2, eventId: 1, status: 'PRESENTE' }),
+      of({ id: 11, memberId: 1, eventId: 1, status: 'FALTOU' }));
+
+    component.markAttendance(1, 'FALTOU');
+    component.markAttendance(2, 'PRESENTE');
+    failing.error(new HttpErrorResponse({ status: 500 }));
+    expect(component.getStatus(2)).toBe('PRESENTE');
+    expect(component.getStatus(1)).toBeNull();
+    expect(component.memberFeedback.get(1)?.kind).toBe('error');
+    expect(component.pendingMemberIds.size).toBe(0);
+
+    component.markAttendance(1, 'FALTOU');
+    expect(component.getStatus(1)).toBe('FALTOU');
+    expect(attendance.createAttendance).toHaveBeenCalledTimes(3);
+  });
+
+  it('prevents event changes while a member is saving', () => {
+    component.selectedEventId = 1;
+    const pending = new Subject<Attendance>();
+    attendance.createAttendance.and.returnValue(pending);
+    component.markAttendance(1, 'PRESENTE');
+    component.onEventChange(2);
+    expect(component.selectedEventId).toBe(1);
+    expect(attendance.getAttendances).toHaveBeenCalledTimes(1);
+    pending.error(new HttpErrorResponse({ status: 500 }));
+    component.onEventChange(2);
+    expect(component.selectedEventId).toBe(2);
   });
 });

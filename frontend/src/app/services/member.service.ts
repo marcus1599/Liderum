@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Member } from '../members/member.model';
 import { environment } from '../../environments/environment';
@@ -13,8 +13,8 @@ export class MemberService {
 
   constructor(private http: HttpClient) { }
 
-  getMembers(): Observable<Member[]> {
-    return this.http.get<Member[]>(this.apiUrl);
+  getMembers(context?: HttpContext): Observable<Member[]> {
+    return this.http.get<Member[]>(this.apiUrl, { context });
   }
 
   deleteMember(id: number): Observable<void> {

@@ -161,6 +161,19 @@
   mat-icon { flex: 0 0 auto; }
 }
 
+.member-save-state {
+  display: block;
+  color: #d7d0ff;
+  font-size: 0.8rem;
+  font-weight: 400;
+  line-height: 1.35;
+  margin-top: 4px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+.member-save-error { color: #ffb3b3; }
+
 .status-radio {
   display: flex;
   align-items: center;

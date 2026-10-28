@@ -1,9 +1,6 @@
 <p *ngIf="errorMessage" role="alert">{{ errorMessage }}</p>
-<p *ngIf="statusMessage" role="status">{{ statusMessage }}</p>
 <button mat-button class="retry-button" type="button" *ngIf="errorMessage && !loading" (click)="loadData()">Tentar carregar novamente</button>
 <p *ngIf="loading" role="status">Carregando dados de presença...</p>
-<p *ngIf="saving" role="status">Salvando presença...</p>
-<p *ngIf="stale">Dados anteriores podem estar desatualizados. Atualize antes de registrar outra presença.</p>
 <p *ngIf="loaded && !loading && events.length === 0">Nenhum evento cadastrado para registrar presença.</p>
 <p *ngIf="loaded && !loading && members.length === 0">Nenhum membro cadastrado para registrar presença.</p>
 <p *ngIf="loaded && !loading && events.length > 0 && members.length > 0 && selectedEventId === null">Selecione um evento para registrar presença.</p>
@@ -39,11 +36,17 @@
               </thead>
               <tbody>
                 <tr *ngFor="let member of members" [class.absence-alert]="membersWithAlert.includes(member.id)">
-                  <th scope="row"><span class="member-nick"><mat-icon aria-hidden="true">person</mat-icon> {{ member.nickname }}</span></th>
+                  <th scope="row">
+                    <span class="member-nick"><mat-icon aria-hidden="true">person</mat-icon> {{ member.nickname }}</span>
+                    <span *ngIf="pendingMemberIds.has(member.id)" class="member-save-state" role="status">Salvando...</span>
+                    <span *ngIf="!pendingMemberIds.has(member.id) && memberFeedback.get(member.id) as feedback"
+                      class="member-save-state" [class.member-save-error]="feedback.kind === 'error'"
+                      [attr.role]="feedback.kind === 'error' ? 'alert' : 'status'">{{ feedback.message }}</span>
+                  </th>
                   <td *ngIf="canManageDomain()">
                     <label class="status-radio present">
                       <input #presentChoice type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
-                        (change)="markAttendance(member.id, 'PRESENTE', presentChoice)" [disabled]="saving" [attr.aria-label]="'Marcar ' + member.nickname + ' presente'"
+                        (change)="markAttendance(member.id, 'PRESENTE', presentChoice)" [disabled]="pendingMemberIds.has(member.id)" [attr.aria-label]="'Marcar ' + member.nickname + ' presente'"
                         [checked]="isChecked(member.id, 'PRESENTE')"
                         [value]="'PRESENTE'"
                       />
@@ -53,7 +56,7 @@
                   <td *ngIf="canManageDomain()">
                     <label class="status-radio absent">
                       <input #absentChoice type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
-                        (change)="markAttendance(member.id, 'FALTOU', absentChoice)" [disabled]="saving" [attr.aria-label]="'Marcar ' + member.nickname + ' faltou'"
+                        (change)="markAttendance(member.id, 'FALTOU', absentChoice)" [disabled]="pendingMemberIds.has(member.id)" [attr.aria-label]="'Marcar ' + member.nickname + ' faltou'"
                         [checked]="isChecked(member.id, 'FALTOU')"
                         [value]="'FALTOU'"
                       />
@@ -63,7 +66,7 @@
                   <td *ngIf="canManageDomain()">
                     <label class="status-radio justified">
                       <input #justifiedChoice type="radio" [attr.name]="'attend-' + member.id + '-' + selectedEventId"
-                        (change)="markAttendance(member.id, 'JUSTIFICOU', justifiedChoice)" [disabled]="saving" [attr.aria-label]="'Marcar ' + member.nickname + ' justificou'"
+                        (change)="markAttendance(member.id, 'JUSTIFICOU', justifiedChoice)" [disabled]="pendingMemberIds.has(member.id)" [attr.aria-label]="'Marcar ' + member.nickname + ' justificou'"
                         [checked]="isChecked(member.id, 'JUSTIFICOU')"
                         [value]="'JUSTIFICOU'"
                       />

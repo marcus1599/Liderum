@@ -13,11 +13,17 @@ import { AttendanceService, AttendanceStatus, Attendance } from '../services/att
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { HttpErrorResponse } from '@angular/common/http';
-import { forkJoin, Observable } from 'rxjs';
+import { finalize, forkJoin, Observable } from 'rxjs';
 import { httpFeedback } from '../shared/http-feedback';
 import { AuthService } from '../auth/auth.service';
 import { UserProfile } from '../auth/auth.models';
 import { Subscription } from 'rxjs';
+import { localLoadingContext } from '../core/interceptors/loading-context';
+
+interface MemberFeedback {
+  kind: 'success' | 'error';
+  message: string;
+}
 
 @Component({
   selector: 'app-attendence',
@@ -35,12 +41,11 @@ export class AttendenceComponent implements OnInit, OnDestroy {
   attendancesLoaded = false;
   loading = false;
   loaded = false;
-  saving = false;
+  pendingMemberIds = new Set<number>();
+  memberFeedback = new Map<number, MemberFeedback>();
   alertLoading = false;
   alertLoaded = false;
   alertError = '';
-  statusMessage = '';
-  stale = false;
   errorMessage = '';
   profile: UserProfile | null = null;
   private profileSubscription?: Subscription;
@@ -50,6 +55,8 @@ export class AttendenceComponent implements OnInit, OnDestroy {
   get selectedEvent(): Event | null {
     return this.events.find(event => event.id === this.selectedEventId) ?? null;
   }
+
+  get saving(): boolean { return this.pendingMemberIds.size > 0; }
 
   constructor(
     private memberService: MemberService,
@@ -70,17 +77,16 @@ export class AttendenceComponent implements OnInit, OnDestroy {
     return ['MARECHAL', 'GENERAL', 'MAJOR'].includes(this.profile?.guildRole ?? '');
   }
 
-  loadData(afterMutation = false) {
-    if (this.loading) return;
-    if (!afterMutation) this.statusMessage = '';
+  loadData() {
+    if (this.loading || this.saving) return;
     const request = ++this.selectionRequest;
     this.loading = true;
     this.loaded = false;
     this.errorMessage = '';
     forkJoin({
-      members: this.memberService.getMembers(),
-      events: this.eventService.getEvents(),
-      attendances: this.attendanceService.getAttendances()
+      members: this.memberService.getMembers(localLoadingContext()),
+      events: this.eventService.getEvents(localLoadingContext()),
+      attendances: this.attendanceService.getAttendances(localLoadingContext())
     }).subscribe({
       next: data => {
         if (request !== this.selectionRequest) return;
@@ -89,14 +95,13 @@ export class AttendenceComponent implements OnInit, OnDestroy {
         this.attendances = this.normalize(data.attendances);
         this.loading = false;
         this.loaded = true;
-        this.stale = false;
         this.attendancesLoaded = this.selectedEventId !== null;
+        this.memberFeedback.clear();
         this.loadAlerts();
       },
       error: (error: HttpErrorResponse) => {
         if (request !== this.selectionRequest) return;
         this.loading = false;
-        this.stale = afterMutation;
         this.attendancesLoaded = false;
         if (error.status === 401 || error.status === 403) {
           this.members = [];
@@ -104,9 +109,7 @@ export class AttendenceComponent implements OnInit, OnDestroy {
           this.attendances = [];
           this.membersWithAlert = [];
         }
-        this.errorMessage = afterMutation
-          ? `Presença salva, mas os dados não foram atualizados. ${httpFeedback(error, 'consultar presenças', true)}`
-          : httpFeedback(error, 'consultar presenças', true);
+        this.errorMessage = httpFeedback(error, 'consultar presenças', true);
       }
     });
   }
@@ -120,7 +123,7 @@ export class AttendenceComponent implements OnInit, OnDestroy {
     this.alertLoading = true;
     this.alertLoaded = false;
     this.alertError = '';
-    this.attendanceService.getMembersWithConsecutiveAbsences(this.settingsService.maxAbsences).subscribe({
+    this.attendanceService.getMembersWithConsecutiveAbsences(this.settingsService.maxAbsences, localLoadingContext()).subscribe({
       next: ids => {
         if (request !== this.alertRequest) return;
         this.membersWithAlert = ids;
@@ -143,59 +146,34 @@ export class AttendenceComponent implements OnInit, OnDestroy {
   }
 
   markAttendance(memberId: number, status: AttendanceStatus, input?: HTMLInputElement) {
-    if (!this.canManageDomain() || this.selectedEventId == null || !this.loaded || this.loading || this.saving) return;
+    if (!this.canManageDomain() || this.selectedEventId == null || !this.loaded || this.loading || this.pendingMemberIds.has(memberId)) return;
     const eventId = this.selectedEventId;
     const existing = this.attendances.find(a => a.memberId === memberId && a.eventId === eventId);
     const confirmed = existing?.status ?? null;
     const attendance: Omit<Attendance, 'id'> = { memberId, eventId, status };
-    this.saving = true;
-    this.errorMessage = '';
-    this.statusMessage = '';
+    this.pendingMemberIds.add(memberId);
+    this.memberFeedback.delete(memberId);
+    this.restoreConfirmedSelection(input, confirmed);
     const operation: Observable<Attendance> = existing?.id
-      ? this.attendanceService.updateAttendance(existing.id, attendance)
-      : this.attendanceService.createAttendance(attendance);
-    operation.subscribe({
+      ? this.attendanceService.updateAttendance(existing.id, attendance, localLoadingContext())
+      : this.attendanceService.createAttendance(attendance, localLoadingContext());
+    operation.pipe(finalize(() => this.pendingMemberIds.delete(memberId))).subscribe({
       next: saved => {
-        this.saving = false;
-        this.statusMessage = 'Presença salva.';
         this.attendances = [...this.attendances.filter(a => !(a.memberId === memberId && a.eventId === eventId)),
           ...this.normalize([saved])];
-        this.refreshAttendancesAfterSave();
+        this.memberFeedback.set(memberId, { kind: 'success', message: 'Presença salva.' });
         this.loadAlerts();
       },
       error: (error: HttpErrorResponse) => {
-        this.saving = false;
-        this.errorMessage = httpFeedback(error, 'salvar presença');
-        if (input) {
-          input.closest('tr')?.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach(radio => {
-            radio.checked = radio.value === confirmed;
-          });
-        }
+        this.memberFeedback.set(memberId, { kind: 'error', message: httpFeedback(error, 'salvar presença') });
+        this.restoreConfirmedSelection(input, confirmed);
       }
     });
   }
 
-  private refreshAttendancesAfterSave(): void {
-    const request = ++this.selectionRequest;
-    this.loading = true;
-    this.attendanceService.getAttendances().subscribe({
-      next: att => {
-        if (request !== this.selectionRequest) return;
-        this.attendances = this.normalize(att);
-        this.loading = false;
-        this.loaded = true;
-        this.stale = false;
-        this.attendancesLoaded = this.selectedEventId !== null;
-      },
-      error: (error: HttpErrorResponse) => {
-        if (request !== this.selectionRequest) return;
-        this.loading = false;
-        this.loaded = false;
-        this.stale = true;
-        this.attendancesLoaded = false;
-        if (error.status === 401 || error.status === 403) this.attendances = [];
-        this.errorMessage = `Presença salva, mas a lista não foi atualizada. ${httpFeedback(error, 'consultar presenças', true)}`;
-      }
+  private restoreConfirmedSelection(input: HTMLInputElement | undefined, confirmed: AttendanceStatus | null): void {
+    input?.closest('tr')?.querySelectorAll<HTMLInputElement>('input[type="radio"]').forEach(radio => {
+      radio.checked = radio.value === confirmed;
     });
   }
 
@@ -220,7 +198,7 @@ export class AttendenceComponent implements OnInit, OnDestroy {
 
   onEventChange(eventId: any) {
     if (this.saving || !this.loaded) return;
-    this.statusMessage = '';
+    this.memberFeedback.clear();
     const parsedEventId = Number(eventId);
     this.selectedEventId = eventId === null || eventId === undefined || eventId === '' || eventId === 'null'
       ? null
@@ -230,7 +208,7 @@ export class AttendenceComponent implements OnInit, OnDestroy {
     if (this.selectedEventId === null) return;
     const request = ++this.selectionRequest;
     this.loading = true;
-    this.attendanceService.getAttendances().subscribe({ next: att => {
+    this.attendanceService.getAttendances(localLoadingContext()).subscribe({ next: att => {
       if (request !== this.selectionRequest) return;
       this.attendances = this.normalize(att);
       this.attendancesLoaded = true;

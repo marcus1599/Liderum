@@ -6,9 +6,16 @@
 
 As seis fases do roadmap original estão concluídas. As tasks UX/UI incrementais elegíveis foram executadas sequencialmente; `normalize-domain-page-visual-rhythm` foi aprovada, arquivada e commitada em `24d647a50205a49487c60374ad76172303382833`, sem push. QA APROVADO COM LIMITAÇÕES e Auditor Task Verdict APROVADO. Angular 119/119, build SUCCESS com avisos preexistentes; alteração somente scoped em Attendance. Capturas não exportadas; estados populados/loading/erro/sucesso, WCAG completa, toque/zoom e RBAC por papel não comprovados. A task 6 de padrões reutilizáveis é condicional e não elegível: o inventário não encontrou repetição/custo de manutenção que justifique abstração. Não há task ativa. A direção visual canônica B está em [[docs/liderum-visual-direction.md]]. A iniciativa RabbitMQ está encerrada administrativamente com limitações; o Release Verdict global permanece BLOQUEADO pelo smoke de produção não executado.
 
+Atualização 2026-10-27: a task separada `contextualize-attendance-loading-feedback` recebeu QA APROVADO COM LIMITAÇÕES e Auditor Task Verdict APROVADO COM LIMITAÇÕES. Attendance agora usa loading e feedback por membro sem overlay global nas chamadas da rota, mantendo o padrão global em Dashboard/autenticação. Angular 132/132, build exit 0, Impeccable detector `[]` e inspeção renderizada local com 100 membros sintéticos em desktop/mobile. Sem backend real, WCAG/leitor de tela completos ou toque/zoom; warning CSS Attendance +102 bytes. Task arquivada; commit local ainda a confirmar. O roadmap UX/UI anterior continua COMPLETED, sem próxima task elegível. Release global RabbitMQ segue BLOQUEADO.
+
 Atualização após autorização do proprietário: a task fora do roadmap `decouple-team-leadership-from-user-status` está concluída e arquivada. Liderança é uma marcação tática temporária para GvG e pode ser atribuída a qualquer Member atualmente associado ao mesmo Team, sem dependência de User, status de conta ou GuildRole; mudanças de associação limpam a marca antiga. Backend `clean verify` 95/95; Angular 122/122 antes do ajuste final de acessibilidade, focused 26/26 depois e build final SUCCESS. QA APROVADO COM LIMITAÇÕES, Security APROVADO, Auditor Task Verdict APROVADO COM LIMITAÇÕES. Migração PostgreSQL e inspeção visual renderizada não foram executadas. Commits locais isolados: implementação/testes `3c22f61`, documentação/governança `02d09a0`, sem push. Roadmap UX/UI continua COMPLETED; não há task ativa ou próxima task elegível. Release global continua BLOQUEADO pelo achado RabbitMQ independente.
 
 ## Última task concluída
+
+- Nome: `contextualize-attendance-loading-feedback`
+- Resultado: feedback contextual por membro em `/attendance`, com padrão global preservado em outras rotas. Testes Angular 132/132, build exit 0, Impeccable detector `[]`; inspeção renderizada com fixture sintética de 100 membros em 1280×800 e 390×844. QA APROVADO COM LIMITAÇÕES, Auditor Task Verdict APROVADO COM LIMITAÇÕES. Sem backend real, WCAG/leitor de tela completos e toque/zoom; warning CSS +102 bytes. Commit local pendente de confirmação; sem push. Release Verdict global BLOQUEADO pelo RabbitMQ independente.
+- Data: 2026-10-27
+- Referência: [[tasks/completed/contextualize-attendance-loading-feedback/audit.md]]
 
 - Nome: `decouple-team-leadership-from-user-status`
 - Resultado: liderança de Team vinculada a Member atual do próprio grupo como marca tática temporária de GvG; criação sem líder, elegibilidade sem relação com status/conta/role, limpeza atômica em move/remove/delete, preservação de RBAC/tenant e migração V5 com histórico legado inerte. Backend `clean verify` 95/95; Angular completa 122/122 antes do ajuste final e testes focados 26/26 depois; build final SUCCESS. QA APROVADO COM LIMITAÇÕES, Security APROVADO, Task Verdict APROVADO COM LIMITAÇÕES. PostgreSQL e inspeção visual não comprovados. Commits locais isolados: implementação/testes `3c22f61`, documentação/governança `02d09a0`; sem push. Release Verdict global continua BLOQUEADO pelo RabbitMQ preexistente.
@@ -43,7 +50,7 @@ Atualização após autorização do proprietário: a task fora do roadmap `deco
 
 ## Task ativa
 
-- Nenhuma task ativa. Roadmap UX/UI incremental `COMPLETED`; a etapa condicional de padrões reutilizáveis continua `NOT_APPLICABLE`, pois o inventário não encontrou benefício concreto para extração. Esta correção de regra de negócio foi autorizada fora do roadmap; não iniciar outra task ou roadmap automaticamente.
+- Nenhuma task ativa após o arquivamento de `contextualize-attendance-loading-feedback`. Roadmap UX/UI incremental `COMPLETED`; a etapa condicional de padrões reutilizáveis continua `NOT_APPLICABLE`, pois o inventário não encontrou benefício concreto para extração. Esta task de feedback foi autorizada separadamente; não iniciar outra task ou roadmap automaticamente.
 
 ## Validações recentes
 
@@ -67,7 +74,7 @@ Atualização após autorização do proprietário: a task fora do roadmap `deco
 
 ## Próximo passo recomendado
 
-Roadmap UX/UI incremental `COMPLETED`; cinco tasks obrigatórias commitadas e task condicional 6 `NOT_APPLICABLE`. A correção separada de liderança tática foi aprovada e arquivada, mas não commitada. Não há task ativa ou próxima task elegível. Em uma solicitação “Continue o roadmap ativo”, reconciliar checkpoint/Git/filesystem e informar que não há pendências; não reativar tasks nem iniciar outro roadmap sem autorização explícita. Release global segue BLOQUEADO pelo achado RabbitMQ preexistente; não retomar RabbitMQ e não fazer push.
+Confirmar o commit local isolado de `contextualize-attendance-loading-feedback` e registrar seu hash. Roadmap UX/UI incremental `COMPLETED`; cinco tasks obrigatórias commitadas e task condicional 6 `NOT_APPLICABLE`. Não há próxima task elegível. Em uma solicitação “Continue o roadmap ativo”, reconciliar checkpoint/Git/filesystem e informar que não há pendências; não reativar tasks nem iniciar outro roadmap sem autorização explícita. Release global segue BLOQUEADO pelo achado RabbitMQ preexistente; não retomar RabbitMQ e não fazer push.
 
 ### Registro histórico — antes da autorização Docker/best-effort — 2026-10-21
 

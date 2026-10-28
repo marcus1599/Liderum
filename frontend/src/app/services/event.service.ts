@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpContext } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -18,8 +18,8 @@ export class EventService {
 
   constructor(private http: HttpClient) {}
 
-  getEvents(): Observable<Event[]> {
-    return this.http.get<Event[]>(this.apiUrl);
+  getEvents(context?: HttpContext): Observable<Event[]> {
+    return this.http.get<Event[]>(this.apiUrl, { context });
   }
 
   getEvent(id: number): Observable<Event> {
